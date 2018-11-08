@@ -1,4 +1,4 @@
-function new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes, pathNewImagesFolder, pathLabels)
+function new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes, pathNewImagesFolder, pathStatsMatrix, pathLabels)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -6,7 +6,7 @@ function new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesTo
 % belongs to (identified thanks to the segmentation map).
 % This results in an image of the same resolution as the provided segm map.
 % We still need to blur the obtained image before downsample it to the
-% desired target resolution,before saving the final result.
+% desired target resolution, before saving the final result.
 
 mergedLabels = mergedLabelsMRI.vol;
 sampleRes=[mergedLabelsMRI.xsize, mergedLabelsMRI.ysize, mergedLabelsMRI.zsize];
@@ -51,11 +51,12 @@ mergedLabelsMRI.xsize = targetRes(1); mergedLabelsMRI.ysize = targetRes(2); merg
 %name of the file
 [~,~,ext] = fileparts(pathLabels);
 brain_num = pathLabels(regexp(pathLabels,'brain')+5);
+mri_type = pathStatsMatrix(regexp(pathStatsMatrix, 'ClassesStats_')+13:regexp(pathStatsMatrix, 'ClassesStats_')+14);
 if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
-    name = ['brain',brain_num,'.synthetic.',num2str(targetRes(1),'%.1f')];
+    name = ['brain',brain_num,'.synthetic.',mri_type,'.',num2str(targetRes(1),'%.1f')];
 else
     resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
-    name = ['brain',brain_num,'.synthetic.',resolution];
+    name = ['brain',brain_num,'.synthetic.',mri_type,'.',resolution];
 end
 pathNewImage = fullfile(pathNewImagesFolder, [name,ext]);
 

@@ -18,6 +18,8 @@ disp('loading image');
 imageMRI = MRIread(pathImage);
 image = imageMRI.vol;
 
+image = round(image);
+
 number_of_classes = length(ClassNames);
 
 %define stat vectors

@@ -22,15 +22,20 @@ addpath /home/benjamin/matlab/toolbox
 % is set to 0, then the images will direclty be generated from these. If
 % computeStatsMatrix = 1, the first path of this list should be the aseg
 % corresponding to the image used to compute the stats matrix.
-cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'; 
-    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg.mgz';
-    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg.mgz';
-    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
-    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg.mgz'};
-% '~/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields_rotated.mgz'};
+% cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'; 
+%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg.mgz';
+%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg.mgz';
+%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
+%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg.mgz'};
+cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfields.mgz'}; 
+%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields.mgz';
+%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg+subfields.mgz';
+%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg+subfields.mgz';
+%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg+subfields.mgz'};
+% cellPathsLabels = {'~/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields_rotated.mgz'};
 
 % merge labels between aseg and hippocampal subfields (0 or 1)
-mergeHippoLabels = 1;
+mergeHippoLabels = 0;
 % if mergeHippoLabels = 1, specify here the paths of hippocampal subfields' 
 % labels. They should be in the same order as the corresponding
 % segmentation maps specified in cellPathsLabels.
@@ -45,14 +50,15 @@ cellPathsHippoLabels = {'/home/benjamin/data/hippocampus_labels/brain1_labels.mg
 computeStatsMatrix = 1;
 % if computeStatsMatrix=0 path where resulting stats matrix will be stored,
 % if computeStatsMatrix=1 path of stats matrix to load
-pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1.mat';
+pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t2.mat';
 % if computeStatsMatrix=1, image to analyse to compute stats from. This 
 % should be the image corresponding to the first segmentation map specified
 %in cellPathsLabels. This should also be at hippocampal labels' resolution.
-pathImage = '/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
+pathImage = '~/data/brains_t2/brain1/brain1_t2.nu.0.3.mgz';
+% pathImage = '~/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
 
 % folder that will contain created images
-pathNewImagesFolder = '/home/benjamin/data/synthetic_brains_t1/';
+pathNewImagesFolder = '/home/benjamin/data/synthetic_brains_t2/';
 
 % define regions that we want to study and group them by class
 ClassNames = ["Cerebral GM","Cerebral WM","Cerebellum GM","Cerebellum WM","Brainstem","Ventral PC","Thalamus","Caudate","Accumbens","Putamen","Pallidum","Ventricules","Choroid Plexus","Hippocampus","Amygdala","CSF","Optic Chiasm","Vessel"];
@@ -71,19 +77,19 @@ targetRes=[0.6 0.6 0.6]; %final resolution of the created image
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if ~exist(pathNewImagesFolder, 'dir'), mkdir(pathNewImagesFolder), end
 for i=1:length(cellPathsLabels)
     
-    disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+    disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
     disp(['PROCESSING IMAGE ', num2str(i)])
-    disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
 
     if mergeHippoLabels == 1
         % merge general and hippocampal labels for generative image
-        disp(['%%%%%%%%%%%%%',' merge general and hippocampal labels ', '%%%%%%%%%%%%%']);
+        disp(['%%%%%%%%%%%%%%',' merge general and hippocampal labels ', '%%%%%%%%%%%%%%%']);
         mergedLabelsMRI = mergeSubfieldLabels(cellPathsLabels{i}, cellPathsHippoLabels{i});
         mergedLabels = mergedLabelsMRI.vol;
     else
-        disp(['%%%%%%%%%%%%%',' loading merged labels ', '%%%%%%%%%%%%%']);
+        disp(['%%%%%%%%%%%%%%%%%%%%%',' loading merged labels ', '%%%%%%%%%%%%%%%%%%%%%%%']);
         mergedLabelsMRI = MRIread(cellPathsLabels{i});
         mergedLabels = mergedLabelsMRI.vol;
     end
@@ -91,17 +97,17 @@ for i=1:length(cellPathsLabels)
     if i == 1
         if computeStatsMatrix == 1 
             % calculate intensity stats for all the specified regions
-            disp(['%%%%%%%%%%%%%',' calculate intensity stats for all the specified regions ', '%%%%%%%%%%%%%']);
+            disp(['%%%%%',' calculate intensity stats for all the specified regions ', '%%%%%']);
             classesStats = computeIntensityStats(pathImage, mergedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix );
         else
-            disp(['%%%%%%%%%%%%%',' loading stats ', '%%%%%%%%%%%%%']);
+            disp(['%%%%%%%%%%%%%%%%%%%%%%%%%%',' loading stats ', '%%%%%%%%%%%%%%%%%%%%%%%%%%']);
             load(pathStatsMatrix,'classesStats')
         end
     end
 
     % create new images
-    disp(['%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%']);
-    new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes, pathNewImagesFolder, cellPathsLabels{i});
+    disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
+    new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes, pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i});
 
 end
 
