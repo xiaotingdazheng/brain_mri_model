@@ -1,4 +1,17 @@
-function [classesStats]=computeIntensityStats(pathImage, fusedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix)
+function [classesStats]=computeIntensityStats(pathImage, mergedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix)
+
+% This function compute basic intensity statistics for different regions of
+% the brain. It takes as inputs the image to derive the stats from, its
+% corresponding segmentation map, and the list of label classes.
+% For each class, this script computes the mean intensity, the median, the
+% std deviation and the median absolute deviation. These parameters are
+% then used to model the intensity distribution of each class as Gaussians.
+% Here we use two types of parameters to build the Gaussians: either the
+% ususal mean and std deviation, or ths median and a std deviation based on
+% the MAD, which allows us to be more robust to outliers.
+% A graph is built along tses calculations to visually compare the real 
+% ditribution to the "mean" and "median" gaussian models.
+% The output is simply the matrix gathering all the computed information.
 
 %read image
 disp('loading image');
@@ -22,7 +35,7 @@ for lC=1:number_of_classes
     
     labelsBelongingToClass = labelsList(labelClasses == lC); %labels belonging to class lC
     for l=1:length(labelsBelongingToClass)
-        temp_intensities = image(fusedLabels==labelsBelongingToClass(l))'; %find values of voxels with label l
+        temp_intensities = image(mergedLabels==labelsBelongingToClass(l))'; %find values of voxels with label l
         intensities = [intensities temp_intensities]; %concatenate intensities of voxels belonging to class lC
     end
     

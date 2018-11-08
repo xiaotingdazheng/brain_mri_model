@@ -1,7 +1,15 @@
-function new_image = createNewImage(fusedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes, pathNewImagesFolder, pathLabels)
+function new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes, pathNewImagesFolder, pathLabels)
 
-fusedLabels = fusedLabelsMRI.vol;
-sampleRes=[fusedLabelsMRI.xsize, fusedLabelsMRI.ysize, fusedLabelsMRI.zsize];
+% This script generates a synthetic image from a segmentation map and basic
+% statistics of intensity distribution for all the regions in the brain.
+% For each voxel, we sample a value drawn from the model of the class it 
+% belongs to (identified thanks to the segmentation map).
+% This results in an image of the same resolution as the provided segm map.
+% We still need to blur the obtained image before downsample it to the
+% desired target resolution,before saving the final result.
+
+mergedLabels = mergedLabelsMRI.vol;
+sampleRes=[mergedLabelsMRI.xsize, mergedLabelsMRI.ysize, mergedLabelsMRI.zsize];
 
 %classesStats: matrix containing stats computed for each class
 % 1st row = mean
@@ -9,7 +17,7 @@ sampleRes=[fusedLabelsMRI.xsize, fusedLabelsMRI.ysize, fusedLabelsMRI.zsize];
 % 3rd row = standard deviation
 % 4th row = 1.4826*median absolute deviation (ie sigmaMAD)
 
-new_image = zeros(size(fusedLabels));
+new_image = zeros(size(mergedLabels));
 
 for lC=1:length(listClassesToGenerate)
     disp(['generating voxel intensities for class ', num2str(lC)]);
@@ -17,7 +25,7 @@ for lC=1:length(listClassesToGenerate)
     classLabel = listClassesToGenerate(lC);
     labelsBelongingToClass = labelsList(labelClasses == classLabel); %labels belonging to class lC
     for l=1:length(labelsBelongingToClass)
-        voxelIndices = find(fusedLabels == labelsBelongingToClass(l)); %find voxels with label l
+        voxelIndices = find(mergedLabels == labelsBelongingToClass(l)); %find voxels with label l
         if strcmp(gaussianType, 'median')
             new_image(voxelIndices) = classesStats(2,classLabel) + classesStats(4,classLabel)*sqrt(8)*randn(size(voxelIndices)); %generate new values for these voxels
         elseif strcmp(gaussianType, 'mean')
@@ -37,8 +45,8 @@ disp('dowmsampling to target resolution');
 new_image=new_image(1:round(f(1)):end,1:round(f(2)):end,1:round(f(3)):end); %subsample to obtain target resolution
 
 disp('writting created image');
-fusedLabelsMRI.vol = new_image;
-fusedLabelsMRI.xsize = targetRes(1); fusedLabelsMRI.ysize = targetRes(2); fusedLabelsMRI.zsize = targetRes(3);
+mergedLabelsMRI.vol = new_image;
+mergedLabelsMRI.xsize = targetRes(1); mergedLabelsMRI.ysize = targetRes(2); mergedLabelsMRI.zsize = targetRes(3);
 
 %name of the file
 [~,~,ext] = fileparts(pathLabels);
@@ -51,6 +59,6 @@ else
 end
 pathNewImage = fullfile(pathNewImagesFolder, [name,ext]);
 
-MRIwrite(fusedLabelsMRI, pathNewImage); %write a new mgz file.
+MRIwrite(mergedLabelsMRI, pathNewImage); %write a new mgz file.
 
 end

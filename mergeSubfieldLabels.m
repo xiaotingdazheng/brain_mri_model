@@ -1,5 +1,18 @@
 function mriLabels = mergeSubfieldLabels(pathLabels, pathHippoLabels)
 
+% This function combines the labels from general image and more precise
+% hippocampal segmentations. 
+% The difference between the two segm maps being located at around the
+% hippocampus, we first crop the image. We then replace the hippocampus
+% label in the general segmentation by the nearest labels. This results in
+% a "hippocampus-less" image that is saved in order to resample it like the
+% hippocampus segm map. When the two images are aligned we can then paste
+% the labels of hippocampus subregions.
+% For the last step we might need to perform several operations to obtain
+% more realistic segmentations. First we observe that the molecular layer 
+% is a bit too thick, so we need to shrink it. An then we need to fill the
+% cyst with CSF instead of white matter.
+
 %%%%%%%%%%%%%%%%%%% read labelled image and GT labels %%%%%%%%%%%%%%%%%%%%
 disp('loading data');
 
