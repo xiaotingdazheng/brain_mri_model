@@ -1,4 +1,4 @@
-function [classesStats]=computeIntensityStats(pathImage, fusedLabels, labelsList, labelClasses, ClassNames)
+function [classesStats]=computeIntensityStats(pathImage, fusedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix)
 
 %read image
 disp('loading image');
@@ -46,6 +46,6 @@ for lC=1:number_of_classes
 
 end
 
-save('~/matlab/ClassesStats.mat','classesStats')
+save(pathStatsMatrix, 'classesStats')
 
 end

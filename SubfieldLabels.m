@@ -12,25 +12,19 @@ addpath /home/benjamin/matlab/toolbox
 cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'; 
     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg.mgz';
     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg.mgz';
-%    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
+    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg.mgz'};
 % '~/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields_rotated.mgz'};
 
 % recompute the label fusion between aseg and hippocampal subfield (0 or 1)
 refuseHippoLabels = 1;
-% hippocampal subfields' labels
-cellPathsHippoLabels = {'/home/benjamin/data/hippocampus_labels/brain1_labels.mgz';
-    '/home/benjamin/data/hippocampus_labels/brain2_labels.mgz'; 
-    '/home/benjamin/data/hippocampus_labels/brain3_labels.mgz'; 
-%     '/home/benjamin/data/hippocampus_labels/brain4_labels.mgz'; 
-    '/home/benjamin/data/hippocampus_labels/brain5_labels.mgz'}; 
-
+% hippocampal subfields' lab
 % recompute stats matrix (set to zero only when it has been already computed)
 recomputeStatsMatrix = 1;
 % image to analyse to compute stats from (at hippocampal labels' resolution)
 pathImage = '/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
 % stats to use to generate the image
-pathStatsMatrix = '~/matlab/ClassesStats.mat';
+pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1.mat';
 
 % folder that will contain created images
 pathNewImagesFolder = '/home/benjamin/data/synthetic_brains_t1/';
@@ -73,7 +67,7 @@ for i=1:length(cellPathsLabels)
         if recomputeStatsMatrix == 1 
             % calculate intensity stats for all the specified regions
             disp(['%%%%%%%%%%%%%',' calculate intensity stats for all the specified regions ', '%%%%%%%%%%%%%']);
-            classesStats = computeIntensityStats(pathImage, fusedLabels, labelsList, labelClasses, ClassNames);
+            classesStats = computeIntensityStats(pathImage, fusedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix);
         else
             disp(['%%%%%%%%%%%%%',' loading stats ', '%%%%%%%%%%%%%']);
             load(pathStatsMatrix,'classesStats')
