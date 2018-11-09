@@ -22,12 +22,12 @@ addpath /home/benjamin/matlab/toolbox
 % is set to 0, then the images will direclty be generated from these. If
 % computeStatsMatrix = 1, the first path of this list should be the aseg
 % corresponding to the image used to compute the stats matrix.
-% cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'; 
+cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'}; 
 %     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg.mgz';
 %     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg.mgz';
 %     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
 %     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg.mgz'};
-cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfields.mgz'}; 
+% cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfields.mgz'}; 
 %     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields.mgz';
 %     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg+subfields.mgz';
 %     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg+subfields.mgz';
@@ -35,7 +35,7 @@ cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfiel
 % cellPathsLabels = {'~/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields_rotated.mgz'};
 
 % merge labels between aseg and hippocampal subfields (0 or 1)
-mergeHippoLabels = 0;
+mergeHippoLabels = 1;
 % if mergeHippoLabels = 1, specify here the paths of hippocampal subfields' 
 % labels. They should be in the same order as the corresponding
 % segmentation maps specified in cellPathsLabels.
@@ -54,13 +54,13 @@ pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t2.mat';
 % if computeStatsMatrix=1, image to analyse to compute stats from. This 
 % should be the image corresponding to the first segmentation map specified
 %in cellPathsLabels. This should also be at hippocampal labels' resolution.
-pathImage = '~/data/brains_t2/brain1/brain1_t2.nu.0.3.mgz';
 % pathImage = '~/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
+pathImage = '~/data/brains_t2/brain1/brain1_t2.0.3.mgz';
 
 % folder that will contain created images
-pathNewImagesFolder = '/home/benjamin/data/synthetic_brains_t2/';
+pathNewImagesFolder = '/home/benjamin/data/synthetic_brains_t2_not_normalised/';
 
-% define regions that we want to study and group them by class
+% define regions that w4559.71e want to study and group them by class
 ClassNames = ["Cerebral GM","Cerebral WM","Cerebellum GM","Cerebellum WM","Brainstem","Ventral PC","Thalamus","Caudate","Accumbens","Putamen","Pallidum","Ventricules","Choroid Plexus","Hippocampus","Amygdala","CSF","Optic Chiasm","Vessel"];
 ClassIndices = '  1            2                 3            4              5            6           7          8           9         10         11         12              13              14          15      16         17          18';
 labelsList = [  2,3, 4, 5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
