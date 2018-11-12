@@ -1,20 +1,24 @@
 function accuracy = computeSegmentationAccuracy(labelMap, registeredGTSegmentation, listLabels)
 
-accuracy = zeros(length(listLabels),1);
+accuracy = NaN(length(listLabels),1);
 
 for i=1:length(listLabels)
 
-    temp_labelMap = (labelMap == listLabels(i));
-    temp_GT = (registeredGTSegmentation == listLabels(i));
+    temp_labelMask = (labelMap == listLabels(i));
+    temp_GT_Mask = (registeredGTSegmentation == listLabels(i));
     
-    accuracy(i) = dice(temp_labelMap, temp_GT);
+    if unique(temp_labelMask) ~= 0 && unique(temp_GT_Mask) ~= 0
+        accuracy(i) = dice(temp_labelMask, temp_GT_Mask);
+    end
     
 end
 
 end
 
 function accuracy = dice(a, b)
+
+% compute dice coefficient between 3d binary masks
     
-    accuracy = 2*sum(sum((a.*b)))/sum(sum((a+b)));
+    accuracy = 2*sum(a.*b, 'all')/sum(a+b, 'all');
     
 end
