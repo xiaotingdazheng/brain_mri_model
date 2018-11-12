@@ -27,12 +27,12 @@ n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
 leftOutIndex = n_training_data:-1:1;
 
-labelsList = [  2,3, 4, 5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
-labelHippo = [20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
+%labelsList = [  2,3, 4, 5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
+labelsList = [20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
 
 sigma = 1;
 
-accuracy = NaN(n_training_data,  length(labelsList));
+accuracy = NaN(n_training_data, length(labelsList));
 
 for i=1:size(leaveOneOutIndices,1)
     
