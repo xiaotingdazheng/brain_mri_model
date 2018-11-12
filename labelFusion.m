@@ -10,7 +10,7 @@ cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfiel
     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg+subfields.mgz';
     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg+subfields.mgz';
     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg+subfields.mgz'};
-    
+ 
 cellPathsSyntheticImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfields.mgz'; 
     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields.mgz';
     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg+subfields.mgz';
@@ -68,11 +68,11 @@ for i=1:size(leaveOneOutIndices,1)
     
     [~,index] = max(labelMap,4);
     labelMap = arrayfun(@(x) labelsList(x), index);
-    
+
     % need to registrate real segmentation
     GTSegmentation = MRIread(cellPathsLabels{leftOutIndex(i)});
     registeredGTSegmentation = GTSegmentation.vol;
-    
+
     accuracy(i,:) = computeSegmentationAccuracy(labelMap, registeredGTSegmentation, listLabels);
    
 end
