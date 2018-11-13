@@ -61,8 +61,8 @@ disp('building hippocampus-less temporary image')
 labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)) = INPAINT; %puts back the modified part
 mriLabels.vol = labels; %write it in the header of mgz file
 
-path_temp_file = '/tmp/.mgz'; %path of temp hippocampus-less segmemtation
-path_new_temp_file = '/tmp/test.0.3.mgz'; %path of upsampled file to be produced
+path_temp_file = '/tmp/.nii.gz'; %path of temp hippocampus-less segmemtation
+path_new_temp_file = '/tmp/test.0.3.nii.gz'; %path of upsampled file to be produced
 
 MRIwrite(mriLabels, path_temp_file); %write a new mgz file.
 
@@ -126,7 +126,7 @@ labels(realHippoIndices) = HippoLabels(realHippoIndices) + 20000; %paste subfiel
 labels(labels==20024) = 24; %puts back CSH in hippocampus to 24
 
 [pathFusedLabels,~,~] = fileparts(pathLabels);
-pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.mgz');
+pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.nii.gz');
 
 mriLabels.vol = labels; %write new matrix in header
 MRIwrite(mriLabels, pathFusedLabels); %write a new mgz file.

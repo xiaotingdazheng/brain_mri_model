@@ -23,6 +23,9 @@ cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.mgz';
     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/nu.mgz';
     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/nu.mgz'};
 
+% need to crop hippocampus 
+% need for a convertion to nifty format
+
 n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
 leftOutIndex = n_training_data:-1:1;
@@ -32,7 +35,7 @@ labelsList = [2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,
 
 sigma = 1;
 
-accuracy = NaN(n_training_data, length(labelsList));
+accuracies = NaN(n_training_data, length(labelsList));
 
 for i=1:size(leaveOneOutIndices,1)
     
@@ -45,7 +48,7 @@ for i=1:size(leaveOneOutIndices,1)
     stripped = fullfile(dir,[name,'.stripped',ext]); %path of stripped real image
     fmask = fullfile(dir,[name,'.mask',ext]); %path of binary mask
     cmd = ['~/Software/ROBEX/runROBEX.sh ' ref ' ' stripped ' ' fmask]; 
-    [~,~] = system(cmd); %compute fmask
+    system(cmd); %compute fmask
     
     for j=1:size(leaveOneOutIndices,2)
         
@@ -95,8 +98,8 @@ for i=1:size(leaveOneOutIndices,1)
     GTSegmentation = MRIread(cellPathsLabels{leftOutIndex(i)});
     registeredGTSegmentation = GTSegmentation.vol;
 
-    accuracy(i,:) = computeSegmentationAccuracy(labelMap, registeredGTSegmentation, listLabels);
+    accuracies(i,:) = computeSegmentationAccuracy(labelMap, registeredGTSegmentation, listLabels);
    
 end
 
-accuracy = mean(accuracy, 'omitnan');
+accuracy = mean(accuracies, 'omitnan');
