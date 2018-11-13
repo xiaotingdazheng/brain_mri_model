@@ -74,7 +74,7 @@ if ~contains(PATH,'/usr/local/freesurfer/bin')
     setenv('PATH',[PATH ':/usr/local/freesurfer/bin']);
 end
 cmd = ['mri_convert ' path_temp_file ' ' path_new_temp_file ' -rl ' pathHippoLabels ' -rt nearest']; %build command
-system(cmd); %execute command
+[~,~] = system(cmd); %execute command
 
 mriLabels = MRIread(path_new_temp_file); %read file converted to the GT file format
 labels = mriLabels.vol;
