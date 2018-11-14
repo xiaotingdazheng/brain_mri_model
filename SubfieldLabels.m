@@ -39,7 +39,7 @@ cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz';
 %     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg+subfields.nii.gz'};
 
 % merge labels between aseg and hippocampal subfields (0 or 1)
-mergeHippoLabels = 0;
+mergeHippoLabels = 1;
 % if mergeHippoLabels = 1, specify here the paths of hippocampal subfields' 
 % labels. They should be in the same order as the corresponding
 % segmentation maps specified in cellPathsLabels.
@@ -48,6 +48,8 @@ cellPathsHippoLabels = {'/home/benjamin/data/hippocampus_labels/brain1_labels.ni
     '/home/benjamin/data/hippocampus_labels/brain3_labels.nii.gz'; 
     '/home/benjamin/data/hippocampus_labels/brain4_labels.nii.gz'; 
     '/home/benjamin/data/hippocampus_labels/brain5_labels.nii.gz'};
+% path of matrix containing max hippocampus cropping
+pathMaxCropping = '~/matlab/brain_mri_model/maxHippoCropping.mat';
 
 % compute stats matrix from a specified image. If computeStatsMatrix = 0 
 % the script will load a previously computed matrix (pathStatsMatrix).
@@ -59,7 +61,7 @@ pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1.mat';
 % should be the image corresponding to the first segmentation map specified
 %in cellPathsLabels. This should also be at hippocampal labels' resolution.
 % pathImage = '~/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
-pathImage = '~/data/brains_t2/brain1/brain1_t2.0.3.mgz';
+pathImage = '/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
 
 % folder that will contain created images
 pathNewImagesFolder = '/home/benjamin/data/synthetic_brains_t1/';
@@ -87,6 +89,7 @@ pathImageResliceLike = '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.mgz
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~exist(pathNewImagesFolder, 'dir'), mkdir(pathNewImagesFolder), end
+maxCropping = zeros(1,6);
 for i=1:length(cellPathsLabels)
     
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
@@ -95,8 +98,9 @@ for i=1:length(cellPathsLabels)
     if mergeHippoLabels == 1
         % merge general and hippocampal labels for generative image
         disp(['%%%%%%%%%%%%%%',' merge general and hippocampal labels ', '%%%%%%%%%%%%%%%']);
-        mergedLabelsMRI = mergeSubfieldLabels(cellPathsLabels{i}, cellPathsHippoLabels{i});
+        [mergedLabelsMRI, maxCropping] = mergeSubfieldLabels(cellPathsLabels{i}, cellPathsHippoLabels{i}, maxCropping);
         mergedLabels = mergedLabelsMRI.vol;
+        if i==length(cellPathsLabels), save(pathMaxCropping, 'maxCropping'), end
     else
         disp(['%%%%%%%%%%%%%%%%%%%%%',' loading merged labels ', '%%%%%%%%%%%%%%%%%%%%%%%']);
         mergedLabelsMRI = MRIread(cellPathsLabels{i});
@@ -114,10 +118,10 @@ for i=1:length(cellPathsLabels)
         end
     end
 
-    % create new images
-    disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
-    new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-        pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i}, pathImageResliceLike, downsample);
+%     % create new images
+%     disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
+%     new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
+%         pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i}, pathImageResliceLike, downsample);
 
 end
 

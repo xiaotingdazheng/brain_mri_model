@@ -1,4 +1,4 @@
-function mriLabels = mergeSubfieldLabels(pathLabels, pathHippoLabels)
+function [mriLabels, maxCropping] = mergeSubfieldLabels(pathLabels, pathHippoLabels, maxCropping)
 
 % This function combines the labels from general image and more precise
 % hippocampal segmentations. 
@@ -37,6 +37,14 @@ end
 [~,cropping] = cropLabelVol(maskmri,5); %maximal cropping around ROI and padds it with 5 voxels, give back where to crop (don't care about cropped mask)
 
 labelsCrop = labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)); %crop the labelled image
+
+if isequal(maxCropping, zeros(1,6))
+    maxCropping = cropping;
+else
+    maxCropping = [min(cropping(1),maxCropping(1)), max(cropping(2),maxCropping(2)),...
+        min(cropping(3),maxCropping(3)), max(cropping(4),maxCropping(4)),...
+        min(cropping(5),maxCropping(5)), max(cropping(6),maxCropping(6))];
+end
 
 %%%%%%%%%%% build distance maps for all non hippocampal labels %%%%%%%%%%%%
 disp('building distance maps for all the other labels')
