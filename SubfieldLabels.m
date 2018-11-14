@@ -118,10 +118,10 @@ for i=1:length(cellPathsLabels)
         end
     end
 
-%     % create new images
-%     disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
-%     new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-%         pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i}, pathImageResliceLike, downsample);
+    % create new images
+    disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
+    new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
+        pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i}, pathImageResliceLike, downsample);
 
 end
 

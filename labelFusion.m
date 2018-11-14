@@ -4,12 +4,6 @@ addpath /home/benjamin/matlab/toolbox
 
 % we assume here labels and synthetic are aligned.
 % labels, synthetic and real images must all have the same resolution
-
-cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz'; 
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
  
 cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz'; 
     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
@@ -17,14 +11,19 @@ cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synt
     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
 
+cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz'; 
+    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
+
 cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.nii.gz'; 
     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/nu.nii.gz';
     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/nu.nii.gz';
     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/nu.nii.gz';
     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/nu.nii.gz'};
 
-% need to crop hippocampus 
-% need for a convertion to nifty format
+[HippoSyntheticImages, HippoLabels, HippoRealImages] = cropHippocampus(cellPathsSyntheticImages, cellPathsLabels, cellPathsRealImages, maxCropping);
 
 n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
