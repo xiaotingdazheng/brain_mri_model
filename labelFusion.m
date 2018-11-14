@@ -7,41 +7,41 @@ addpath /home/benjamin/matlab/toolbox
 % we assume here labels and synthetic are aligned.
 % labels, synthetic and real images must all have the same resolution
 
-cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz'; 
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
-cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz'; 
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
-cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.nii.gz'; 
-    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.nii.gz';
-    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.nii.gz';
-    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.nii.gz';
-    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.nii.gz'};
+% cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz'; 
+%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
+% cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz'; 
+%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
+% cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.nii.gz'; 
+%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.nii.gz';
+%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.nii.gz';
+%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.nii.gz';
+%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.nii.gz'};
 
-% cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.hippo.cropped.nii.gz'; 
-%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.hippo.cropped.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.hippo.cropped.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.hippo.cropped.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.hippo.cropped.nii.gz'};
-% cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'; 
-%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'};
-% cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz'; 
-%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
-%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
-%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
-%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz'};
+cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.hippo.cropped.nii.gz'; 
+    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.hippo.cropped.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.hippo.cropped.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.hippo.cropped.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.hippo.cropped.nii.gz'};
+cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'; 
+    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'};
+cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz'; 
+    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz'};
 
 % crop Hippocampus if set to 1. Set to 0 if you don't wish to crop images
 % or if you've already entered cropped images
-cropHippo = 1;
+cropHippo = 0;
 % path of max hippocampus bounding box (only used if cropHippo=1)
 pathMaxCropping = '/home/benjamin/matlab/brain_mri_model/maxHippoCropping.mat';
 
@@ -71,29 +71,30 @@ for i=1:size(leaveOneOutIndices,1)
     
     %compute binary mask of ROI within real image
     ref = cellPathsRealImages{leftOutIndex(i)}; %path of real image
-    [dir,name,ext] = fileparts(ref);
-    stripped = fullfile(dir,[name,'.stripped',ext]); %path of stripped real image
-    fmask = fullfile(dir,[name,'.mask',ext]); %path of binary mask
+    temp_ref = strrep(ref,'.nii.gz','.mgz');
+    [dir,name,~] = fileparts(temp_ref);
+    stripped = fullfile(dir,[name,'.stripped','.nii.mgz']); %path of stripped real image
+    fmask = fullfile(dir,[name,'.mask','.nii.gz']); %path of binary mask
     cmd = ['~/Software/ROBEX/runROBEX.sh ' ref ' ' stripped ' ' fmask]; 
     system(cmd); %compute fmask
     
     for j=1:size(leaveOneOutIndices,2)
         
         floSynthetic = cellPathsSyntheticImages{leaveOneOutIndices(i,j)}; %path of synthetic image
-        [dir,name,ext] = fileparts(floSynthetic);
-        stripped = fullfile(dir,[name,'.stripped',ext]); %path of stripped synthetic image
-        rmask = fullfile(dir,[name,'.mask',ext]); %path of binary mask
-        resSynthetic = fullfile(dir,[name,'.registered_to_image_',num2str(leftOutIndex(i)),ext]); %path of registered real image
+        temp_floSynthetic = strrep(floSynthetic,'.nii.gz','.mgz');
+        [dir,name,~] = fileparts(temp_floSynthetic);
+        stripped = fullfile(dir,[name,'.stripped','.nii.gz']); %path of stripped synthetic image
+        rmask = fullfile(dir,[name,'.mask','.nii.gz']); %path of binary mask
+        resSynthetic = fullfile(dir,[name,'.registered_to_image_',num2str(leftOutIndex(i)),'.nii.gz']); %path of registered real image
         trans = fullfile(dir,[name,'.registered_to_image_',num2str(leftOutIndex(i)),'.cpp']); %modify name of the saved aff file
         
         % compute binary mask of ROI synthetic image
         cmd = ['~/Software/ROBEX/runROBEX.sh ' floSynthetic ' ' stripped ' ' rmask];
-        [~,~] = system(cmd);
+        system(cmd);
         
         % compute registration synthetic image to real image
-        cmd = ['reg_f3d -ref ',ref,' -flo ',floSynthetic',' -res ',resSynthetic,' -rmask ',rmask,' -fmask ',fmask,' -cpp ',trans,' -pad 0 -voff'];
-        [~,~] = system(cmd);
-        eu plus tôt dans la mati
+        cmd = ['reg_f3d -ref ',ref,' -flo ',floSynthetic,' -res ',resSynthetic,' -rmask ',rmask,' -fmask ',fmask,' -cpp ',trans,' -pad 0 -voff'];
+        system(cmd);
         % apply registration to segmentation map
         floSegm = cellPathsLabels{leaveOneOutIndices(i,j)}; % path of segmentation map to apply register
         resSegm = ''; % path of registered segmentation map
