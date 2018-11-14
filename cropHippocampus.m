@@ -1,21 +1,21 @@
-function [HippoSyntheticImages, HippoLabels, HippoRealImages] = cropHippocampus(SyntheticImages, Labels, RealImages, maxCropping)
+function [HippoSyntheticImages, HippoLabels, HippoRealImages] = cropHippocampus(cellPathsSyntheticImages, cellPathsLabels, cellPathsRealImages, maxCropping)
 
 addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
-if length(SyntheticImages) ~= length(Labels) || length(SyntheticImages) ~= length(RealImages)
+if length(cellPathsSyntheticImages) ~= length(cellPathsLabels) || length(cellPathsSyntheticImages) ~= length(cellPathsRealImages)
     error('not same number of synthetic images, real images and label maps')
 end
 
-HippoSyntheticImages=SyntheticImages;
-HippoLabels=Labels;
-HippoRealImages=RealImages;
+HippoSyntheticImages=cellPathsSyntheticImages;
+HippoLabels=cellPathsLabels;
+HippoRealImages=cellPathsRealImages;
 
 disp('cropping synthetic images')
-for i=1:length(SyntheticImages)
+for i=1:length(cellPathsSyntheticImages)
     
     % read full image
-    tempMRI = MRIread(SyntheticImages{i});
+    tempMRI = MRIread(cellPathsSyntheticImages{i});
     
     % modify components of nifty file
     tempMRI.vol = tempMRI.vol(maxCropping(1):maxCropping(2),maxCropping(3):maxCropping(4),maxCropping(5):maxCropping(6));
@@ -23,22 +23,22 @@ for i=1:length(SyntheticImages)
     tempMri.height = tempMRI.volsize(1); tempMri.width = tempMRI.volsize(2); tempMri.depth = tempMRI.volsize(3);
     
     % writing cropped synthetic image and saving path in HippoSyntheticImages
-    newPath = strrep(SyntheticImages{i},'.nii.gz','hippo.cropped.nii.gz');
+    newPath = strrep(cellPathsSyntheticImages{i},'.nii.gz','.hippo.cropped.nii.gz');
     MRIwrite(tempMRI, newPath);
     HippoSyntheticImages{i} = newPath;
 
 end
 
 disp('cropping labels')
-for i=1:length(Labels)
+for i=1:length(cellPathsLabels)
     
-    tempMRI = MRIread(Labels{i});
+    tempMRI = MRIread(cellPathsLabels{i});
     
     tempMRI.vol = tempMRI.vol(maxCropping(1):maxCropping(2),maxCropping(3):maxCropping(4),maxCropping(5):maxCropping(6));
     tempMRI.volsize = [maxCropping(2)-maxCropping(1)+1,maxCropping(3)-maxCropping(4)+1,maxCropping(5)-maxCropping(6)+1];
     tempMri.height = tempMRI.volsize(1); tempMri.width = tempMRI.volsize(2); tempMri.depth = tempMRI.volsize(3);
     
-    newPath = strrep(Labels{i},'.nii.gz','hippo.cropped.nii.gz');
+    newPath = strrep(cellPathsLabels{i},'.nii.gz','.hippo.cropped.nii.gz');
     MRIwrite(tempMRI, newPath);
     
     HippoLabels{i} = newPath;
@@ -46,15 +46,15 @@ for i=1:length(Labels)
 end
 
 disp('cropping real images')
-for i=1:length(RealImages)
+for i=1:length(cellPathsRealImages)
 
-    tempMRI = MRIread(RealImages{i});
+    tempMRI = MRIread(cellPathsRealImages{i});
     
     tempMRI.vol = tempMRI.vol(maxCropping(1):maxCropping(2),maxCropping(3):maxCropping(4),maxCropping(5):maxCropping(6));
     tempMRI.volsize = [maxCropping(2)-maxCropping(1)+1,maxCropping(3)-maxCropping(4)+1,maxCropping(5)-maxCropping(6)+1];
     tempMri.height = tempMRI.volsize(1); tempMri.width = tempMRI.volsize(2); tempMri.depth = tempMRI.volsize(3);
     
-    newPath = strrep(RealImages{i},'.nii.gz','hippo.cropped.nii.gz');
+    newPath = strrep(cellPathsRealImages{i},'.nii.gz','.hippo.cropped.nii.gz');
     MRIwrite(tempMRI, newPath);
     
     HippoRealImages{i} = newPath;

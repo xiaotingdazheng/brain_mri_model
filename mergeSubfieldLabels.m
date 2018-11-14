@@ -137,6 +137,7 @@ labels(labels==20024) = 24; %puts back CSH in hippocampus to 24
 pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.nii.gz');
 
 mriLabels.vol = labels; %write new matrix in header
+mriLabels.fspec = pathFusedLabels;
 MRIwrite(mriLabels, pathFusedLabels); %write a new mgz file.
 
 end
