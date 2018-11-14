@@ -79,8 +79,10 @@ if ~downsample
     [~,~] = system(cmd);
     
     % do the same to corresponding aseg+subfields
+    pathNewImage = strrep(pathNewImage, '.nii.gz', '.mgz');    
     [dir,name,ext] = fileparts(pathNewImage);
     pathNewSegmMap = fullfile(dir,[name,'.labels',ext]);
+    pathNewSegmMap = strrep(pathNewSegmMap, '.mgz', '.nii.gz');
     cmd = ['mri_convert ' mergedLabelsMRI.fspec ' ' pathNewSegmMap ' -rl ' pathImageResliceLike ' -rt nearest -odt float'];
     [~,~] = system(cmd);
 end
