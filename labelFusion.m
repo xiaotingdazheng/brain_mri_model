@@ -6,38 +6,38 @@ addpath /home/benjamin/matlab/toolbox
 
 % we assume here labels and synthetic are aligned.
 % labels, synthetic and real images must all have the same resolution
- 
-% cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz'; 
-%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
-% cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz'; 
-%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
-% cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.nii.gz'; 
-%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/nu.nii.gz';
-%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/nu.nii.gz';
-%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/nu.nii.gz';
-%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/nu.nii.gz'};
 
-cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.hippo.cropped.nii.gz'; 
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.hippo.cropped.nii.gz'};
-cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'; 
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'};
-cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz'; 
-    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz';
-    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz';
-    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz';
-    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz'};
+cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz'; 
+    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
+cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz'; 
+    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
+cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.nii.gz'; 
+    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.nii.gz';
+    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.nii.gz';
+    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.nii.gz';
+    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.nii.gz'};
+
+% cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.hippo.cropped.nii.gz'; 
+%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.hippo.cropped.nii.gz'};
+% cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'; 
+%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'};
+% cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz'; 
+%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz'};
 
 % crop Hippocampus if set to 1. Set to 0 if you don't wish to crop images
 % or if you've already entered cropped images
