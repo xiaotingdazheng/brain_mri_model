@@ -4,41 +4,41 @@ addpath /home/benjamin/matlab/toolbox
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
-% cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
-%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
-% cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.nii.gz';
-%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.nii.gz';
-%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.nii.gz';
-%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.nii.gz';
-%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.nii.gz'};
+cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
+cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
+    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
+cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
 
-cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.hippo.cropped.nii.gz'; 
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.hippo.cropped.nii.gz'};
-cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'; 
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'};
-cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz'; 
-    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
-    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
-    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
-    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz'};
+% cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.hippo.cropped.nii.gz'; 
+%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.hippo.cropped.nii.gz'};
+% cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'; 
+%     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.hippo.cropped.nii.gz';
+%     '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.hippo.cropped.nii.gz'};
+% cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/nu.hippo.cropped.nii.gz'; 
+%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz';
+%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.hippo.cropped.nii.gz'};
 
 % crop Hippocampus if set to 1. Set to 0 if you don't wish to crop images
 % or if you've already entered cropped images
-cropHippo = 0;
+cropHippo = 1;
 % path of max hippocampus bounding box (only used if cropHippo=1)
 pathMaxCropping = '/home/benjamin/matlab/brain_mri_model/maxHippoCropping.mat';
 cropBeforeRegister = 1;
@@ -91,12 +91,12 @@ for i=1:size(leaveOneOutIndices,1)
         registeredSyntheticImage = MRIread(pathResultSynthetic);
         registeredLabels = MRIread(pathResultLabels);
         
-        if realImage.volsize ~= registeredSyntheticImage.volsize || realImage.volsize ~= registeredLabels.volsize
+        if ~isequal(realImage.volsize, registeredSyntheticImage.volsize) || ~isequal(realImage.volsize, registeredLabels.volsize)
             error('registered image doesn t have the same size as synthetic image')
         end
         
         % calculate similarity between test (real) image and training (synthetic) image
-        likelihood = 1/sqrt(2*pi*sigma)*exp(-(realImage.vol-registeredSyntheticImage.vol)^2/(2*sigma^2));
+        likelihood = 1/sqrt(2*pi*sigma)*exp(-(realImage.vol-registeredSyntheticImage.vol).^2/(2*sigma^2));
         
         for k=1:length(labelsList)
             labelMap(:,:,:,k) = labelMap(:,:,:,k) + (registeredLabels.vol == labelsList(k)).*likelihood;
