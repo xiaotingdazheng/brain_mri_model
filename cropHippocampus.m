@@ -24,6 +24,7 @@ for i=1:length(cellPathsSyntheticImages)
     
     % writing cropped synthetic image and saving path in HippoSyntheticImages
     newPath = strrep(cellPathsSyntheticImages{i},'.nii.gz','.hippo.cropped.nii.gz');
+    tempMRI.fspec = newPath;
     MRIwrite(tempMRI, newPath);
     HippoSyntheticImages{i} = newPath;
 
