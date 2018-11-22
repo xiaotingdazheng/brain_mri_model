@@ -3,6 +3,7 @@ addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tic
 
 cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
     '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
@@ -32,6 +33,7 @@ leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
 refIndex = n_training_data:-1:1;
 labelsList = [2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,...
     52,54,58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
+
 accuracies = NaN(n_training_data, length(labelsList));
 
 % test label fusion on each real image 
@@ -89,8 +91,10 @@ for i=1:size(leaveOneOutIndices,1)
     [~,index] = max(labelMap, [], 4);
     labelMap = arrayfun(@(x) labelsList(x), index);
 
-    accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedGTSegmentation, listLabels);
+    accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedGTSegmentation, labelsList);
    
 end
 
 accuracy = mean(accuracies, 'omitnan');
+
+toc

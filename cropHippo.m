@@ -10,7 +10,7 @@ end
 SegmentationMaskMRI.vol = SegmentationMask;
 SegmentationMaskMRI.vox2ras0 = zeros(4);
 
-[croppedSegmentation, cropping] = cropLabelVol(SegmentationMaskMRI, margin);
-croppedSegmentation = croppedSegmentation.vol;
+[~, cropping] = cropLabelVol(SegmentationMaskMRI, margin);
+croppedSegmentation = Segmentation(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
 
 end
