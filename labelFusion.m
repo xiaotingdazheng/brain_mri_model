@@ -22,6 +22,7 @@ cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.384
 
 sigma = 1;
 margin = 30;
+recompute = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -39,7 +40,7 @@ for i=1:size(leaveOneOutIndices,1)
     % open reference image (real)
     pathRealRefImage = cellPathsRealImages{refIndex(i)}; %path of real image
     realRefImage = MRIread(pathRealRefImage); %read real image
-    % open correpsonding segmentation
+    % open correpsonding segmentation and find cropping of hippocampus
     GTSegmentation = MRIread(cellPathsLabels{refIndex(i)});
     GTSegmentation = GTSegmentation.vol;
     [croppedGTSegmentation, cropping] = cropHippo(GTSegmentation, margin);
@@ -50,8 +51,10 @@ for i=1:size(leaveOneOutIndices,1)
     [dir,name,~] = fileparts(temp_ref);
     stripped = fullfile(dir,[name,'.stripped','.nii.gz']); %path of stripped real image
     fmask = fullfile(dir,[name,'.mask','.nii.gz']); %path of binary mask
-    cmd = ['~/Software/ROBEX/runROBEX.sh ' pathRealRefImage ' ' stripped ' ' fmask]; 
-    system(cmd); %compute fmask
+    if ~exist(fmask, 'file')
+        cmd = ['~/Software/ROBEX/runROBEX.sh ' pathRealRefImage ' ' stripped ' ' fmask]; 
+        system(cmd); %compute fmask
+    end
     
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
@@ -59,7 +62,7 @@ for i=1:size(leaveOneOutIndices,1)
         % registration of synthetic image and labels to real image
         pathSyntheticImage = cellPathsSyntheticImages{leaveOneOutIndices(i,j)};
         pathLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
-        [pathResultSynthetic, pathResultLabels] = register(pathRealRefImage, fmask, pathSyntheticImage, pathLabels, refIndex(i));
+        [pathResultSynthetic, pathResultLabels] = register(pathRealRefImage, fmask, pathSyntheticImage, pathLabels, refIndex(i), recompute);
         
         % read registered real,synthetic and segmentation images
         registeredSyntheticImage = MRIread(pathResultSynthetic);
@@ -70,7 +73,7 @@ for i=1:size(leaveOneOutIndices,1)
         croppedRegisteredSyntheticImage = registeredSyntheticImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         croppedRegisteredLabels = registeredLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
        
-        if ~isequal(croppedRealRefImage, croppedRegisteredSyntheticImage) || ~isequal(croppedRealRefImage, croppedRegisteredLabels)
+        if ~isequal(size(croppedRealRefImage), size(croppedRegisteredSyntheticImage)) || ~isequal(size(croppedRealRefImage), size(croppedRegisteredLabels))
             error('registered image doesn t have the same size as synthetic image')
         end
         
@@ -78,7 +81,7 @@ for i=1:size(leaveOneOutIndices,1)
         likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRealRefImage-croppedRegisteredSyntheticImage).^2/(2*sigma^2));
          
         for k=1:length(labelsList)
-            labelMap(:,:,:,k) = labelMap(:,:,:,k) + (croppedRegisteredLabels == labelsList(k)).*likelihood;
+            labelMap(:,:,:,k) = labelMap(:,:,:,k) + (croppedRegisteredLabels == labelsList(k)).*likelihood; % problem here !!!!!
         end
        
     end
