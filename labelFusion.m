@@ -81,12 +81,12 @@ for i=1:size(leaveOneOutIndices,1)
         likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRealRefImage-croppedRegisteredSyntheticImage).^2/(2*sigma^2));
          
         for k=1:length(labelsList)
-            labelMap(:,:,:,k) = labelMap(:,:,:,k) + (croppedRegisteredLabels == labelsList(k)).*likelihood; % problem here !!!!!
+            labelMap(:,:,:,k) = labelMap(:,:,:,k) + (croppedRegisteredLabels == labelsList(k)).*likelihood;
         end
        
     end
     
-    [~,index] = max(labelMap,4);
+    [~,index] = max(labelMap, [], 4);
     labelMap = arrayfun(@(x) labelsList(x), index);
 
     accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedGTSegmentation, listLabels);
