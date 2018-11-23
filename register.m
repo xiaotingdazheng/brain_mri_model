@@ -6,7 +6,7 @@ temp_pathSyntheticImage = strrep(pathSyntheticImage,'.nii.gz','.mgz');
 pathResultSynthetic = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); %path of registered real image
 pathTransformation = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.cpp.nii.gz']); %modify name of the saved aff file
 aff = fullfile(dir,[filename,'.aff']); %result of first registration
-temp_res = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'aladinOnly','.nii.gz']); %path of registered real image
+temp_res = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.aladinOnly','.nii.gz']); %path of registered real image
 % compute binary mask of ROI synthetic image
 stripped = fullfile(dir,[filename,'.stripped','.nii.gz']); %path of stripped synthetic image
 rmask = fullfile(dir,[filename,'.mask','.nii.gz']); %path of binary mask
