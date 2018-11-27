@@ -76,11 +76,7 @@ MRIwrite(mriLabels, path_temp_file); %write a new mgz file.
 
 %%%%%%%%%%%%%%%%%% convert image into hippo labels format  %%%%%%%%%%%%%%%%
 
-setenv('FREESURFER_HOME','/usr/local/freesurfer/'); %setup of freesurfer environment
-PATH = getenv('PATH');
-if ~contains(PATH,'/usr/local/freesurfer/bin')
-    setenv('PATH',[PATH ':/usr/local/freesurfer/bin']);
-end
+setFreeSurfer();
 cmd = ['mri_convert ' path_temp_file ' ' path_new_temp_file ' -rl ' pathHippoLabels ' -rt nearest'];
 [~,~] = system(cmd); %execute command
 

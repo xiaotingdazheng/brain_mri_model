@@ -5,34 +5,43 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 
-cellPathsSyntheticImages = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
-cellPathsLabels = {'/home/benjamin/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
-    '/home/benjamin/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
-cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
+cellPathsSyntheticImages = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
+cellPathsLabels = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
+cellPathsRealImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
+
+% set recompute to 1 if you wish to recompute all the masks and
+% registrations. The results will be saved in an automatically generated 
+% folder '~/data/registrations_date_time'. If recompute = 0, specify where
+% is the data to be used.
+recompute = 0;
+dataFolder = '~/data/synthetic_brains_t1';
 
 sigma = 1;
 margin = 30;
-recompute = 1;
 labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % initialisation
 now = clock;
-resultsFolder = ['/home/benjamin/data/registrations_' num2str(now(3)) ':' num2str(now(2)) '_' num2str(now(4)) ':' num2str(now(5))];
+resultsFolder = ['~/data/label_fusion_' num2str(now(3)) ':' num2str(now(2)) '_' num2str(now(4)) ':' num2str(now(5))];
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
+if ~recompute
+    resultsFolder = dataFolder;
+end
 
 n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
@@ -65,8 +74,9 @@ for i=1:size(leaveOneOutIndices,1)
     [~,name,~] = fileparts(temp_ref);
     pathRealRefMaskedImage = fullfile(resultsFolder, [name,'.masked','.nii.gz']); %path of binary mask
     if ~exist(pathRealRefMaskedImage, 'file') || recompute == 1
+        setFreeSurfer();
         disp(['masking real image ' pathRealRefImage])
-        cmd = ['mask_mri ' pathRealRefImage ' ' pathRealRefLabels ' ' pathRealRefMaskedImage]; 
+        cmd = ['mri_mask ' pathRealRefImage ' ' pathRealRefLabels ' ' pathRealRefMaskedImage]; 
         system(cmd); %mask real ref image
     end
     

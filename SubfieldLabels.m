@@ -85,7 +85,6 @@ downsample = 0;
 pathImageResliceLike = '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.mgz';
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~exist(pathNewImagesFolder, 'dir'), mkdir(pathNewImagesFolder), end
