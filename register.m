@@ -7,6 +7,7 @@ pathResultSynthetic = fullfile(dir,[filename,'.registered_to_image_',num2str(ref
 pathTransformation = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.cpp.nii.gz']); %modify name of the saved aff file
 aff = fullfile(dir,[filename,'.aff']); %result of first registration
 temp_res = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.aladinOnly','.nii.gz']); %path of registered real image
+
 % compute binary mask of ROI synthetic image
 stripped = fullfile(dir,[filename,'.stripped','.nii.gz']); %path of stripped synthetic image
 rmask = fullfile(dir,[filename,'.mask','.nii.gz']); %path of binary mask
@@ -24,10 +25,10 @@ end
 % compute registration synthetic image to real image
 if ~exist(pathResultSynthetic, 'file') || recompute == 1
     disp(['registering with reg_f3d ',pathSyntheticImage,' to ',pathRealRefImage]);
-    cmd = ['reg_f3d -ref ',pathRealRefImage,' -flo ',pathSyntheticImage,' -fmask ',fmask,' -rmask ',rmask,' -res ',pathResultSynthetic,' -aff ',aff,' -cpp ',pathTransformation,' -pad 0 -voff'];
+    cmd = ['reg_f3d -ref ',pathRealRefImage,' -flo ',pathSyntheticImage,' -fmask ',fmask,' -rmask ',rmask,' -res ',pathResultSynthetic,...
+        ' -aff ',aff,' -cpp ',pathTransformation,' -pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff'];
     system(cmd);    
 end
-
 
 % define pathnames of used/saved files for label registration
 temp_floSegm = strrep(pathLabels,'.nii.gz','.mgz');

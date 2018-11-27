@@ -24,6 +24,7 @@ cellPathsRealImages = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.384
 sigma = 1;
 margin = 30;
 recompute = 1;
+labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
 
 pathAccuracies = '/home/benjamin/matlab/brain_mri_model/LabelFusionAccuracy.mat';
 
@@ -100,7 +101,14 @@ for i=1:size(leaveOneOutIndices,1)
         
         disp('updating segmentation likelihood')
         for k=1:length(labelsList)
-            labelMap(:,:,:,k) = labelMap(:,:,:,k) + (croppedRegisteredLabels == labelsList(k)).*likelihood;
+            if isequal(labelPriorType, 'delta function')
+                labelPrior = (croppedRegisteredLabels == labelsList(k));
+            elseif  isequal(labelPriorType, 'logOdds')
+                labelPrior = (croppedRegisteredLabels == labelsList(k));
+            else
+                error('wrong type of label Prior, must be delta function or logOdds')
+            end
+            labelMap(:,:,:,k) = labelMap(:,:,:,k) + labelPrior.*likelihood;
         end
        
     end

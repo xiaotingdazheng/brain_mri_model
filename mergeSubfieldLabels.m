@@ -34,7 +34,7 @@ for h=1:length(hippoLabels)
     maskmri.vol = maskmri.vol | labels==hippoLabels(h); %logical mask of hippocampus by performing or operation
 end
 
-[~,cropping] = cropLabelVol(maskmri,20); %maximal cropping around ROI and padds it with 5 voxels, give back where to crop (don't care about cropped mask)
+[~,cropping] = cropLabelVol(maskmri,20); %maximal cropping around ROI and padds, give back where to crop (don't care about cropped mask)
 
 labelsCrop = labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)); %crop the labelled image
 
@@ -81,7 +81,7 @@ PATH = getenv('PATH');
 if ~contains(PATH,'/usr/local/freesurfer/bin')
     setenv('PATH',[PATH ':/usr/local/freesurfer/bin']);
 end
-cmd = ['mri_convert ' path_temp_file ' ' path_new_temp_file ' -rl ' pathHippoLabels ' -rt nearest']; %build command
+cmd = ['mri_convert ' path_temp_file ' ' path_new_temp_file ' -rl ' pathHippoLabels ' -rt nearest'];
 [~,~] = system(cmd); %execute command
 
 mriLabels = MRIread(path_new_temp_file); %read file converted to the GT file format
