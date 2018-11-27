@@ -23,7 +23,7 @@ end
 
 % define pathnames of used/saved files for label registration
 temp_floSegm = strrep(pathSyntheticLabels,'.nii.gz','.mgz');
-[resultsFolder,filename,~] = fileparts(temp_floSegm);
+[~,filename,~] = fileparts(temp_floSegm);
 pathRegisteredSyntheticLabels = fullfile(resultsFolder, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
 % apply registration to segmentation map
 if ~exist(pathRegisteredSyntheticLabels, 'file') || recompute == 1
