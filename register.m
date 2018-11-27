@@ -1,43 +1,34 @@
-function [pathResultSynthetic, pathResultLabels] = register(pathRealRefImage, fmask, pathSyntheticImage, pathLabels, refIndex, recompute)
+function [pathRegisteredSyntheticImage, pathRegisteredSyntheticLabels] = register(pathRealRefMaskedImage, pathSyntheticImage, pathSyntheticLabels, refIndex, recompute)
 
 % names of files that will be used/saved during registration
 temp_pathSyntheticImage = strrep(pathSyntheticImage,'.nii.gz','.mgz');
 [dir,filename,~] = fileparts(temp_pathSyntheticImage);
-pathResultSynthetic = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); %path of registered real image
-pathTransformation = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.cpp.nii.gz']); %modify name of the saved aff file
-aff = fullfile(dir,[filename,'.aff']); %result of first registration
-temp_res = fullfile(dir,[filename,'.registered_to_image_',num2str(refIndex),'.aladinOnly','.nii.gz']); %path of registered real image
+pathRegisteredSyntheticImage = fullfile(dir,[filename '.registered_to_image_' num2str(refIndex) '.nii.gz']); %path of registered real image
+aff = fullfile(dir,[filename,'.aff']); %deformation of first registration
+pathAffineTransformation = fullfile(dir,[filename '.registered_to_image_' num2str(refIndex) '.affine.nii.gz']); %path of registered real image
+pathTransformation = fullfile(dir,[filename '.registered_to_image_' num2str(refIndex) '.cpp.nii.gz']); %modify name of the saved aff file
 
-% compute binary mask of ROI synthetic image
-stripped = fullfile(dir,[filename,'.stripped','.nii.gz']); %path of stripped synthetic image
-rmask = fullfile(dir,[filename,'.mask','.nii.gz']); %path of binary mask
-if ~exist(rmask, 'file') || recompute == 1
-    disp(['computing mask of synthetic image ',pathSyntheticImage])
-    cmd = ['~/Software/ROBEX/runROBEX.sh ' pathSyntheticImage ' ' stripped ' ' rmask];
-    system(cmd);
-end
 % compute first rigid registration
 if ~exist(aff, 'file') || recompute == 1
-    disp(['registering with reg_aladin ',pathSyntheticImage,' to ',pathRealRefImage]);
-    cmd = ['reg_aladin -ref ',pathRealRefImage,' -flo ',pathSyntheticImage,' -fmask ',fmask,' -rmask ',rmask,' -aff ',aff,' -res ',temp_res,' -pad 0 -voff'];
+    disp(['registering with reg_aladin ',pathSyntheticImage,' to ',pathRealRefMaskedImage]);
+    cmd = ['reg_aladin -ref ' pathRealRefMaskedImage ' -flo ' pathSyntheticImage ' -aff ' aff ' -res ' pathAffineTransformation ' -pad 0 -voff'];
     system(cmd);
 end
 % compute registration synthetic image to real image
-if ~exist(pathResultSynthetic, 'file') || recompute == 1
-    disp(['registering with reg_f3d ',pathSyntheticImage,' to ',pathRealRefImage]);
-    cmd = ['reg_f3d -ref ',pathRealRefImage,' -flo ',pathSyntheticImage,' -fmask ',fmask,' -rmask ',rmask,' -res ',pathResultSynthetic,...
-        ' -aff ',aff,' -cpp ',pathTransformation,' -pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff'];
+if ~exist(pathRegisteredSyntheticImage, 'file') || recompute == 1
+    disp(['registering with reg_f3d ',pathSyntheticImage,' to ',pathRealRefMaskedImage]);
+    cmd = ['reg_f3d -ref ' pathRealRefMaskedImage ' -flo ' pathSyntheticImage ' -res ' pathRegisteredSyntheticImage ' -aff ' aff ' -cpp ' pathTransformation ' -pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff'];
     system(cmd);    
 end
 
 % define pathnames of used/saved files for label registration
-temp_floSegm = strrep(pathLabels,'.nii.gz','.mgz');
+temp_floSegm = strrep(pathSyntheticLabels,'.nii.gz','.mgz');
 [dir,filename,~] = fileparts(temp_floSegm);
-pathResultLabels = fullfile(dir, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
+pathRegisteredSyntheticLabels = fullfile(dir, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
 % apply registration to segmentation map
-if ~exist(pathResultLabels, 'file') || recompute == 1
-    disp(['applying ',pathTransformation,' to ',pathLabels]);
-    cmd = ['reg_resample -ref ',pathRealRefImage,' -flo ',pathLabels,' -trans ',pathTransformation,' -res ',pathResultLabels,' -pad 0 -inter 0 -voff'];
+if ~exist(pathRegisteredSyntheticLabels, 'file') || recompute == 1
+    disp(['applying ',pathTransformation,' to ',pathSyntheticLabels]);
+    cmd = ['reg_resample -ref ',pathRealRefMaskedImage,' -flo ',pathSyntheticLabels,' -trans ',pathTransformation,' -res ',pathRegisteredSyntheticLabels,' -pad 0 -inter 0 -voff'];
     system(cmd);
 end
 
