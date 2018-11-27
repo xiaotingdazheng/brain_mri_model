@@ -26,11 +26,14 @@ margin = 30;
 recompute = 1;
 labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
 
-pathAccuracies = '/home/benjamin/matlab/brain_mri_model/LabelFusionAccuracy.mat';
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % initialisation
+now = clock;
+resultsFolder = ['/home/benjamin/data/registrations_' num2str(now(3)) ':' num2str(now(2)) '_' num2str(now(4)) ':' num2str(now(5))];
+if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
+pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
+
 n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
 refIndex = n_training_data:-1:1;
@@ -59,8 +62,8 @@ for i=1:size(leaveOneOutIndices,1)
     
     % mask real image and open it
     temp_ref = strrep(pathRealRefImage,'.nii.gz','.mgz');
-    [dir,name,~] = fileparts(temp_ref);
-    pathRealRefMaskedImage = fullfile(dir,[name,'.masked','.nii.gz']); %path of binary mask
+    [~,name,~] = fileparts(temp_ref);
+    pathRealRefMaskedImage = fullfile(resultsFolder, [name,'.masked','.nii.gz']); %path of binary mask
     if ~exist(pathRealRefMaskedImage, 'file') || recompute == 1
         disp(['masking real image ' pathRealRefImage])
         cmd = ['mask_mri ' pathRealRefImage ' ' pathRealRefLabels ' ' pathRealRefMaskedImage]; 
@@ -84,7 +87,7 @@ for i=1:size(leaveOneOutIndices,1)
         % registration of synthetic image and labels to real image
         pathSyntheticImage = cellPathsSyntheticImages{leaveOneOutIndices(i,j)};
         pathSyntheticLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
-        [pathRegisteredSyntheticImage, pathRegisteredSyntheticLabels] = register(realRefMaskedImage, pathSyntheticImage, pathSyntheticLabels, refIndex(i), recompute);
+        [pathRegisteredSyntheticImage, pathRegisteredSyntheticLabels] = register(realRefMaskedImage, pathSyntheticImage, pathSyntheticLabels, resultsFolder, refIndex(i), recompute);
         
         % read registered real,synthetic and segmentation images
         %to change !!! realRefImage = MRIread(pathRealRefImage); %read real image

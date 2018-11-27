@@ -1,12 +1,12 @@
-function [pathRegisteredSyntheticImage, pathRegisteredSyntheticLabels] = register(pathRealRefMaskedImage, pathSyntheticImage, pathSyntheticLabels, refIndex, recompute)
+function [pathRegisteredSyntheticImage, pathRegisteredSyntheticLabels] = register(pathRealRefMaskedImage, pathSyntheticImage, pathSyntheticLabels, resultsFolder, refIndex, recompute)
 
 % names of files that will be used/saved during registration
 temp_pathSyntheticImage = strrep(pathSyntheticImage,'.nii.gz','.mgz');
-[dir,filename,~] = fileparts(temp_pathSyntheticImage);
-pathRegisteredSyntheticImage = fullfile(dir,[filename '.registered_to_image_' num2str(refIndex) '.nii.gz']); %path of registered real image
-aff = fullfile(dir,[filename,'.aff']); %deformation of first registration
-pathAffineTransformation = fullfile(dir,[filename '.registered_to_image_' num2str(refIndex) '.affine.nii.gz']); %path of registered real image
-pathTransformation = fullfile(dir,[filename '.registered_to_image_' num2str(refIndex) '.cpp.nii.gz']); %modify name of the saved aff file
+[~,filename,~] = fileparts(temp_pathSyntheticImage);
+pathRegisteredSyntheticImage = fullfile(resultsFolder,[filename '.registered_to_image_' num2str(refIndex) '.nii.gz']); %path of registered real image
+aff = fullfile(resultsFolder, [filename,'.aff']); %deformation of first registration
+pathAffineTransformation = fullfile(resultsFolder, [filename '.registered_to_image_' num2str(refIndex) '.affine.nii.gz']); %path of registered real image
+pathTransformation = fullfile(resultsFolder, [filename '.registered_to_image_' num2str(refIndex) '.cpp.nii.gz']); %modify name of the saved aff file
 
 % compute first rigid registration
 if ~exist(aff, 'file') || recompute == 1
@@ -23,8 +23,8 @@ end
 
 % define pathnames of used/saved files for label registration
 temp_floSegm = strrep(pathSyntheticLabels,'.nii.gz','.mgz');
-[dir,filename,~] = fileparts(temp_floSegm);
-pathRegisteredSyntheticLabels = fullfile(dir, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
+[resultsFolder,filename,~] = fileparts(temp_floSegm);
+pathRegisteredSyntheticLabels = fullfile(resultsFolder, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
 % apply registration to segmentation map
 if ~exist(pathRegisteredSyntheticLabels, 'file') || recompute == 1
     disp(['applying ',pathTransformation,' to ',pathSyntheticLabels]);
