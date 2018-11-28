@@ -25,8 +25,8 @@ cellPathsRealImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated 
 % folder '~/data/registrations_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 0;
-dataFolder = '~/data/label_fusion_23:11_12:00';
+recompute = 1;
+dataFolder = '~/data/label_fusion_23_11_12_00';
 
 sigma = 1;
 margin = 30;
@@ -36,7 +36,7 @@ labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
 
 % initialisation
 now = clock;
-resultsFolder = ['~/data/label_fusion_' num2str(now(3)) ':' num2str(now(2)) '_' num2str(now(4)) ':' num2str(now(5))];
+resultsFolder = ['~/data/label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))];
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
 if ~recompute, resultsFolder = dataFolder; end
@@ -69,9 +69,10 @@ for i=1:size(leaveOneOutIndices,1)
     pathRealRefLabels = cellPathsLabels{refIndex(i)};
     
     % mask real image and open it
+    brain_num = pathRealRefImage(regexp(pathRealRefImage,'brain'):regexp(pathRealRefImage,'brain')+5);
     temp_ref = strrep(pathRealRefImage,'.nii.gz','.mgz');
     [~,name,~] = fileparts(temp_ref);
-    pathRealRefMaskedImage = fullfile(resultsFolder, [name,'.masked','.nii.gz']); %path of binary mask
+    pathRealRefMaskedImage = fullfile(resultsFolder, [brain_num '.' name '.masked.nii.gz']); %path of binary mask
     if ~exist(pathRealRefMaskedImage, 'file') || recompute == 1
         setFreeSurfer();
         disp(['masking real image ' pathRealRefImage])

@@ -67,14 +67,8 @@ MRIwrite(mergedLabelsMRI, pathNewImage); %write a new mgz file.
 if ~downsample
     disp('dowmsampling to target resolution');
     
-    % calls freesurfer package
-    setenv('FREESURFER_HOME','/usr/local/freesurfer/'); %setup of freesurfer environment
-    PATH = getenv('PATH');
-    if ~contains(PATH,'/usr/local/freesurfer/bin')
-        setenv('PATH',[PATH ':/usr/local/freesurfer/bin']);
-    end
-    
     % downsample and reslice like template image
+    setFreeSurfer(); % calls freesurfer package
     cmd = ['mri_convert ' pathNewImage ' ' pathNewImage ' -rl ' pathImageResliceLike ' -rt nearest -odt float'];
     [~,~] = system(cmd);
     
