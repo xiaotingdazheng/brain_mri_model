@@ -10,7 +10,7 @@ tic
 %     '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
 %     '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
 %     '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
-cellPathsSyntheticImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
+cellPathsFloatingImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
@@ -20,18 +20,22 @@ cellPathsLabels = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.ni
     '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
     '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.labels.nii.gz';
     '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.labels.nii.gz'};
-cellPathsRealImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
+cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
 
 % set recompute to 1 if you wish to recompute all the masks and
-% registrations. The results will be saved in an automatically generated 
+% registrations. The results will be saved in an automatically generated
 % folder '~/data/registrations_date_time'. If recompute = 0, specify where
 % is the data to be used.
 recompute = 1;
 dataFolder = '~/data/label_fusion_27_11_18_12';
+
+% set to 1 if you wish to apply masking to floating images. Resulting mask
+% image will be saved in resultsFolder.
+maskFloatingImages = 1;
 
 sigma = 1;
 margin = 30;
@@ -64,30 +68,30 @@ labelsList = [2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,
 
 accuracies = NaN(n_training_data, length(labelsList));
 
-% test label fusion on each real image 
+% test label fusion on each real image
 for i=1:size(leaveOneOutIndices,1)
     
-    disp(['%%% testing label fusion on ',cellPathsRealImages{refIndex(i)}])
+    disp(['%%% testing label fusion on ',cellPathsRefImages{refIndex(i)}])
     
     % define paths of real image and corresponding labels
-    pathRealRefImage = cellPathsRealImages{refIndex(i)}; %path of real image
-    pathRealRefLabels = cellPathsLabels{refIndex(i)};
+    pathRefImage = cellPathsRefImages{refIndex(i)}; %path of real image
+    pathRefLabels = cellPathsLabels{refIndex(i)};
     
     % mask real image
-    brain_num = pathRealRefImage(regexp(pathRealRefImage,'brain'):regexp(pathRealRefImage,'brain')+5);
-    temp_ref = strrep(pathRealRefImage,'.nii.gz','.mgz');
+    brain_num = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'brain')+5);
+    temp_ref = strrep(pathRefImage,'.nii.gz','.mgz');
     [~,name,~] = fileparts(temp_ref);
-    pathRealRefMaskedImage = fullfile(resultsFolder, [brain_num '.' name '.masked.nii.gz']); %path of binary mask
-    if ~exist(pathRealRefMaskedImage, 'file') || recompute == 1
+    pathRefMaskedImage = fullfile(resultsFolder, [brain_num '_' name '.masked.nii.gz']); %path of binary mask
+    if ~exist(pathRefMaskedImage, 'file') || recompute == 1
         setFreeSurfer();
-        disp(['masking real image ' pathRealRefImage])
-        cmd = ['mri_mask ' pathRealRefImage ' ' pathRealRefLabels ' ' pathRealRefMaskedImage]; 
+        disp(['masking real image ' pathRefImage])
+        cmd = ['mri_mask ' pathRefImage ' ' pathRefLabels ' ' pathRefMaskedImage];
         system(cmd); %mask real ref image
     end
     
     % open real masked image and corresponding labels
-    realRefMaskedImage = MRIread(pathRealRefMaskedImage);
-    GTSegmentation = MRIread(pathRealRefLabels);
+    realRefMaskedImage = MRIread(pathRefMaskedImage);
+    GTSegmentation = MRIread(pathRefLabels);
     
     % open corresponding segmentation and find cropping of hippocampus
     GTSegmentation = GTSegmentation.vol;
@@ -97,49 +101,70 @@ for i=1:size(leaveOneOutIndices,1)
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
         
-        disp(['processing synthtetic data ',cellPathsSyntheticImages{leaveOneOutIndices(i,j)}])
+        disp(['processing synthtetic data ',cellPathsFloatingImages{leaveOneOutIndices(i,j)}])
+        
+        % paths of synthetic image and labels
+        pathFloatingImage = cellPathsFloatingImages{leaveOneOutIndices(i,j)};
+        pathFloatingLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
+        
+        %mask image if needed
+        if maskFloatingImages
+            temp_flo = strrep(pathFloatingImage,'.nii.gz','.mgz');
+            [~,name,~] = fileparts(temp_flo);
+            if contains(pathFloatingImage, 'brain') && ~contains(name, 'brain')
+                brain_num = [pathFloatingImage(regexp(pathFloatingImage,'brain'):regexp(pathFloatingImage,'brain')+5) '_'];
+            else
+                brain_num = '';
+            end
+            pathMaskedFloatingImage = fullfile(resultsFolder, [brain_num  name '.masked.nii.gz']); %path of mask
+            if ~exist(pathMaskedFloatingImage, 'file')
+                setFreeSurfer();
+                disp(['masking real image ' pathRefImage])
+                cmd = ['mri_mask ' pathFloatingImage ' ' pathFloatingLabels ' ' pathMaskedFloatingImage];
+                system(cmd);
+            end
+            pathFloatingImage = pathMaskedFloatingImage;
+        end
         
         % registration of synthetic image and labels to real image
-        pathSyntheticImage = cellPathsSyntheticImages{leaveOneOutIndices(i,j)};
-        pathSyntheticLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
-        [pathRegisteredSyntheticImage, pathRegisteredSyntheticLabels] = register(pathRealRefMaskedImage, pathSyntheticImage, pathSyntheticLabels, resultsFolder, refIndex(i), recompute);
+        [pathRegisteredFloatingImage, pathRegisteredFloatingLabels] = register(pathRefMaskedImage, pathFloatingImage, pathFloatingLabels, resultsFolder, refIndex(i), recompute);
         
         % read registered real,synthetic and segmentation images
         %to change !!! realRefImage = MRIread(pathRealRefImage); %read real image
-        registeredSyntheticImage = MRIread(pathRegisteredSyntheticImage);
-        registeredSyntheticLabels = MRIread(pathRegisteredSyntheticLabels);
+        registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
+        registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         
         % cropp registered synthetic images and corresponding segmentation
         croppedRealRefMaskedImage = realRefMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-        croppedRegisteredSyntheticImage = registeredSyntheticImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-        croppedRegisteredSyntheticLabels = registeredSyntheticLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-       
-        if ~isequal(size(croppedRealRefMaskedImage), size(croppedRegisteredSyntheticImage)) || ~isequal(size(croppedRealRefMaskedImage), size(croppedRegisteredSyntheticLabels))
+        croppedRegisteredFloatingImage = registeredFloatingImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+        croppedRegisteredFloatingLabels = registeredFloatingLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+        
+        if ~isequal(size(croppedRealRefMaskedImage), size(croppedRegisteredFloatingImage)) || ~isequal(size(croppedRealRefMaskedImage), size(croppedRegisteredFloatingLabels))
             error('registered image doesn t have the same size as synthetic image')
         end
         
         % calculate similarity between test (real) image and training (synthetic) image
-        likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRealRefMaskedImage-croppedRegisteredSyntheticImage).^2/(2*sigma^2));
+        likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRealRefMaskedImage-croppedRegisteredFloatingImage).^2/(2*sigma^2));
         
         disp('updating segmentation likelihood')
         for k=1:length(labelsList)
             if isequal(labelPriorType, 'delta function')
-                labelPrior = (croppedRegisteredSyntheticLabels == labelsList(k));
+                labelPrior = (croppedRegisteredFloatingLabels == labelsList(k));
             elseif  isequal(labelPriorType, 'logOdds')
-                labelPrior = (croppedRegisteredSyntheticLabels == labelsList(k));
+                labelPrior = (croppedRegisteredFloatingLabels == labelsList(k));
             else
                 error('wrong type of label Prior, must be delta function or logOdds')
             end
             labelMap(:,:,:,k) = labelMap(:,:,:,k) + labelPrior.*likelihood;
         end
-       
+        
     end
     
     disp('finding most likely segmentation and calculating corresponding accuracy')
     [~,index] = max(labelMap, [], 4);
     labelMap = arrayfun(@(x) labelsList(x), index);
     accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedGTSegmentation, labelsList);
-   
+    
 end
 
 % formating and saving result matrix
