@@ -134,6 +134,6 @@ pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.nii.gz');
 
 mriLabels.vol = labels; %write new matrix in header
 mriLabels.fspec = pathFusedLabels;
-MRIwrite(mriLabels, pathFusedLabels); %write a new mgz file.
+MRIwrite(mriLabels, pathFusedLabels); %write a new nii.gz file.
 
 end

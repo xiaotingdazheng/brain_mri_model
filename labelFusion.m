@@ -5,11 +5,16 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 
-cellPathsSyntheticImages = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
-    '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
-    '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
-    '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
-    '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
+% cellPathsSyntheticImages = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
+%     '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
+%     '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
+%     '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
+%     '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
+cellPathsSyntheticImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
+    '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
 cellPathsLabels = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz';
     '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
     '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
@@ -26,7 +31,7 @@ cellPathsRealImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % folder '~/data/registrations_date_time'. If recompute = 0, specify where
 % is the data to be used.
 recompute = 1;
-dataFolder = '~/data/label_fusion_23_11_12_00';
+dataFolder = '~/data/label_fusion_27_11_18_12';
 
 sigma = 1;
 margin = 30;
@@ -68,7 +73,7 @@ for i=1:size(leaveOneOutIndices,1)
     pathRealRefImage = cellPathsRealImages{refIndex(i)}; %path of real image
     pathRealRefLabels = cellPathsLabels{refIndex(i)};
     
-    % mask real image and open it
+    % mask real image
     brain_num = pathRealRefImage(regexp(pathRealRefImage,'brain'):regexp(pathRealRefImage,'brain')+5);
     temp_ref = strrep(pathRealRefImage,'.nii.gz','.mgz');
     [~,name,~] = fileparts(temp_ref);
@@ -93,7 +98,7 @@ for i=1:size(leaveOneOutIndices,1)
     for j=1:size(leaveOneOutIndices,2)
         
         disp(['processing synthtetic data ',cellPathsSyntheticImages{leaveOneOutIndices(i,j)}])
-
+        
         % registration of synthetic image and labels to real image
         pathSyntheticImage = cellPathsSyntheticImages{leaveOneOutIndices(i,j)};
         pathSyntheticLabels = cellPathsLabels{leaveOneOutIndices(i,j)};

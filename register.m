@@ -3,6 +3,10 @@ function [pathRegisteredSyntheticImage, pathRegisteredSyntheticLabels] = registe
 % names of files that will be used/saved during registration
 temp_pathSyntheticImage = strrep(pathSyntheticImage,'.nii.gz','.mgz');
 [~,filename,~] = fileparts(temp_pathSyntheticImage);
+if ~contains(filename, 'brain') && contains(pathSyntheticImage, 'brain')
+    brain_num = pathSyntheticImage(regexp(pathSyntheticImage,'brain'):regexp(pathSyntheticImage,'brain')+5);
+    filename = [brain_num '_' filename];
+end
 pathRegisteredSyntheticImage = fullfile(resultsFolder,[filename '.registered_to_image_' num2str(refIndex) '.nii.gz']); %path of registered real image
 aff = fullfile(resultsFolder, [filename,'.aff']); %deformation of first registration
 pathAffineTransformation = fullfile(resultsFolder, [filename '.registered_to_image_' num2str(refIndex) '.affine.nii.gz']); %path of registered real image
