@@ -38,7 +38,7 @@ dataFolder = '~/data/label_fusion_29_11_12_52';
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
 recomputeLogOdds = 1;
-cellLogOddsFolder = '~/data/logOddsCells';
+logOddsFolder = '~/data/logOdds';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
@@ -49,7 +49,7 @@ sigma = 1;                         % std dev of gaussian similarity meaure
 margin = 30;                       % margin introduced when hippocampus are cropped
 labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
 rho = 0.2;                        % exponential decay for prob logOdds
-threshold = 0.6;                   % threshold for prob logOdds
+threshold = 0.5;                   % threshold for prob logOdds
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -60,7 +60,7 @@ if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
 if ~recompute, resultsFolder = dataFolder; end
 
-if ~exist(cellLogOddsFolder, 'dir'), mkdir(cellLogOddsFolder), end
+if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end
 
 n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
@@ -120,13 +120,11 @@ for i=1:size(leaveOneOutIndices,1)
         pathFloatingLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
         
         % compute logOdds
-        temp_lab = strrep(pathFloatingLabels,'.nii.gz','.mgz');
+        temp_lab = strrep(pathFloatingLabels,'.nii.gz','');
         [~,name,~] = fileparts(temp_lab);
-        pathCellToLogOdds = fullfile(cellLogOddsFolder, [name '.logOdds.mat']);
-        if ~exist(pathCellToLogOdds, 'file') || recomputeLogOdds
-            cellLogOdds = labels2prob(pathFloatingLabels, pathCellToLogOdds, rho, threshold, labelsList);
-        else
-           load(pathCellToLogOdds);
+        pathlogOddsSubfolder = fullfile(logOddsFolder, name);
+        if ~exist(pathlogOddsSubfolder, 'dir') || recomputeLogOdds
+            labels2prob(pathFloatingLabels, pathlogOddsSubfolder, rho, threshold, labelsList);
         end
         
         %mask image if needed
