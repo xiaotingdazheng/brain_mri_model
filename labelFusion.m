@@ -30,17 +30,26 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated
 % folder '~/data/registrations_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 1;
-dataFolder = '~/data/label_fusion_27_11_18_12';
+recompute = 0;
+dataFolder = '~/data/label_fusion_29_11_12_52';
+
+% set recomputeLogOdds to 1 if you wish to recompute the logOdds
+% probability maps. The new ones will be stored to cellLogOddsFolder. If
+% recomputeLogOdds is set to 0, data stored in the specified folder will be
+% reused directly.
+recomputeLogOdds = 1;
+cellLogOddsFolder = '~/data/logOddsCells';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
 maskFloatingImages = 1;
 
 % label fusion parameter
-sigma = 1; %std dev of gaussian similarity meaure
-margin = 30; %margin introduced when hippocampus are cropped
+sigma = 1;                         % std dev of gaussian similarity meaure
+margin = 30;                       % margin introduced when hippocampus are cropped
 labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
+rho = 0.2;                        % exponential decay for prob logOdds
+threshold = 0.6;                   % threshold for prob logOdds
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -50,6 +59,8 @@ resultsFolder = ['~/data/label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' 
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
 if ~recompute, resultsFolder = dataFolder; end
+
+if ~exist(cellLogOddsFolder, 'dir'), mkdir(cellLogOddsFolder), end
 
 n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
@@ -107,6 +118,16 @@ for i=1:size(leaveOneOutIndices,1)
         % paths of synthetic image and labels
         pathFloatingImage = cellPathsFloatingImages{leaveOneOutIndices(i,j)};
         pathFloatingLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
+        
+        % compute logOdds
+        temp_lab = strrep(pathFloatingLabels,'.nii.gz','.mgz');
+        [~,name,~] = fileparts(temp_lab);
+        pathCellToLogOdds = fullfile(cellLogOddsFolder, [name '.logOdds.mat']);
+        if ~exist(pathCellToLogOdds, 'file') || recomputeLogOdds
+            cellLogOdds = labels2prob(pathFloatingLabels, pathCellToLogOdds, rho, threshold, labelsList);
+        else
+           load(pathCellToLogOdds);
+        end
         
         %mask image if needed
         if maskFloatingImages
