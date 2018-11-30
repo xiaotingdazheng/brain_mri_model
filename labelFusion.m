@@ -37,8 +37,9 @@ dataFolder = '~/data/label_fusion_27_11_18_12';
 % image will be saved in resultsFolder.
 maskFloatingImages = 1;
 
-sigma = 1;
-margin = 30;
+% label fusion parameter
+sigma = 1; %std dev of gaussian similarity meaure
+margin = 30; %margin introduced when hippocampus are cropped
 labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
