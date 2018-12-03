@@ -155,29 +155,21 @@ for i=1:size(leaveOneOutIndices,1)
         registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         
         % cropp registered synthetic images and corresponding segmentation
-        croppedRealRefMaskedImage = realRefMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+        croppedRefMaskedImage = realRefMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         croppedRegisteredFloatingImage = registeredFloatingImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         croppedRegisteredFloatingLabels = registeredFloatingLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         
-        if ~isequal(size(croppedRealRefMaskedImage), size(croppedRegisteredFloatingImage)) || ~isequal(size(croppedRealRefMaskedImage), size(croppedRegisteredFloatingLabels))
+        if ~isequal(size(croppedRefMaskedImage), size(croppedRegisteredFloatingImage)) || ~isequal(size(croppedRefMaskedImage), size(croppedRegisteredFloatingLabels))
             error('registered image doesn t have the same size as synthetic image')
         end
         
         % calculate similarity between test (real) image and training (synthetic) image
-        likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRealRefMaskedImage-croppedRegisteredFloatingImage).^2/(2*sigma^2));
+        likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRefMaskedImage-croppedRegisteredFloatingImage).^2/(2*sigma^2));
         
-        disp('updating segmentation likelihood')
-        for k=1:length(labelsList)
-            if isequal(labelPriorType, 'delta function')
-                labelPrior = (croppedRegisteredFloatingLabels == labelsList(k));
-            elseif  isequal(labelPriorType, 'logOdds')
-                labelPrior = (croppedRegisteredFloatingLabels == labelsList(k));
-            else
-                error('wrong type of label Prior, must be delta function or logOdds')
-            end
-            labelMap(:,:,:,k) = labelMap(:,:,:,k) + labelPrior.*likelihood;
-        end
-        
+        disp('updating sum of posteriors')
+        labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, croppedRegisteredFloatingImage, croppedRegisteredFloatingLabels, ...
+            labelsList, cropping, sigma, labelPriorType, pathlogOddsSubfolder);
+
     end
     
     disp('finding most likely segmentation and calculating corresponding accuracy')
