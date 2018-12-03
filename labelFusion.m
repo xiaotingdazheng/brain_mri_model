@@ -42,7 +42,7 @@ logOddsFolder = '~/data/logOdds';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
-maskFloatingImages = 1;
+computeMaskFloatingImages = 1;
 
 % label fusion parameter
 sigma = 1;                         % std dev of gaussian similarity meaure
@@ -127,23 +127,9 @@ for i=1:size(leaveOneOutIndices,1)
             labels2prob(pathFloatingLabels, pathlogOddsSubfolder, rho, threshold, labelsList);
         end
         
-        %mask image if needed
-        if maskFloatingImages
-            temp_flo = strrep(pathFloatingImage,'.nii.gz','.mgz');
-            [~,name,~] = fileparts(temp_flo);
-            if contains(pathFloatingImage, 'brain') && ~contains(name, 'brain')
-                brain_num = [pathFloatingImage(regexp(pathFloatingImage,'brain'):regexp(pathFloatingImage,'brain')+5) '_'];
-            else
-                brain_num = '';
-            end
-            pathMaskedFloatingImage = fullfile(resultsFolder, [brain_num  name '.masked.nii.gz']); %path of mask
-            if ~exist(pathMaskedFloatingImage, 'file')
-                setFreeSurfer();
-                disp(['masking real image ' pathRefImage])
-                cmd = ['mri_mask ' pathFloatingImage ' ' pathFloatingLabels ' ' pathMaskedFloatingImage];
-                system(cmd);
-            end
-            pathFloatingImage = pathMaskedFloatingImage;
+        %mask image if specified
+        if computeMaskFloatingImages
+            pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder);
         end
         
         % registration of synthetic image and labels to real image

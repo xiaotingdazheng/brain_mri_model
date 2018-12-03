@@ -19,7 +19,7 @@ switch labelPriorType
         marginalisation = zeros(size(croppedRefMaskedImage));
         
         for k=1:length(labelsList)
-            temp_pathLogOdds = fullfile(pathlogOddsSubfolder, ['logOdds_' num2str(labelsList(l)) '.nii.gz']); % path to logOdds file
+            temp_pathLogOdds = fullfile(pathlogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']); % path to logOdds file
             MRILogOdds = MRIread(temp_pathLogOdds); % load logOdds
             labelPrior = MRILogOdds.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)); % crop LogOdds around ROI
             marginalisation = marginalisation + labelPrior; % update marginalisation over all labels
