@@ -49,7 +49,7 @@ sigma = 1;                    % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
 labelPriorType = 'logOdds';   %'delta function' or 'loggOdds'
 rho = 0.2;                    % exponential decay for prob logOdds
-threshold = 0.5;              % threshold for prob logOdds
+threshold = 0.3;              % threshold for prob logOdds
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -90,10 +90,10 @@ for i=1:size(leaveOneOutIndices,1)
     pathRefLabels = cellPathsLabels{refIndex(i)};
     
     % mask real image
-    brain_num = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'brain')+5);
+    refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'brain')+5);
     temp_ref = strrep(pathRefImage,'.nii.gz','.mgz');
     [~,name,~] = fileparts(temp_ref);
-    pathRefMaskedImage = fullfile(resultsFolder, [brain_num '_' name '.masked.nii.gz']); %path of binary mask
+    pathRefMaskedImage = fullfile(resultsFolder, [refBrainNum '_' name '.masked.nii.gz']); %path of binary mask
     if ~exist(pathRefMaskedImage, 'file') || recompute == 1
         setFreeSurfer();
         disp(['masking real image ' pathRefImage])
@@ -119,47 +119,48 @@ for i=1:size(leaveOneOutIndices,1)
         pathFloatingImage = cellPathsFloatingImages{leaveOneOutIndices(i,j)};
         pathFloatingLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
         
+        % extracting name of Floating image's brain number from label path
+        [~,name,~] = fileparts(strrep(pathFloatingLabels,'.nii.gz','.mgz'));
+        floBrainNum = name(regexp(name,'brain'):regexp(name,'brain')+5);
+        
         % compute logOdds
         temp_lab = strrep(pathFloatingLabels,'.nii.gz','');
         [~,name,~] = fileparts(temp_lab);
-        pathlogOddsSubfolder = fullfile(logOddsFolder, name);
-        if ~exist(pathlogOddsSubfolder, 'dir') || recomputeLogOdds
-            labels2prob(pathFloatingLabels, pathlogOddsSubfolder, rho, threshold, labelsList);
+        pathLogOddsSubfolder = fullfile(logOddsFolder, name);
+        if ~exist(pathLogOddsSubfolder, 'dir') || recomputeLogOdds
+            labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList);
         end
         
         %mask image if specified
         if computeMaskFloatingImages
-            pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder);
+            pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder, floBrainNum);
         end
         
         % registration of synthetic image and labels to real image
         [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathTransformation] = register(pathRefMaskedImage, pathFloatingImage,...
-            pathFloatingLabels, resultsFolder, refIndex(i), recompute);
+            pathFloatingLabels, labelPriorType, resultsFolder, refIndex(i), recompute, floBrainNum);
         
         % registration of loggOdds
         if isequal(labelPriorType, 'logOdds')
-            registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathlogOddsSubfolder, resultsFolder, recompute);
+            disp('applying registration warping to logOdds')
+            pathRegisteredLogOddsSubfolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathLogOddsSubfolder, ...
+                resultsFolder, recompute, refBrainNum, floBrainNum);
         end
         
-        % read registered synthetic and segmentation images
+        % read registered floating image
         registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
-        registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         
-        % cropp registered synthetic images and corresponding segmentation
+        % cropp reference and registered synthetic images
         croppedRefMaskedImage = refMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         croppedRegisteredFloatingImage = registeredFloatingImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-        croppedRegisteredFloatingLabels = registeredFloatingLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-        
-        if ~isequal(size(croppedRefMaskedImage), size(croppedRegisteredFloatingImage)) || ~isequal(size(croppedRefMaskedImage), size(croppedRegisteredFloatingLabels))
-            error('registered image doesn t have the same size as synthetic image')
-        end
         
         % calculate similarity between test (real) image and training (synthetic) image
         likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRefMaskedImage-croppedRegisteredFloatingImage).^2/(2*sigma^2));
         
-        disp('updating sum of posteriors')
-        labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, croppedRegisteredFloatingImage, croppedRegisteredFloatingLabels, ...
-            labelsList, cropping, sigma, labelPriorType, pathlogOddsSubfolder, pathTransformation, pathRefMaskedImage);
+        disp('cropping registered floating labels and updating sum of posteriors')
+        if isequal(labelPriorType, 'delat function'), pathRegisteredLogOddsSubfolder = ''; end
+        labelMap = updateLabelMap(labelMap, pathRegisteredFloatingLabels, croppedRefMaskedImage, croppedRegisteredFloatingImage, croppedRegisteredFloatingLabels, ...
+            labelsList, cropping, sigma, labelPriorType, pathRegisteredLogOddsSubfolder, refBrainNum, floBrainNum);
 
     end
     

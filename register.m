@@ -1,11 +1,11 @@
 function [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathTransformation] = register(pathRefMaskedImage, pathFloatingImage, ...
-    pathFloatingLabels, resultsFolder, refIndex, recompute)
+    pathFloatingLabels, labelPriorType, resultsFolder, refIndex, recompute, floBrainNum)
 
 % names of files that will be used/saved during registration
 temp_pathSyntheticImage = strrep(pathFloatingImage,'.nii.gz','.mgz');
 [~,filename,~] = fileparts(temp_pathSyntheticImage);
 if ~contains(filename, 'brain') && contains(pathFloatingImage, 'brain')
-    brain_num = pathFloatingImage(regexp(pathFloatingImage,'brain'):regexp(pathFloatingImage,'brain')+5);
+    brain_num = floBrainNum;
     filename = [brain_num '_' filename];
 end
 pathRegisteredFloatingImage = fullfile(resultsFolder,[filename '.registered_to_image_' num2str(refIndex) '.nii.gz']); %path of registered real image
@@ -26,15 +26,19 @@ if ~exist(pathRegisteredFloatingImage, 'file') || recompute
     system(cmd);    
 end
 
-% define pathnames of used/saved files for label registration
-temp_floSegm = strrep(pathFloatingLabels,'.nii.gz','.mgz');
-[~,filename,~] = fileparts(temp_floSegm);
-pathRegisteredFloatingLabels = fullfile(resultsFolder, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
-% apply registration to segmentation map
-if ~exist(pathRegisteredFloatingLabels, 'file') || recompute
-    disp(['applying ',pathTransformation,' to ',pathFloatingLabels]);
-    cmd = ['reg_resample -ref ',pathRefMaskedImage,' -flo ',pathFloatingLabels,' -trans ',pathTransformation,' -res ',pathRegisteredFloatingLabels,' -pad 0 -inter 0 -voff'];
-    system(cmd);
+if isequal(labelPriorType, 'delta function')
+    % define pathnames of used/saved files for label registration
+    temp_floSegm = strrep(pathFloatingLabels,'.nii.gz','.mgz');
+    [~,filename,~] = fileparts(temp_floSegm);
+    pathRegisteredFloatingLabels = fullfile(resultsFolder, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
+    % apply registration to segmentation map
+    if ~exist(pathRegisteredFloatingLabels, 'file') || recompute
+        disp(['applying ',pathTransformation,' to ',pathFloatingLabels]);
+        cmd = ['reg_resample -ref ',pathRefMaskedImage,' -flo ',pathFloatingLabels,' -trans ',pathTransformation,' -res ',pathRegisteredFloatingLabels,' -pad 0 -inter 0 -voff'];
+        system(cmd);
+    end
+else
+    pathRegisteredFloatingLabels = '';
 end
 
 end
