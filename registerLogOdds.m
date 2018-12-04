@@ -1,4 +1,4 @@
-function pathRegisteredLogOddsSubfolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathlogOddsSubfolder, ...
+function pathRegisteredLogOddsSubfolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathlogOddsSubfolder, logOddsFolder,...
     resultsFolder, recompute, refBrainNum, floBrainNum)
 
 % This function is called only if labelPriorType was set to 'logOdds'. It
@@ -9,7 +9,8 @@ function pathRegisteredLogOddsSubfolder = registerLogOdds(pathTransformation, pa
 for k=1:length(labelsList)
     
     registrationName = [floBrainNum '_registered_to_' refBrainNum];
-    pathRegisteredLogOddsSubfolder = fullfile(resultsFolder, ['logOdds.' registrationName]);
+    [~,logOddsType,~] = fileparts(logOddsFolder);
+    pathRegisteredLogOddsSubfolder = fullfile(resultsFolder, [logOddsType '.' registrationName]);
     if ~exist(pathRegisteredLogOddsSubfolder, 'dir'), mkdir(pathRegisteredLogOddsSubfolder), end
     pathRegisteredLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.' registrationName '.nii.gz']);
     

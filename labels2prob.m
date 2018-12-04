@@ -14,8 +14,8 @@ LabelsMask = Labels > 1;
 for l=1:length(labelsList)-1
     
     mask = (Labels == labelsList(l)); % find mask of current label
-    erudedMask = imerode(mask,ones(2,2,2)); % erode mask
-    prob = exp(-rho*bwdist(erudedMask)); % calculate prob of voxel belonging to label l
+    %mask = imerode(mask,ones(2,2,2)); % erode mask
+    prob = exp(-rho*bwdist(mask)); % calculate prob of voxel belonging to label l
     thresholdMap = prob > threshold; 
     prob = prob.*thresholdMap; % threshold prob map
     prob = prob.*LabelsMask;
@@ -29,8 +29,8 @@ end
 
 % calculate logOdds for whole hippocampus
 mask = Labels > 20000;
-erudedMask = imerode(mask,ones(2,2,2)); % erode mask
-prob = exp(-rho*bwdist(erudedMask)); % calculate prob of voxel belonging to label l
+%mask = imerode(mask,ones(2,2,2)); % erode mask
+prob = exp(-rho*bwdist(mask)); % calculate prob of voxel belonging to label l
 thresholdMap = prob > threshold;
 prob = prob.*thresholdMap; % threshold prob map
 prob = prob.*LabelsMask;
