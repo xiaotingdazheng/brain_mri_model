@@ -47,7 +47,7 @@ computeMaskFloatingImages = 1;
 % label fusion parameter
 sigma = 1;                    % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
-labelPriorType = 'logOdds';   %'delta function' or 'loggOdds'
+labelPriorType = 'delta function';   %'delta function' or 'loggOdds'
 rho = 0.2;                    % exponential decay for prob logOdds
 threshold = 0.3;              % threshold for prob logOdds
 
@@ -65,7 +65,7 @@ if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end
 n_training_data = length(cellPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
 refIndex = n_training_data:-1:1;
-namesList = {'left cerebral WM';'left cerebral cortex';'left lateral ventricule';'left inf lat vent';...
+namesList = {'background';'left cerebral WM';'left cerebral cortex';'left lateral ventricule';'left inf lat vent';...
     'left cerebellum WM';'left cerebellum cortex';'left thalamus proper';'left caudate';'left putamen';...
     'left pallidum';'3rd ventricule';'4th ventricule';'brain stem';'left hippocampus';'left amygdala';...
     'CSF';'left accubens area';'left ventralDC';'left vessel';'left-choroid plexus';'right cerebral WM';...
@@ -75,7 +75,7 @@ namesList = {'left cerebral WM';'left cerebral cortex';'left lateral ventricule'
     'optic chiasm';'CC posterior';'CC mid posterior';'CC central';'CC Mid anterior';'CC anterior';'R_CA1';...
     'R _subiculum';'R_CA4DG';'R_CA3';'R_molecular layer';'L_CA1';'L_subiculum';'L_CA4DG';'L_CA3';...
     'L_molecular_layer';'all hippocampus'};
-labelsList = [2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
+labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
     58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106,NaN];
 
 accuracies = NaN(n_training_data, length(labelsList));
@@ -96,7 +96,7 @@ for i=1:size(leaveOneOutIndices,1)
     pathRefMaskedImage = fullfile(resultsFolder, [refBrainNum '_' name '.masked.nii.gz']); %path of binary mask
     if ~exist(pathRefMaskedImage, 'file') || recompute == 1
         setFreeSurfer();
-        disp(['masking real image ' pathRefImage])
+        disp(['masking reference image ' pathRefImage])
         cmd = ['mri_mask ' pathRefImage ' ' pathRefLabels ' ' pathRefMaskedImage];
         system(cmd); %mask real ref image
     end
@@ -116,7 +116,7 @@ for i=1:size(leaveOneOutIndices,1)
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
         
-        disp(['processing synthtetic data ',cellPathsFloatingImages{leaveOneOutIndices(i,j)}])
+        disp(['processing floating image ',cellPathsFloatingImages{leaveOneOutIndices(i,j)}])
         
         % paths of synthetic image and labels
         pathFloatingImage = cellPathsFloatingImages{leaveOneOutIndices(i,j)};
@@ -148,13 +148,15 @@ for i=1:size(leaveOneOutIndices,1)
             disp('applying registration warping to logOdds')
             pathRegisteredLogOddsSubfolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathLogOddsSubfolder, ...
                 resultsFolder, recompute, refBrainNum, floBrainNum);
+        else
+            pathRegisteredLogOddsSubfolder = '';
         end
         
         % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors')
         if isequal(labelPriorType, 'delat function'), pathRegisteredLogOddsSubfolder = ''; end
         labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, ...
-    labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum);
+    labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
 
     end
     

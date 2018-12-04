@@ -1,5 +1,5 @@
 function labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, ...
-    labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum)
+    labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation)
 
 % This function updates the labelMap matrix on which we will perform the
 % argmax operation to obatin the best segmentation possible. The update
