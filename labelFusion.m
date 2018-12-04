@@ -28,7 +28,7 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 
 % set recompute to 1 if you wish to recompute all the masks and
 % registrations. The results will be saved in an automatically generated
-% folder '~/data/registrations_date_time'. If recompute = 0, specify where
+% folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
 recompute = 0;
 dataFolder = '~/data/label_fusion_29_11_12_52';
@@ -37,7 +37,7 @@ dataFolder = '~/data/label_fusion_29_11_12_52';
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
-recomputeLogOdds = 1;
+recomputeLogOdds = 0;
 logOddsFolder = '~/data/logOdds';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
@@ -45,11 +45,11 @@ logOddsFolder = '~/data/logOdds';
 computeMaskFloatingImages = 1;
 
 % label fusion parameter
-sigma = 1;                         % std dev of gaussian similarity meaure
-margin = 30;                       % margin introduced when hippocampus are cropped
-labelPriorType = 'delta function'; %'delta function' or 'loggOdds'
-rho = 0.2;                        % exponential decay for prob logOdds
-threshold = 0.5;                   % threshold for prob logOdds
+sigma = 1;                    % std dev of gaussian similarity meaure
+margin = 30;                  % margin introduced when hippocampus are cropped
+labelPriorType = 'logOdds';   %'delta function' or 'loggOdds'
+rho = 0.2;                    % exponential decay for prob logOdds
+threshold = 0.5;              % threshold for prob logOdds
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -102,7 +102,7 @@ for i=1:size(leaveOneOutIndices,1)
     end
     
     % open real masked image and corresponding labels
-    realRefMaskedImage = MRIread(pathRefMaskedImage);
+    refMaskedImage = MRIread(pathRefMaskedImage);
     GTSegmentation = MRIread(pathRefLabels);
     
     % open corresponding segmentation and find cropping of hippocampus
@@ -133,15 +133,20 @@ for i=1:size(leaveOneOutIndices,1)
         end
         
         % registration of synthetic image and labels to real image
-        [pathRegisteredFloatingImage, pathRegisteredFloatingLabels] = register(pathRefMaskedImage, pathFloatingImage, pathFloatingLabels, resultsFolder, refIndex(i), recompute);
+        [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathTransformation] = register(pathRefMaskedImage, pathFloatingImage,...
+            pathFloatingLabels, resultsFolder, refIndex(i), recompute);
         
-        % read registered real,synthetic and segmentation images
-        %to change !!! realRefImage = MRIread(pathRealRefImage); %read real image
+        % registration of loggOdds
+        if isequal(labelPriorType, 'logOdds')
+            registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathlogOddsSubfolder, resultsFolder, recompute);
+        end
+        
+        % read registered synthetic and segmentation images
         registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
         registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         
         % cropp registered synthetic images and corresponding segmentation
-        croppedRefMaskedImage = realRefMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+        croppedRefMaskedImage = refMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         croppedRegisteredFloatingImage = registeredFloatingImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         croppedRegisteredFloatingLabels = registeredFloatingLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         
@@ -154,7 +159,7 @@ for i=1:size(leaveOneOutIndices,1)
         
         disp('updating sum of posteriors')
         labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, croppedRegisteredFloatingImage, croppedRegisteredFloatingLabels, ...
-            labelsList, cropping, sigma, labelPriorType, pathlogOddsSubfolder);
+            labelsList, cropping, sigma, labelPriorType, pathlogOddsSubfolder, pathTransformation, pathRefMaskedImage);
 
     end
     
