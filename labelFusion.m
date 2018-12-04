@@ -101,14 +101,17 @@ for i=1:size(leaveOneOutIndices,1)
         system(cmd); %mask real ref image
     end
     
-    % open real masked image and corresponding labels
+    % open reference labels
+    refSegmentation = MRIread(pathRefLabels);
     refMaskedImage = MRIread(pathRefMaskedImage);
-    GTSegmentation = MRIread(pathRefLabels);
     
-    % open corresponding segmentation and find cropping of hippocampus
-    GTSegmentation = GTSegmentation.vol;
-    [croppedGTSegmentation, cropping] = cropHippo(GTSegmentation, margin);
-    labelMap = zeros([size(croppedGTSegmentation), length(labelsList)]); %initialise matrix
+    % open corresponding segmentation and crop ref image/labels around hippocampus
+    refSegmentation = refSegmentation.vol;
+    [croppedRefSegmentation, cropping] = cropHippo(refSegmentation, margin);
+    croppedRefMaskedImage = refMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+    
+    %initialise matrix on which label fusion will be performed
+    labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]); 
     
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
@@ -147,27 +150,18 @@ for i=1:size(leaveOneOutIndices,1)
                 resultsFolder, recompute, refBrainNum, floBrainNum);
         end
         
-        % read registered floating image
-        registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
-        
-        % cropp reference and registered synthetic images
-        croppedRefMaskedImage = refMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-        croppedRegisteredFloatingImage = registeredFloatingImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-        
-        % calculate similarity between test (real) image and training (synthetic) image
-        likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRefMaskedImage-croppedRegisteredFloatingImage).^2/(2*sigma^2));
-        
+        % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors')
         if isequal(labelPriorType, 'delat function'), pathRegisteredLogOddsSubfolder = ''; end
-        labelMap = updateLabelMap(labelMap, pathRegisteredFloatingLabels, croppedRefMaskedImage, croppedRegisteredFloatingImage, croppedRegisteredFloatingLabels, ...
-            labelsList, cropping, sigma, labelPriorType, pathRegisteredLogOddsSubfolder, refBrainNum, floBrainNum);
+        labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, ...
+    labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum);
 
     end
     
     disp('finding most likely segmentation and calculating corresponding accuracy')
     [~,index] = max(labelMap, [], 4);
     labelMap = arrayfun(@(x) labelsList(x), index);
-    accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedGTSegmentation, labelsList);
+    accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedRefSegmentation, labelsList);
     
 end
 
