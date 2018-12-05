@@ -9,6 +9,7 @@ if ~exist(pathLogOddsSubfolder, 'dir'), mkdir(pathLogOddsSubfolder), end
 LabelsMRI = MRIread(pathLabels);
 Labels = LabelsMRI.vol;
 LabelsMask = Labels > 1;
+LabelsMask = imfill(bwdist(LabelsMask)< 5, 'holes');
 
 % loop over all the labels
 for l=1:length(labelsList)-1

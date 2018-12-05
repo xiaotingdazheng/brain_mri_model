@@ -37,7 +37,7 @@ dataFolder = '~/data/label_fusion_29_11_12_52';
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
-recomputeLogOdds = 1;
+recomputeLogOdds = 0;
 logOddsFolder = '~/data/logOdds_without_erosion';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
@@ -49,7 +49,7 @@ sigma = 1;                    % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
 labelPriorType = 'logOdds';   %'delta function' or 'logOdds'
 rho = 0.2;                    % exponential decay for prob logOdds
-threshold = 0.3;              % threshold for prob logOdds
+threshold = 0.4;              % threshold for prob logOdds
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -72,9 +72,9 @@ namesList = {'background';'left cerebral WM';'left cerebral cortex';'left latera
     'right cerebral cortex';'right lateral ventricule';'right inf lat vent';'right cerebellum WM';...
     'right cerebellum cortex';'right thalamus proper';'right caudate';'right putamen';'right pallidum';...
     'right amygdala';'right accumbens area';'right ventral DC';'right vessel';'right choroid plexus';...
-    'optic chiasm';'CC posterior';'CC mid posterior';'CC central';'CC Mid anterior';'CC anterior';'R_CA1';...
-    'R _subiculum';'R_CA4DG';'R_CA3';'R_molecular layer';'L_CA1';'L_subiculum';'L_CA4DG';'L_CA3';...
-    'L_molecular_layer';'all hippocampus'};
+    'optic chiasm';'CC posterior';'CC mid posterior';'CC central';'CC Mid anterior';'CC anterior';'R CA1';...
+    'R  subiculum';'R CA4DG';'R CA3';'R molecular layer';'L CA1';'L subiculum';'L CA4DG';'L CA3';...
+    'L molecular layer';'all hippocampus'};
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
     58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106,NaN];
 
@@ -83,7 +83,7 @@ accuracies = NaN(n_training_data, length(labelsList));
 % test label fusion on each real image
 for i=1:size(leaveOneOutIndices,1)
     
-    disp(['%%% testing label fusion on ',cellPathsRefImages{refIndex(i)}])
+    disp(['%%%%% testing label fusion on ',cellPathsRefImages{refIndex(i)} ' %%%%%'])
     
     % define paths of real image and corresponding labels
     pathRefImage = cellPathsRefImages{refIndex(i)}; %path of real image
@@ -116,7 +116,7 @@ for i=1:size(leaveOneOutIndices,1)
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
         
-        disp(['processing floating image ',cellPathsFloatingImages{leaveOneOutIndices(i,j)}])
+        disp(['%% processing floating image ',cellPathsFloatingImages{leaveOneOutIndices(i,j)} ' %%'])
         
         % paths of synthetic image and labels
         pathFloatingImage = cellPathsFloatingImages{leaveOneOutIndices(i,j)};
@@ -130,7 +130,7 @@ for i=1:size(leaveOneOutIndices,1)
         temp_lab = strrep(pathFloatingLabels,'.nii.gz','');
         [~,name,~] = fileparts(temp_lab);
         pathLogOddsSubfolder = fullfile(logOddsFolder, name);
-        if ~exist(pathLogOddsSubfolder, 'dir') || recomputeLogOdds
+        if (~exist(pathLogOddsSubfolder, 'dir') || recomputeLogOdds) && isequal(labelPriorType,'logOdds')
             disp(['computing logOdds of ' pathFloatingLabels])
             labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList);
         end
@@ -145,23 +145,22 @@ for i=1:size(leaveOneOutIndices,1)
             pathFloatingLabels, labelPriorType, resultsFolder, refIndex(i), recompute, floBrainNum);
         
         % registration of loggOdds
+        pathRegisteredLogOddsSubfolder = '';
         if isequal(labelPriorType, 'logOdds')
             disp('applying registration warping to logOdds')
             pathRegisteredLogOddsSubfolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathLogOddsSubfolder, logOddsFolder,...
                 resultsFolder, recompute, refBrainNum, floBrainNum);
-        else
-            pathRegisteredLogOddsSubfolder = '';
         end
         
         % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors')
         if isequal(labelPriorType, 'delat function'), pathRegisteredLogOddsSubfolder = ''; end
         labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, ...
-    labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
+            labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
 
     end
     
-    disp('finding most likely segmentation and calculating corresponding accuracy')
+    disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' ');
     [~,index] = max(labelMap, [], 4);
     labelMap = arrayfun(@(x) labelsList(x), index);
     accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedRefSegmentation, labelsList);
