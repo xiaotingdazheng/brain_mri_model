@@ -28,7 +28,7 @@ switch labelPriorType
         registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         croppedRegisteredFloatingLabels = registeredFloatingLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         
-        for k=1:length(labelsList)
+        for k=1:length(labelsList)-1
             labelPrior = (croppedRegisteredFloatingLabels == labelsList(k)); % binary map of label k
             labelMap(:,:,:,k) = labelMap(:,:,:,k) + labelPrior.*likelihood;  % update corresponding submatrix of labelMap
         end
@@ -40,7 +40,7 @@ switch labelPriorType
         marginalisation = zeros(size(croppedRefMaskedImage));
         registrationName = [floBrainNum '_registered_to_' refBrainNum];
         
-        for k=1:length(labelsList)
+        for k=1:length(labelsList)-1
             
             % load logOdds and crop it around ROI
             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.' registrationName '.nii.gz']);

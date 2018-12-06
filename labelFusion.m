@@ -30,8 +30,8 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 0;
-dataFolder = '~/data/label_fusion_5_12_17_51';
+recompute = 1;
+dataFolder = '~/data/label_fusion_6_12_13_55';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
@@ -47,7 +47,7 @@ computeMaskFloatingImages = 1;
 % label fusion parameter
 sigma = 15;                    % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
-labelPriorType = 'delta function';   %'delta function' or 'logOdds'
+labelPriorType = 'logOdds';   %'delta function' or 'logOdds'
 rho = 0.4;                    % exponential decay for prob logOdds
 threshold = 0.5;              % threshold for prob logOdds
 

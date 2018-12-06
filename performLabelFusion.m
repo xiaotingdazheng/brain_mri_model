@@ -3,7 +3,7 @@ function [accuracy, labelMap, croppedRefSegmentation] = performLabelFusion(cellP
 
 % initialisation
 now = clock;
-resultsFolder = ['~/data/label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5)) '_sigma_' num2str(sigma)];
+resultsFolder = ['~/data/label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))];
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
 if ~recompute, resultsFolder = dataFolder; end
