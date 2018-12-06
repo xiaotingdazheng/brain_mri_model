@@ -45,15 +45,20 @@ logOddsFolder = '~/data/logOdds_without_erosion';
 computeMaskFloatingImages = 1;
 
 % label fusion parameter
-sigmaList = [0.1, 1, 10, 20, 30, 40, 50, 60, 70, 80,90,100];
+sigmaList = [10, 15, 20];
 margin = 30;                  % margin introduced when hippocampus are cropped
 labelPriorType = 'delta function';   %'delta function' or 'logOdds'
 rho = 0.4;                    % exponential decay for prob logOdds
 threshold = 0.5;              % threshold for prob logOdds
 
+means = zeros(length(sigmaList),1);
 for i=1:length(sigmaList)
     [accuracy, labelMap, croppedRefSegmentation] = performLabelFusion(cellPathsFloatingImages, cellPathsLabels, cellPathsRefImages, recompute, dataFolder,...
         recomputeLogOdds, logOddsFolder, computeMaskFloatingImages, sigmaList(i), margin, labelPriorType, rho, threshold);
+    means(i) = mean(cell2mat(accuracy(end,2:end)),'omitnan');
 end
+
+figure;
+bar(sigmaList,means);
 
 toc

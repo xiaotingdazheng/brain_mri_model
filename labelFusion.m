@@ -45,7 +45,7 @@ logOddsFolder = '~/data/logOdds_without_erosion';
 computeMaskFloatingImages = 1;
 
 % label fusion parameter
-sigma = 50;                    % std dev of gaussian similarity meaure
+sigma = 15;                    % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
 labelPriorType = 'delta function';   %'delta function' or 'logOdds'
 rho = 0.4;                    % exponential decay for prob logOdds
