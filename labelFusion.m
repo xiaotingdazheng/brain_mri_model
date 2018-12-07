@@ -30,8 +30,8 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 1;
-dataFolder = '~/data/label_fusion_6_12_13_55';
+recompute = 0;
+dataFolder = '~/data/label_fusion_6_12_14_52_logOdds_real';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
@@ -76,7 +76,7 @@ namesList = {'background';'left cerebral WM';'left cerebral cortex';'left latera
     'R  subiculum';'R CA4DG';'R CA3';'R molecular layer';'L CA1';'L subiculum';'L CA4DG';'L CA3';...
     'L molecular layer';'all hippocampus'};
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
-    58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106,NaN];
+    58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
 
 accuracies = NaN(n_training_data, length(labelsList));
 
@@ -106,12 +106,12 @@ for i=1:size(leaveOneOutIndices,1)
     refMaskedImage = MRIread(pathRefMaskedImage);
     
     % open corresponding segmentation and crop ref image/labels around hippocampus
-    refSegmentation = refSegmentation.vol;
-    [croppedRefSegmentation, cropping] = cropHippo(refSegmentation, margin);
-    croppedRefMaskedImage = refMaskedImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+    refSegmentation = refSegmentation.vol; refMaskedImage = refMaskedImage.vol;
+    [croppedRefSegmentation, croppedRefMaskedImage, cropping] = cropHippo(refSegmentation, refMaskedImage, margin, resultsFolder);
     
     %initialise matrix on which label fusion will be performed
-    labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]); 
+    labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]);
+    labelMapHippo = zeros([size(croppedRefSegmentation), 2]);
     
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
@@ -155,15 +155,14 @@ for i=1:size(leaveOneOutIndices,1)
         % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
         if isequal(labelPriorType, 'delat function'), pathRegisteredLogOddsSubfolder = ''; end
-        labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, ...
-            labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
+        [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
+            pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
 
     end
     
     disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');
-    [~,index] = max(labelMap, [], 4);
-    labelMap = arrayfun(@(x) labelsList(x), index);
-    accuracies(i,:) = computeSegmentationAccuracy(labelMap, croppedRefSegmentation, labelsList);
+    [labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum); % argmax operation
+    accuracies(i,:) = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedRefSegmentation, labelsList); % compute Dice coef for all structures
     
 end
 

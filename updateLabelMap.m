@@ -1,5 +1,5 @@
-function labelMap = updateLabelMap(labelMap, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, ...
-    labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation)
+function [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, ...
+    pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation)
 
 % This function updates the labelMap matrix on which we will perform the
 % argmax operation to obatin the best segmentation possible. The update
@@ -28,7 +28,7 @@ switch labelPriorType
         registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         croppedRegisteredFloatingLabels = registeredFloatingLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         
-        for k=1:length(labelsList)-1
+        for k=1:length(labelsList)
             labelPrior = (croppedRegisteredFloatingLabels == labelsList(k)); % binary map of label k
             labelMap(:,:,:,k) = labelMap(:,:,:,k) + labelPrior.*likelihood;  % update corresponding submatrix of labelMap
         end
@@ -37,10 +37,10 @@ switch labelPriorType
         
         % initialisation
         unmargenalisedPosterior = zeros(size(labelMap));
-        marginalisation = zeros(size(croppedRefMaskedImage));
+        partitionFunction = zeros(size(croppedRefMaskedImage));
         registrationName = [floBrainNum '_registered_to_' refBrainNum];
         
-        for k=1:length(labelsList)-1
+        for k=1:length(labelsList)
             
             % load logOdds and crop it around ROI
             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.' registrationName '.nii.gz']);
@@ -48,13 +48,34 @@ switch labelPriorType
             labelPrior = MRILogOdds.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
             
             % update marginalisation over all labels and compute posterior
-            marginalisation = marginalisation + labelPrior;
+            partitionFunction = partitionFunction + labelPrior;
             unmargenalisedPosterior(:,:,:,k) = labelPrior.*likelihood;
             
         end
         
         %update labelMap with marginalised posterior
-        labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, marginalisation);
+        labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+        
+        
+        %%% same mechanism for hipocampus logOdds
+        
+        % redefine variables for label fusion on hippocampus
+        unmargenalisedPosterior = zeros(size(labelMapHippo));
+        partitionFunction = zeros(size(croppedRefMaskedImage));
+        % load non hippo logOdds
+        temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_non_hippo.' registrationName '.nii.gz']);
+        MRILogOdds = MRIread(temp_pathLogOdds);
+        labelPrior = MRILogOdds.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+        partitionFunction = partitionFunction + labelPrior;
+        unmargenalisedPosterior(:,:,:,1) = labelPrior.*likelihood;
+        % load hippo logOdds
+        temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_hippo.' registrationName '.nii.gz']);
+        MRILogOdds = MRIread(temp_pathLogOdds);
+        labelPrior = MRILogOdds.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+        partitionFunction = partitionFunction + labelPrior;
+        unmargenalisedPosterior(:,:,:,1) = labelPrior.*likelihood;
+        %update labelMapHippo with marginalised posterior
+        labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
 end
 
