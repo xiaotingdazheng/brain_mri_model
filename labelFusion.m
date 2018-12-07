@@ -31,7 +31,7 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
 recompute = 0;
-dataFolder = '~/data/label_fusion_6_12_14_52_logOdds_real';
+dataFolder = '~/data/label_fusion_6_12_13_55_delta_real';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
@@ -47,7 +47,7 @@ computeMaskFloatingImages = 1;
 % label fusion parameter
 sigma = 15;                    % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
-labelPriorType = 'logOdds';   %'delta function' or 'logOdds'
+labelPriorType = 'delta function';   %'delta function' or 'logOdds'
 rho = 0.4;                    % exponential decay for prob logOdds
 threshold = 0.5;              % threshold for prob logOdds
 
@@ -107,7 +107,7 @@ for i=1:size(leaveOneOutIndices,1)
     
     % open corresponding segmentation and crop ref image/labels around hippocampus
     refSegmentation = refSegmentation.vol; refMaskedImage = refMaskedImage.vol;
-    [croppedRefSegmentation, croppedRefMaskedImage, cropping] = cropHippo(refSegmentation, refMaskedImage, margin, resultsFolder);
+    [croppedRefSegmentation, croppedRefMaskedImage, cropping] = cropHippo(refSegmentation, refMaskedImage, margin, resultsFolder, refBrainNum);
     
     %initialise matrix on which label fusion will be performed
     labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]);
@@ -140,9 +140,15 @@ for i=1:size(leaveOneOutIndices,1)
             pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder, floBrainNum);
         end
         
+        % create hippocampus segmentation map of floating image
+        pathFloatingHippoLabels = '';
+        if isequal(labelPriorType, 'delta function')
+            pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, floBrainNum, recompute);      
+        end
+        
         % registration of synthetic image and labels to real image
-        [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathTransformation] = register(pathRefMaskedImage, pathFloatingImage,...
-            pathFloatingLabels, labelPriorType, resultsFolder, refIndex(i), recompute, floBrainNum);
+        [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels, pathTransformation] = register(pathRefMaskedImage, ...
+            pathFloatingImage, pathFloatingLabels, pathFloatingHippoLabels, labelPriorType, resultsFolder, refIndex(i), recompute, floBrainNum);
         
         % registration of loggOdds
         pathRegisteredLogOddsSubfolder = '';
@@ -156,8 +162,8 @@ for i=1:size(leaveOneOutIndices,1)
         disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
         if isequal(labelPriorType, 'delat function'), pathRegisteredLogOddsSubfolder = ''; end
         [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
-            pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
-
+            pathRegisteredFloatingHippoLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
+        
     end
     
     disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');

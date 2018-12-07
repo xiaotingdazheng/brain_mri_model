@@ -1,5 +1,5 @@
-function [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, ...
-    pathRegisteredFloatingLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation)
+function [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels,...
+    pathRegisteredFloatingHippoLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation)
 
 % This function updates the labelMap matrix on which we will perform the
 % argmax operation to obatin the best segmentation possible. The update
@@ -32,6 +32,19 @@ switch labelPriorType
             labelPrior = (croppedRegisteredFloatingLabels == labelsList(k)); % binary map of label k
             labelMap(:,:,:,k) = labelMap(:,:,:,k) + labelPrior.*likelihood;  % update corresponding submatrix of labelMap
         end
+        
+        
+        %%% same mechanism for hippocampus map
+        
+        % load and crop hippocampus segmentation map
+        registeredFloatingHippoLabels = MRIread(pathRegisteredFloatingHippoLabels);
+        croppedRegisteredFloatingHippoLabels = registeredFloatingHippoLabels.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+        % update labelMapHippo
+        labelPrior = (croppedRegisteredFloatingHippoLabels == 0); 
+        labelMapHippo(:,:,:,1) = labelMapHippo(:,:,:,1) + labelPrior.*likelihood;
+        labelPrior = (croppedRegisteredFloatingHippoLabels == 1);
+        labelMapHippo(:,:,:,2) = labelMapHippo(:,:,:,2) + labelPrior.*likelihood;
+        
         
     case 'logOdds'
         

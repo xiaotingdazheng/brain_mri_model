@@ -1,11 +1,11 @@
-function [croppedSegmentation, croppedImage, cropping] = cropHippo(Segmentation, Image, margin, resultsFolder)
+function [croppedSegmentation, croppedImage, cropping] = cropHippo(Segmentation, Image, margin, resultsFolder, refBrainNum)
 
 % This function takes as inputs an image and its correpsonding
 % segmentation map, locates the hippocampus (or  hippocampi if both 
 % hemishperes) and saves the cropped images and segmentation in specified
 % resul folder. The cropping is done with a specified margin.
 
-SegmentationMask = Segmentation > 20000 | Segmentation == 17 | Segmentation == 43 ; % detect hippocampus labels (17 or 43) and subfields labels (>20000)
+SegmentationMask = Segmentation > 20000 | Segmentation == 17 | Segmentation == 53 ; % detect hippocampus labels (17 or 43) and subfields labels (>20000)
 SegmentationMaskMRI.vol = SegmentationMask; % builds MRI object to be read by cropLabelVol function
 SegmentationMaskMRI.vox2ras0 = zeros(4);
 

@@ -1,5 +1,5 @@
-function [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathTransformation] = register(pathRefMaskedImage, pathFloatingImage, ...
-    pathFloatingLabels, labelPriorType, resultsFolder, refIndex, recompute, floBrainNum)
+function [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels, pathTransformation] = register(pathRefMaskedImage, ...
+    pathFloatingImage, pathFloatingLabels, pathFloatingHippoLabels, labelPriorType, resultsFolder, refIndex, recompute, floBrainNum)
 
 % names of files that will be used/saved during registration
 temp_pathSyntheticImage = strrep(pathFloatingImage,'.nii.gz','.mgz');
@@ -27,6 +27,7 @@ if ~exist(pathRegisteredFloatingImage, 'file') || recompute
 end
 
 if isequal(labelPriorType, 'delta function')
+    
     % define pathnames of used/saved files for label registration
     temp_floSegm = strrep(pathFloatingLabels,'.nii.gz','.mgz');
     [~,filename,~] = fileparts(temp_floSegm);
@@ -37,8 +38,21 @@ if isequal(labelPriorType, 'delta function')
         cmd = ['reg_resample -ref ',pathRefMaskedImage,' -flo ',pathFloatingLabels,' -trans ',pathTransformation,' -res ',pathRegisteredFloatingLabels,' -pad 0 -inter 0 -voff'];
         system(cmd);
     end
+    
+    % same mechanism for hippocampus segmentation map
+    temp_floSegm = strrep(pathFloatingHippoLabels,'.nii.gz','.mgz');
+    [~,filename,~] = fileparts(temp_floSegm);
+    pathRegisteredFloatingHippoLabels = fullfile(resultsFolder, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
+    % apply registration to segmentation map
+    if ~exist(pathRegisteredFloatingHippoLabels, 'file') || recompute
+        disp(['applying ',pathTransformation,' to ',pathFloatingLabels]);
+        cmd = ['reg_resample -ref ',pathRefMaskedImage,' -flo ',pathFloatingHippoLabels,' -trans ',pathTransformation,' -res ',pathRegisteredFloatingHippoLabels,' -pad 0 -inter 0 -voff'];
+        system(cmd);
+    end
+    
 else
     pathRegisteredFloatingLabels = '';
+    pathRegisteredFloatingHippoLabels = '';
 end
 
 end

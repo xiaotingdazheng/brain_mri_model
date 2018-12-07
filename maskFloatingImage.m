@@ -1,15 +1,15 @@
-function pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder, FloBrainNum)
+function pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder, floBrainNum)
 
 temp_flo = strrep(pathFloatingImage,'.nii.gz','.mgz');
 [~,name,~] = fileparts(temp_flo);
 
 if ~contains(name, 'brain')
-    brain_num = FloBrainNum;
+    brain_num = [floBrainNum '_'];
 else
     brain_num = '';
 end
 
-pathMaskedFloatingImage = fullfile(resultsFolder, [brain_num '_' name '.masked.nii.gz']); %path of mask
+pathMaskedFloatingImage = fullfile(resultsFolder, [brain_num  name '.masked.nii.gz']); %path of mask
 
 if ~exist(pathMaskedFloatingImage, 'file')
     setFreeSurfer();

@@ -17,7 +17,7 @@ for i=1:length(labelsList)
 end
 
 % compute dice coef for all hippocampus
-temp_GT_Mask = croppedGTSegmentation > 20000 | croppedGTSegmentation == 17 | croppedGTSegmentation == 43;
+temp_GT_Mask = croppedGTSegmentation > 20000 | croppedGTSegmentation == 17 | croppedGTSegmentation == 53;
 if ~isequal(unique(labelMapHippo), 0) && ~isequal(unique(temp_GT_Mask), 0)
     accuracy(end) = dice(labelMapHippo, temp_GT_Mask);
 end

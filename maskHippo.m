@@ -19,7 +19,7 @@ if ~exist(pathFloatingHippoLabels, 'file') || recompute
     
     FloatingLabels = MRIread(pathFloatingLabels); % read labels
     
-    hippoMap = FloatingLabels.vol > 20000 | FloatingLabels.vol == 17 | FloatingLabels.vol == 43; % hippo mask
+    hippoMap = FloatingLabels.vol > 20000 | FloatingLabels.vol == 17 | FloatingLabels.vol == 53; % hippo mask
     
     FloatingLabels.vol = hippoMap; 
     
