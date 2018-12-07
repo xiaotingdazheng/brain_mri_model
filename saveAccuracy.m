@@ -1,5 +1,7 @@
 function accuracy = saveAccuracy(accuracies, namesList, labelsList, pathAccuracies)
 
+labelsList = [labelsList , NaN];
+
 accuracy = cell(size(accuracies,1)+3,size(accuracies,2)+1);
 accuracy{1,1} = 'brain regions'; accuracy{2,1} = 'associated label';
 accuracy{3,1} = 'leave one out accuracies'; accuracy{end,1} = 'mean accuracy';
