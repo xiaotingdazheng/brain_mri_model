@@ -1,16 +1,26 @@
-function [croppedSegmentation, cropping] = cropHippo(Segmentation, margin)
+function [croppedSegmentation, croppedImage, cropping] = cropHippo(Segmentation, Image, margin, resultsFolder)
 
-HippoLabels = [17,53,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
+% This function takes as inputs an image and its correpsonding
+% segmentation map, locates the hippocampus (or  hippocampi if both 
+% hemishperes) and saves the cropped images and segmentation in specified
+% resul folder. The cropping is done with a specified margin.
 
-SegmentationMask = zeros(size(Segmentation));
-
-for h=1:length(HippoLabels)
-    SegmentationMask = SegmentationMask | Segmentation==HippoLabels(h); %logical mask of hippocampus by performing or operation
-end
-SegmentationMaskMRI.vol = SegmentationMask;
+SegmentationMask = Segmentation > 20000 | Segmentation == 17 | Segmentation == 43 ; % detect hippocampus labels (17 or 43) and subfields labels (>20000)
+SegmentationMaskMRI.vol = SegmentationMask; % builds MRI object to be read by cropLabelVol function
 SegmentationMaskMRI.vox2ras0 = zeros(4);
 
-[~, cropping] = cropLabelVol(SegmentationMaskMRI, margin);
+[~, cropping] = cropLabelVol(SegmentationMaskMRI, margin); % finds cropping around hippocampus
+
+% crop both image and corresponding segmentation
 croppedSegmentation = Segmentation(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+croppedImage = Image(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+
+% save cropped segmentation
+pathCroppedSegmentation = fullfile(resultsFolder, [refBrainNum '_GT_segmentation_map.nii.gz']);
+save(pathCroppedSegmentation, 'croppedSegmentation');
+
+% save cropped image
+pathCroppedImage = fullfile(resultsFolder, [refBrainNum '_cropped_image.nii.gz']);
+save(pathCroppedImage, 'croppedImage');
 
 end
