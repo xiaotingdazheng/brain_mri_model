@@ -86,7 +86,7 @@ switch labelPriorType
         MRILogOdds = MRIread(temp_pathLogOdds);
         labelPrior = MRILogOdds.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
         partitionFunction = partitionFunction + labelPrior;
-        unmargenalisedPosterior(:,:,:,1) = labelPrior.*likelihood;
+        unmargenalisedPosterior(:,:,:,2) = labelPrior.*likelihood;
         %update labelMapHippo with marginalised posterior
         labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
