@@ -30,14 +30,14 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 0;
+recompute = 1;
 dataFolder = '~/data/label_fusion_7_12_18_44';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
-recomputeLogOdds = 0;
+recomputeLogOdds = 1;
 logOddsFolder = '~/data/logOdds_without_erosion';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask

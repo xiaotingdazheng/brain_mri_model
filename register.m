@@ -19,10 +19,10 @@ if ~exist(aff, 'file') || recompute
     cmd = ['reg_aladin -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -aff ' aff ' -res ' pathAffineTransformation ' -pad 0 -voff'];
     system(cmd);
 end
-% compute registration synthetic image to real image
+% compute registration synthetic image to real images
 if ~exist(pathRegisteredFloatingImage, 'file') || recompute
     disp(['registering with reg_f3d ',pathFloatingImage,' to ',pathRefMaskedImage]);
-    cmd = ['reg_f3d -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -res ' pathRegisteredFloatingImage ' -aff ' aff ' -cpp ' pathTransformation ' -pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff'];
+    cmd = ['reg_f3d -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -res ' pathRegisteredFloatingImage ' -aff ' aff ' -cpp ' pathTransformation ' -pad 0 -ln 4 -sx 5 --lncc 5.0 -vel -voff'];
     system(cmd);    
 end
 
