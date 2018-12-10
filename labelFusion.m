@@ -38,7 +38,8 @@ dataFolder = '~/data/label_fusion_7_12_18_44';
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
 recomputeLogOdds = 1;
-logOddsFolder = '~/data/logOdds_without_erosion';
+erode = 0;
+logOddsFolder = '~/data/logOdds_test';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
@@ -60,6 +61,7 @@ if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
 if ~recompute, resultsFolder = dataFolder; end
 
+if ~erode, logOddsFolder = [logOddsFolder, '_without_erosion']; end
 if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end
 
 n_training_data = length(cellPathsLabels);
@@ -132,7 +134,7 @@ for i=1:size(leaveOneOutIndices,1)
         pathLogOddsSubfolder = fullfile(logOddsFolder, name);
         if (~exist(pathLogOddsSubfolder, 'dir') || recomputeLogOdds) && isequal(labelPriorType,'logOdds')
             disp(['computing logOdds of ' pathFloatingLabels])
-            labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList);
+            labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList, erode);
         end
         
         %mask image if specified
