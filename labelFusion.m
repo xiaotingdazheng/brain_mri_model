@@ -30,16 +30,16 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 1;
-dataFolder = '~/data/label_fusion_7_12_18_44';
+recompute = 0;
+dataFolder = '~/data/label_fusion_10_12_13_00';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
-recomputeLogOdds = 1;
+recomputeLogOdds = 0;
 erode = 0;
-logOddsFolder = '~/data/logOdds_test';
+logOddsFolder = '~/data/signed_dist_logOdds';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
@@ -49,8 +49,8 @@ computeMaskFloatingImages = 1;
 sigma = 15;                    % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
 labelPriorType = 'logOdds';   %'delta function' or 'logOdds'
-rho = 0.4;                    % exponential decay for prob logOdds
-threshold = 0.5;              % threshold for prob logOdds
+rho = 0.5;                    % exponential decay for prob logOdds
+threshold = 0.3;              % threshold for prob logOdds
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -111,7 +111,9 @@ for i=1:size(leaveOneOutIndices,1)
     refSegmentation = refSegmentation.vol; refMaskedImage = refMaskedImage.vol;
     [croppedRefSegmentation, croppedRefMaskedImage, cropping] = cropHippo(refSegmentation, refMaskedImage, margin, resultsFolder, refBrainNum);
     
-    %initialise matrix on which label fusion will be performed
+    % initialise matrix on which label fusion will be performed
+    % initialising with zeros correspond to start with a background image 
+    % (because 0 is the background label).
     labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]);
     labelMapHippo = zeros([size(croppedRefSegmentation), 2]);
     
