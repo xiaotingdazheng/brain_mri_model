@@ -31,7 +31,7 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
 recompute = 0;
-dataFolder = '~/data/label_fusion_10_12_13_00';
+dataFolder = '~/data/label_fusion_10_12_13_00_signed_dist_logOdds';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
