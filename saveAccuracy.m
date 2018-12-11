@@ -12,7 +12,7 @@ accuracy{end,1} = 'region mean accuracy';
 
 accuracy(1,2:end-1) = namesList'; % insert brain regions' names
 accuracy(2,2:end-1) = num2cell(labelsList); % insert corresponding labels
-accuracy{1,end} = 'brain mean accuracy';
+accuracy{1,end} = 'test brain mean accuracy';
 
 accuracy(3:end-1,2:end-1) = num2cell(accuracies); % results of label fusion
 
