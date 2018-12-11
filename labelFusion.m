@@ -5,16 +5,16 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 
-% cellPathsSyntheticImages = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
-cellPathsFloatingImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
+cellPathsFloatingImages = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
+    '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
+% cellPathsFloatingImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
+%     '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
+%     '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
+%     '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
+%     '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
 cellPathsLabels = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.labels.nii.gz';
     '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.labels.nii.gz';
     '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.labels.nii.gz';
@@ -30,23 +30,23 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 0;
+recompute = 1;
 dataFolder = '~/data/label_fusion_10_12_13_00_signed_dist_logOdds';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
 % probability maps. The new ones will be stored to cellLogOddsFolder. If
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
-recomputeLogOdds = 0;
+recomputeLogOdds = 1;
 erode = 0;
-logOddsFolder = '~/data/signed_dist_logOdds';
+logOddsFolder = '~/data/signed_dist_logOdds_synthetic';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
 computeMaskFloatingImages = 1;
 
 % label fusion parameter
-sigma = 15;                    % std dev of gaussian similarity meaure
+sigma = 15;                   % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
 labelPriorType = 'logOdds';   %'delta function' or 'logOdds'
 rho = 0.5;                    % exponential decay for prob logOdds
