@@ -55,7 +55,7 @@ mergedLabelsMRI.vol = new_image;
 brain_num = pathLabels(regexp(pathLabels,'brain')+5);
 mri_type = pathStatsMatrix(regexp(pathStatsMatrix, 'ClassesStats_')+13:regexp(pathStatsMatrix, 'ClassesStats_')+14);
 if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
-    name = ['brain',brain_num,'.synthetic.',mri_type,'.',num2str(targetRes(1),'%.1f')];
+    name = ['brain',brain_num,'.synthetic.',mri_type,'.',num2str(targetRes(1),'%.1f'),'corrected'];
 else
     resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
     name = ['brain',brain_num,'.synthetic.',mri_type,'.',resolution,'corrected'];
