@@ -30,15 +30,15 @@ cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
 % registrations. The results will be saved in an automatically generated
 % folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
 % is the data to be used.
-recompute = 1;
-dataFolder = '~/data/label_fusion_10_12_13_00_signed_dist_logOdds';
+recompute = 0;
+dataFolder = '~/data/label_fusion_11_12_18_21_logOdds_synthetic';
 
 % set recomputeLogOdds to 1 if you wish to recompute the logOdds
-% probability maps. The new ones will be stored to cellLogOddsFolder. If
+% probability maps. The new ones will be stored to LogOddsFolder. If
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
-recomputeLogOdds = 1;
-logOddsFolder = '~/data/signed_dist_logOdds_synthetic';
+recomputeLogOdds = 0;
+logOddsFolder = '~/data/logOdds_synthetic';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
@@ -47,7 +47,7 @@ computeMaskFloatingImages = 1;
 % label fusion parameter
 sigma = 15;                   % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
-labelPriorType = 'logOdds';   %'delta function' or 'logOdds'
+labelPriorType = 'delta function';   %'delta function' or 'logOdds'
 rho = 0.5;                    % exponential decay for prob logOdds
 threshold = 0.3;              % threshold for prob logOdds
 
@@ -174,6 +174,7 @@ for i=1:size(leaveOneOutIndices,1)
 end
 
 % formating and saving result matrix
+disp(['%%%% summarising all accuracy in ' pathAccuraccies ' %%%%']); disp(' '); disp(' ');
 accuracy = saveAccuracy(accuracies, namesList, labelsList, pathAccuracies);
 
 toc

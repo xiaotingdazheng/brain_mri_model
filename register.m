@@ -45,7 +45,7 @@ if isequal(labelPriorType, 'delta function')
     pathRegisteredFloatingHippoLabels = fullfile(resultsFolder, [filename,'.registered_to_image_',num2str(refIndex),'.nii.gz']); % path of registered segmentation map
     % apply registration to segmentation map
     if ~exist(pathRegisteredFloatingHippoLabels, 'file') || recompute
-        disp(['applying ',pathTransformation,' to ',pathFloatingLabels]);
+        disp(['applying ',pathTransformation,' to ',pathFloatingHippoLabels]);
         cmd = ['reg_resample -ref ',pathRefMaskedImage,' -flo ',pathFloatingHippoLabels,' -trans ',pathTransformation,' -res ',pathRegisteredFloatingHippoLabels,' -pad 0 -inter 0 -voff'];
         system(cmd);
     end
