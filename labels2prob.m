@@ -1,4 +1,4 @@
-function labels2prob(pathLabels, pathLogOddsSubfolder, rho, threshold, labelsList, erode)
+function labels2prob(pathLabels, pathLogOddsSubfolder, rho, threshold, labelsList)
 
 addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
