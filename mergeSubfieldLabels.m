@@ -130,7 +130,7 @@ labels(realHippoIndices) = HippoLabels(realHippoIndices) + 20000; %paste subfiel
 labels(labels==20024) = 24; %puts back CSH in hippocampus to 24
 
 [pathFusedLabels,~,~] = fileparts(pathLabels);
-pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.nii.gz');
+pathFusedLabels = fullfile(pathFusedLabels,'aseg+corrected_subfields.nii.gz');
 
 mriLabels.vol = labels; %write new matrix in header
 mriLabels.fspec = pathFusedLabels;

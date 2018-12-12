@@ -43,20 +43,20 @@ mergeHippoLabels = 1;
 % if mergeHippoLabels = 1, specify here the paths of hippocampal subfields' 
 % labels. They should be in the same order as the corresponding
 % segmentation maps specified in cellPathsLabels.
-cellPathsHippoLabels = {'/home/benjamin/data/hippocampus_labels/brain1_labels.nii.gz';
-    '/home/benjamin/data/hippocampus_labels/brain2_labels.nii.gz'; 
-    '/home/benjamin/data/hippocampus_labels/brain3_labels.nii.gz'; 
-    '/home/benjamin/data/hippocampus_labels/brain4_labels.nii.gz'; 
-    '/home/benjamin/data/hippocampus_labels/brain5_labels.nii.gz'};
+cellPathsHippoLabels = {'/home/benjamin/data/hippocampus_labels/brain1_labels.corrected.nii.gz';
+    '/home/benjamin/data/hippocampus_labels/brain2_labels.corrected.nii.gz'; 
+    '/home/benjamin/data/hippocampus_labels/brain3_labels.corrected.nii.gz'; 
+    '/home/benjamin/data/hippocampus_labels/brain4_labels.corrected.nii.gz'; 
+    '/home/benjamin/data/hippocampus_labels/brain5_labels.corrected.nii.gz'};
 % path of matrix containing max hippocampus cropping
 pathMaxCropping = '~/matlab/brain_mri_model/maxHippoCropping.mat';
 
 % compute stats matrix from a specified image. If computeStatsMatrix = 0 
 % the script will load a previously computed matrix (pathStatsMatrix).
-computeStatsMatrix = 0;
+computeStatsMatrix = 1;
 % if computeStatsMatrix=0 path where resulting stats matrix will be stored,
 % if computeStatsMatrix=1 path of stats matrix to load
-pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1.mat';
+pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1_corrected.mat';
 % if computeStatsMatrix=1, image to analyse to compute stats from. This 
 % should be the image corresponding to the first segmentation map specified
 %in cellPathsLabels. This should also be at hippocampal labels' resolution.
@@ -80,7 +80,7 @@ gaussianType = 'median';
 targetRes=[0.6 0.6 0.6];
 % set to 1 if you wish to compute the downsampling to target resolution
 % with the current version, and to 0 to use mri_convert
-downsample = 0;
+downsampleWithMatlab = 0;
 % if downsample = 0 provide here image to us as template for downsampling
 pathImageResliceLike = '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.mgz';
 
@@ -120,7 +120,7 @@ for i=1:length(cellPathsLabels)
     % create new images
     disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
     new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-        pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i}, pathImageResliceLike, downsample);
+        pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i}, pathImageResliceLike, downsampleWithMatlab);
 
 end
 

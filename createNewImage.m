@@ -1,5 +1,5 @@
 function new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-    pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, downsample)
+    pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, downsampleWithMatlab)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -42,7 +42,7 @@ f=targetRes./sampleRes;
 sigmaFilt=0.9*f;
 new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
 
-if downsample
+if downsampleWithMatlab
     disp('dowmsampling to target resolution');
     new_image=new_image(1:round(f(1)):end,1:round(f(2)):end,1:round(f(3)):end); %subsample to obtain target resolution
     mergedLabelsMRI.xsize = targetRes(1); mergedLabelsMRI.ysize = targetRes(2); mergedLabelsMRI.zsize = targetRes(3);
@@ -58,13 +58,13 @@ if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
     name = ['brain',brain_num,'.synthetic.',mri_type,'.',num2str(targetRes(1),'%.1f')];
 else
     resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
-    name = ['brain',brain_num,'.synthetic.',mri_type,'.',resolution];
+    name = ['brain',brain_num,'.synthetic.',mri_type,'.',resolution,'corrected'];
 end
 pathNewImage = fullfile(pathNewImagesFolder, [name,'.nii.gz']);
 
 MRIwrite(mergedLabelsMRI, pathNewImage); %write a new mgz file.
 
-if ~downsample
+if ~downsampleWithMatlab
     disp('dowmsampling to target resolution');
     
     % downsample and reslice like template image
