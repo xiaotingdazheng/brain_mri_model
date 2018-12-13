@@ -1,5 +1,5 @@
 function new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-    pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, downsampleWithMatlab)
+    pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, downsampleWithMatlab, subfieldsSmoothing)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -55,11 +55,12 @@ mergedLabelsMRI.vol = new_image;
 brain_num = pathLabels(regexp(pathLabels,'brain')+5);
 mri_type = pathStatsMatrix(regexp(pathStatsMatrix, 'ClassesStats_')+13:regexp(pathStatsMatrix, 'ClassesStats_')+14);
 if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
-    name = ['brain',brain_num,'.synthetic.',mri_type,'.',num2str(targetRes(1),'%.1f'),'.corrected'];
+    name = ['brain',brain_num,'.synthetic.',mri_type,'.',num2str(targetRes(1),'%.1f')];
 else
     resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
-    name = ['brain',brain_num,'.synthetic.',mri_type,'.',resolution,'.corrected'];
+    name = ['brain',brain_num,'.synthetic.',mri_type,'.',resolution];
 end
+if subfieldsSmoothing, name = [name '.smoothed']; end
 pathNewImage = fullfile(pathNewImagesFolder, [name,'.nii.gz']);
 
 MRIwrite(mergedLabelsMRI, pathNewImage); %write a new mgz file.
@@ -74,9 +75,8 @@ if ~downsampleWithMatlab
     
     % do the same to corresponding aseg+subfields
     pathNewImage = strrep(pathNewImage, '.nii.gz', '.mgz');    
-    [dir,name,ext] = fileparts(pathNewImage);
-    pathNewSegmMap = fullfile(dir,[name,'.labels',ext]);
-    pathNewSegmMap = strrep(pathNewSegmMap, '.mgz', '.nii.gz');
+    [dir,name,~] = fileparts(pathNewImage);
+    pathNewSegmMap = fullfile(dir,[name,'.labels.nii.gz']);
     cmd = ['mri_convert ' mergedLabelsMRI.fspec ' ' pathNewSegmMap ' -rl ' pathImageResliceLike ' -rt nearest -odt float'];
     [~,~] = system(cmd);
 end

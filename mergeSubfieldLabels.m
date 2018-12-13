@@ -1,4 +1,4 @@
-function mriLabels = mergeSubfieldLabels(pathLabels, pathHippoLabels)
+function mriLabels = mergeSubfieldLabels(pathLabels, pathHippoLabels, subfieldsSmoothing)
 
 % This function combines the labels from general image and more precise
 % hippocampal segmentations. 
@@ -24,6 +24,13 @@ HippoLabels = mriHippoLabels.vol;
 
 hippoLabels = [17, 53]; %hippocampal labels
 CSFlabel = 24;
+
+%%%%%%%%%%%%%%%%%%%%%%%% smooth subfields labels %%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if subfieldsSmoothing
+    mriHippoLabels = smoothSubfieldSegmentation(mriHippoLabels, pathHippoLabels);
+    HippoLabels = mriHippoLabels.vol;
+end
 
 %%%%%%%%%%%%%%%%%%%%%%% find ROI and crop the image %%%%%%%%%%%%%%%%%%%%%%%
 disp('locating hippocampus')
@@ -123,7 +130,11 @@ labels(realHippoIndices) = HippoLabels(realHippoIndices) + 20000; %paste subfiel
 labels(labels==20024) = 24; %puts back CSH in hippocampus to 24
 
 [pathFusedLabels,~,~] = fileparts(pathLabels);
-pathFusedLabels = fullfile(pathFusedLabels,'aseg+corrected_subfields.nii.gz');
+if subfieldsSmoothing
+    pathFusedLabels = fullfile(pathFusedLabels,'aseg+corrected_subfields.nii.gz');
+else
+    pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.nii.gz');
+end
 
 mriLabels.vol = labels; %write new matrix in header
 mriLabels.fspec = pathFusedLabels;
