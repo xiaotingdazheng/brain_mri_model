@@ -18,11 +18,11 @@ croppedImage = Image(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5)
 % save cropped segmentation
 SegmentationMaskMRI.vol = croppedSegmentation;
 pathCroppedSegmentation = fullfile(resultsFolder, [refBrainNum '.labels.cropped.nii.gz']);
-MRIwrite(SegmentationMaskMRI, pathCroppedSegmentation)
+MRIwrite(SegmentationMaskMRI, pathCroppedSegmentation);
 
 % save cropped image
 SegmentationMaskMRI.vol = croppedImage;
 pathCroppedImage = fullfile(resultsFolder, [refBrainNum '.cropped.nii.gz']);
-MRIwrite(SegmentationMaskMRI, pathCroppedImage)
+MRIwrite(SegmentationMaskMRI, pathCroppedImage);
 
 end
