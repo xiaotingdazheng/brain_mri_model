@@ -66,7 +66,7 @@ labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)) 
 mriLabels.vol = labels;
 pathCorrectedLabels = strrep(pathLabels,'nii.gz','mgz');
 [dir,name,~] = fileparts(pathCorrectedLabels);
-pathCorrectedLabels = fullfile(dir, [name, '.corrected.nii.gz']);
+pathCorrectedLabels = fullfile(dir, [name, '.smoothed.nii.gz']);
 disp(['writing smoothed subfields ' pathCorrectedLabels]);
 MRIwrite(mriLabels, pathCorrectedLabels); %write a new nii.gz file.
 

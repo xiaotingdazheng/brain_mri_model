@@ -27,19 +27,19 @@ addpath /home/benjamin/matlab/toolbox
 % is set to 0, then the images will direclty be generated from these. If
 % computeStatsMatrix = 1, the first path of this list should be the aseg
 % corresponding to the image used to compute the stats matrix.
-% cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'; 
-%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg.mgz';
-%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg.mgz';
-%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
-%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg.mgz'};
-cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz'; 
-    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
-    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
-    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
-    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz'};
+cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'; 
+    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg.mgz';
+    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg.mgz';
+    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
+    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg.mgz'};
+% cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz'; 
+%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
+%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
+%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
+%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz'};
 
 % merge labels between aseg and hippocampal subfields (0 or 1)
-mergeHippoLabels = 0;
+mergeHippoLabels = 1;
 % if mergeHippoLabels = 1, specify here the paths of hippocampal subfields' 
 % labels. They should be in the same order as the corresponding
 % segmentation maps specified in cellPathsLabels.
@@ -57,7 +57,7 @@ subfieldsSmoothing = 1;
 computeStatsMatrix = 1;
 % if computeStatsMatrix=0 path where resulting stats matrix will be stored,
 % if computeStatsMatrix=1 path of stats matrix to load
-pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1_smoothed.mat';
+pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1_smoothed_twice.mat';
 % if computeStatsMatrix=1, image to analyse to compute stats from. This 
 % should be the image corresponding to the first segmentation map specified
 %in cellPathsLabels. This should also be at hippocampal labels' resolution.

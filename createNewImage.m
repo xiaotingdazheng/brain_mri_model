@@ -60,7 +60,7 @@ else
     resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
     name = ['brain',brain_num,'.synthetic.',mri_type,'.',resolution];
 end
-if subfieldsSmoothing, name = [name '.smoothed']; end
+if subfieldsSmoothing, name = [name '.smoothed_twice']; end
 pathNewImage = fullfile(pathNewImagesFolder, [name,'.nii.gz']);
 
 MRIwrite(mergedLabelsMRI, pathNewImage); %write a new mgz file.

@@ -15,11 +15,11 @@ cellPathsFloatingImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
-cellPathsLabels = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.smoothed.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.smoothed.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.smoothed.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.smoothed.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.smoothed.labels.nii.gz'};
+cellPathsLabels = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
+    '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.smoothed_twice.labels.nii.gz'};
 cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
     '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
@@ -38,7 +38,7 @@ dataFolder = '~/data/label_fusion_11_12_18_21_logOdds_synthetic';
 % recomputeLogOdds is set to 0, data stored in the specified folder will be
 % reused directly.
 recomputeLogOdds = 1;
-logOddsFolder = '~/data/logOdds_synth_corrected';
+logOddsFolder = '~/data/logOdds_real_smoothed_twice';
 
 % set to 1 if you wish to apply masking to floating images. Resulting mask
 % image will be saved in resultsFolder.
