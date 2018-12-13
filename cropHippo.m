@@ -1,7 +1,7 @@
 function [croppedSegmentation, croppedImage, cropping] = cropHippo(Segmentation, Image, margin, resultsFolder, refBrainNum)
 
 % This function takes as inputs an image and its correpsonding
-% segmentation map, locates the hippocampus (or  hippocampi if both 
+% segmentation map, locates the hippocampus (or  hippocampi if both
 % hemishperes) and saves the cropped images and segmentation in specified
 % resul folder. The cropping is done with a specified margin.
 
@@ -16,11 +16,13 @@ croppedSegmentation = Segmentation(cropping(1):cropping(2),cropping(3):cropping(
 croppedImage = Image(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
 
 % save cropped segmentation
-pathCroppedSegmentation = fullfile(resultsFolder, [refBrainNum '_GT_segmentation_map.nii.gz']);
-save(pathCroppedSegmentation, 'croppedSegmentation');
+SegmentationMaskMRI.vol = croppedSegmentation;
+pathCroppedSegmentation = fullfile(resultsFolder, [refBrainNum '.labels.cropped.nii.gz']);
+MRIwrite(SegmentationMaskMRI, pathCroppedSegmentation)
 
 % save cropped image
-pathCroppedImage = fullfile(resultsFolder, [refBrainNum '_cropped_image.nii.gz']);
-save(pathCroppedImage, 'croppedImage');
+SegmentationMaskMRI.vol = croppedImage;
+pathCroppedImage = fullfile(resultsFolder, [refBrainNum '.cropped.nii.gz']);
+MRIwrite(SegmentationMaskMRI, pathCroppedImage)
 
 end
