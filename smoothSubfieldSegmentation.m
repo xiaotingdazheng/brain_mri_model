@@ -24,7 +24,7 @@ labelsNum = length(labelsList); % number of present labels
 
 labelsMasks = zeros([size(labelsCrop),labelsNum]); % masks for each labels
 labelsCount = zeros([size(labelsCrop),labelsNum]); % number of neighbour voxels of this type
-convMask = ones(3,3,3); convMask(2,2) = 1; % convolution neighbour counting mask
+convMask = ones(3,3,3); % convolution neighbour counting mask
 
 for i=1:labelsNum
     labelsMasks(:,:,:,i) = labelsCrop==labelsList(i); % mask
@@ -49,7 +49,7 @@ labelsNum = length(labelsList); % number of present labels
 
 labelsMasks = zeros([size(labelsCrop),labelsNum]); % masks for each labels
 labelsCount = zeros([size(labelsCrop),labelsNum]); % number of neighbour voxels of this type
-convMask = ones(3,3,3); convMask(2,2) = 1; % convolution neighbour counting mask
+convMask = ones(3,3,3); % convolution neighbour counting mask
 
 for i=1:labelsNum
     labelsMasks(:,:,:,i) = labelsCrop==labelsList(i); % mask
