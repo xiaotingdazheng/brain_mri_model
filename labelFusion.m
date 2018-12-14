@@ -175,7 +175,7 @@ for i=1:size(leaveOneOutIndices,1)
 end
 
 % formating and saving result matrix
-disp(['%%%% summarising all accuracy in ' pathAccuracies ' %%%%']); disp(' '); disp(' ');
+disp(['%%%% summarising all accuracies in ' pathAccuracies ' %%%%']); disp(' '); disp(' ');
 accuracy = saveAccuracy(accuracies, namesList, labelsList, pathAccuracies);
 
 toc

@@ -7,7 +7,8 @@ function [croppedSegmentation, croppedImage, cropping] = cropHippo(Segmentation,
 
 SegmentationMask = Segmentation > 20000 | Segmentation == 17 | Segmentation == 53 ; % detect hippocampus labels (17 or 43) and subfields labels (>20000)
 SegmentationMaskMRI.vol = SegmentationMask; % builds MRI object to be read by cropLabelVol function
-SegmentationMaskMRI.vox2ras0 = zeros(4);
+z = zeros(4); z(1:3,1:3) = eye(3);
+SegmentationMaskMRI.vox2ras0 = z;
 
 [~, cropping] = cropLabelVol(SegmentationMaskMRI, margin); % finds cropping around hippocampus
 

@@ -8,7 +8,8 @@ function [labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, la
 
 hippoLabelList= [0, 1];
 
-SegmentationMaskMRI.vox2ras0 = zeros(4); % initialse nifty files to be saved
+z = zeros(4); z(1:3,1:3) = eye(3);
+SegmentationMaskMRI.vox2ras0 = z; % initialse nifty files to be saved
 
 % argmax on labelMap to get final segmentation
 [~,index] = max(labelMap, [], 4);
