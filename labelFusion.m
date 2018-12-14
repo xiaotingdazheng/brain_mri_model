@@ -88,6 +88,7 @@ for i=1:size(leaveOneOutIndices,1)
     % define paths of real image and corresponding labels
     pathRefImage = cellPathsRefImages{refIndex(i)}; %path of real image
     pathRefLabels = cellPathsLabels{refIndex(i)};
+    +
     
     % mask real image
     refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'brain')+5);
@@ -174,7 +175,7 @@ for i=1:size(leaveOneOutIndices,1)
 end
 
 % formating and saving result matrix
-disp(['%%%% summarising all accuracy in ' pathAccuraccies ' %%%%']); disp(' '); disp(' ');
+disp(['%%%% summarising all accuracy in ' pathAccuracies ' %%%%']); disp(' '); disp(' ');
 accuracy = saveAccuracy(accuracies, namesList, labelsList, pathAccuracies);
 
 toc

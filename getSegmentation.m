@@ -17,7 +17,7 @@ labelMap = arrayfun(@(x) labelsList(x), index);
 % save result whole brain segmentation
 SegmentationMaskMRI.vol = labelMap;
 pathResultSegmentation = fullfile(resultsFolder, [refBrainNum 'labels.result.nii.gz']);
-MRIwrite(SegmentationMaskMRI, pathResultSegmentation)
+MRIwrite(SegmentationMaskMRI, pathResultSegmentation);
 
 % argmax on labelMapHippo to get final hippocampus segmentation
 [~,index] = max(labelMapHippo, [], 4);
@@ -26,6 +26,6 @@ labelMapHippo = arrayfun(@(x) hippoLabelList(x), index);
 % save result hippocampus segmentation
 SegmentationMaskMRI.vol = labelMapHippo;
 pathResultHippoSegmentation = fullfile(resultsFolder, [refBrainNum 'hippo.labels.result.nii.gz']);
-MRIwrite(SegmentationMaskMRI, pathResultHippoSegmentation)
+MRIwrite(SegmentationMaskMRI, pathResultHippoSegmentation);
 
 end
