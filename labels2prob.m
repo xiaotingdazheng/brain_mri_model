@@ -1,8 +1,5 @@
 function labels2prob(pathLabels, pathLogOddsSubfolder, rho, threshold, labelsList)
 
-addpath /usr/local/freesurfer/matlab
-addpath /home/benjamin/matlab/toolbox
-
 % create sufolder if it doesn't exist
 if ~exist(pathLogOddsSubfolder, 'dir'), mkdir(pathLogOddsSubfolder), end
 
@@ -54,22 +51,3 @@ LabelsMRI.vol = probMap;
 MRIwrite(LabelsMRI, path);
 
 end
-
-% function computeLogOdds(mask, LabelsMask, path, LabelsMRI, rho, threshold, erode)
-% 
-% if erode
-%     mask = imerode(mask,ones(2,2,2)); % erode mask
-% end
-% 
-% probMap = exp(-rho*bwdist(mask)); % calculate prob of voxel belonging to label l
-% thresholdMap = probMap > threshold;
-% probMap = probMap.*thresholdMap; % threshold prob map
-% probMap = probMap.*LabelsMask;
-% 
-% % write new prob map in mgz file
-% LabelsMRI.vol = probMap; 
-% 
-% % save label probability in separate file
-% MRIwrite(LabelsMRI, path);
-% 
-% end
