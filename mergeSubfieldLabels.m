@@ -27,8 +27,8 @@ CSFlabel = 24;
 
 %%%%%%%%%%%%%%%%%%%%%%%% smooth subfields labels %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if subfieldsSmoothing
-    mriHippoLabels = smoothSubfieldSegmentation(mriHippoLabels, pathHippoLabels);
+if subfieldsSmoothing > 0
+    mriHippoLabels = smoothSubfieldSegmentation(mriHippoLabels, pathHippoLabels, subfieldsSmoothing);
     HippoLabels = mriHippoLabels.vol;
 end
 
