@@ -10,22 +10,19 @@ pathDirFloatingImages = '~/data/CobraLab/reference_images/*norm.384.nii.gz';
 pathDirLabels = '~/data/CobraLab/synthetic_brains_t1/*labels.nii.gz';
 pathDirRefImages = '~/data/CobraLab/reference_images/*norm.384.nii.gz';
 
-% set recompute to 1 if you wish to recompute all the masks and
-% registrations. The results will be saved in an automatically generated
-% folder '~/data/label_fusion_date_time'. If recompute = 0, specify where
-% is the data to be used.
+% set recompute to 1 to recompute all the masks and registrations (saved in
+% automatically generated folder '~/data/label_fusion_date_time'. If 
+% recompute = 0, specify where is the data to be used.
 recompute = 1;
 dataFolder = '~/data/label_fusion_11_12_18_21_logOdds_synthetic';
 
-% set recomputeLogOdds to 1 if you wish to recompute the logOdds
-% probability maps. The new ones will be stored to LogOddsFolder. If
-% recomputeLogOdds is set to 0, data stored in the specified folder will be
-% reused directly.
+% set recomputeLogOdds to 1 to recompute the logOdds probability maps 
+% (stored in LogOddsFolder). If recomputeLogOdds = 0, specify where
+% is the data to be used.
 recomputeLogOdds = 1;
 logOddsFolder = '~/data/logOdds_real_smoothed_twice';
 
-% set to 1 if you wish to apply masking to floating images. Resulting mask
-% image will be saved in resultsFolder.
+% set to 1 if you wish to apply masking to floating images.
 computeMaskFloatingImages = 1;
 
 % label fusion parameter

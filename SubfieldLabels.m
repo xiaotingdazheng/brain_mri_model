@@ -22,38 +22,31 @@ addpath /home/benjamin/matlab/toolbox
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% list of segmentation masks which will be merged with hippocampal 
-% subfields' labels (only if fuseHippoLabels = 1). If mergeHippoLabels 
-% is set to 0, then the images will direclty be generated from these. If
-% computeStatsMatrix = 1, the first path of this list should be the aseg
-% corresponding to the image used to compute the stats matrix.
-pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*.mgz';
-
-% merge labels between aseg and hippocampal subfields (0 or 1)
+% merge labels between labels and hippocampal subfields
 mergeHippoLabels = 1;
-% if mergeHippoLabels = 1, specify here the paths of hippocampal subfields' 
-% labels. They should be in the same order as the corresponding
-% segmentation maps specified in cellPathsLabels.
+% If mergeHippoLabels = 1, specify the paths of hippocampal subfields' 
+% labels. Make sure they are listed in same order as pathDirLabels.
 pathDirHippoLabels = '/home/benjamin/data/CobraLab/hippocampus_labels/*labels.nii.gz';
 % set how many times you want to smooth the hippocampus labels (integer)
 subfieldsSmoothing = 1;
 
-% compute stats matrix from a specified image. If computeStatsMatrix = 0 
-% the script will load a previously computed matrix (pathStatsMatrix).
+% folder containing labels to generate images from. If mergeHippoLabels = 0
+% then the images will direclty be generated from these.
+pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*.mgz';
+
+% compute stats matrix from a specified image.
 computeStatsMatrix = 1;
 % if computeStatsMatrix=0 path where resulting stats matrix will be stored,
 % if computeStatsMatrix=1 path of stats matrix to load
 pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1_smoothed_twice.mat';
-% if computeStatsMatrix=1, image to analyse to compute stats from. This 
-% should be the image corresponding to the first segmentation map specified
-%in cellPathsLabels. This should also be at hippocampal labels' resolution.
-% pathImage = '~/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
+% if computeStatsMatrix=1, image to compute stats from. Should correspond 
+% to the first map in pathDirLabels (at hippocampal labels' resolution).
 pathImage = '/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
 
 % folder that will contain created images
-pathNewImagesFolder = '/home/benjamin/data/synthetic_brains_t1/';
+pathNewImagesFolder = '/home/benjamin/data/CobraLab/synthetic_brains_t1/';
 
-% define regions that w4559.71e want to study and group them by class
+% define regions that we want to study and group them by class
 ClassNames = ["Cerebral GM","Cerebral WM","Cerebellum GM","Cerebellum WM","Brainstem","Ventral PC","Thalamus","Caudate","Accumbens","Putamen","Pallidum","Ventricules","Choroid Plexus","Hippocampus","Amygdala","CSF","Optic Chiasm","Vessel"];
 ClassIndices = '  1            2                 3            4              5            6           7          8           9         10         11         12              13              14          15      16         17          18';
 labelsList = [  2,3, 4, 5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,53,54,58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
@@ -65,10 +58,7 @@ gaussianType = 'median';
 
 % target resolution of generated images
 targetRes=[0.6 0.6 0.6];
-% set to 1 if you wish to compute the downsampling to target resolution
-% with the current version, and to 0 to use mri_convert
-downsampleWithMatlab = 0;
-% if downsample = 0 provide here image to use as template for downsampling
+% image to use as template for downsampling
 pathImageResliceLike = '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.mgz';
 
 

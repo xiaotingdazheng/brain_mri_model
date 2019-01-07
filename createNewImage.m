@@ -1,5 +1,5 @@
 function new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-    pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, downsampleWithMatlab, subfieldsSmoothing)
+    pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, subfieldsSmoothing)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -42,12 +42,6 @@ f=targetRes./sampleRes;
 sigmaFilt=0.9*f;
 new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
 
-if downsampleWithMatlab
-    disp('dowmsampling to target resolution');
-    new_image=new_image(1:round(f(1)):end,1:round(f(2)):end,1:round(f(3)):end); %subsample to obtain target resolution
-    mergedLabelsMRI.xsize = targetRes(1); mergedLabelsMRI.ysize = targetRes(2); mergedLabelsMRI.zsize = targetRes(3);
-end
-
 disp('writting created image');
 mergedLabelsMRI.vol = new_image;
 
@@ -65,20 +59,17 @@ pathNewImage = fullfile(pathNewImagesFolder, [name,'.nii.gz']);
 
 MRIwrite(mergedLabelsMRI, pathNewImage); %write a new mgz file.
 
-if ~downsampleWithMatlab
-    disp('dowmsampling to target resolution');
-    
-    % downsample and reslice like template image
-    setFreeSurfer(); % calls freesurfer package
-    cmd = ['mri_convert ' pathNewImage ' ' pathNewImage ' -rl ' pathImageResliceLike ' -rt nearest -odt float'];
-    [~,~] = system(cmd);
-    
-    % do the same to corresponding aseg+subfields
-    pathNewImage = strrep(pathNewImage, '.nii.gz', '.mgz');    
-    [dir,name,~] = fileparts(pathNewImage);
-    pathNewSegmMap = fullfile(dir,[name,'.labels.nii.gz']);
-    cmd = ['mri_convert ' mergedLabelsMRI.fspec ' ' pathNewSegmMap ' -rl ' pathImageResliceLike ' -rt nearest -odt float'];
-    [~,~] = system(cmd);
-end
+disp('dowmsampling to target resolution');
+% downsample and reslice like template image
+setFreeSurfer(); % calls freesurfer package
+cmd = ['mri_convert ' pathNewImage ' ' pathNewImage ' -rl ' pathImageResliceLike ' -rt nearest -odt float'];
+[~,~] = system(cmd);
+
+% do the same to corresponding aseg+subfields
+pathNewImage = strrep(pathNewImage, '.nii.gz', '.mgz');    
+[dir,name,~] = fileparts(pathNewImage);
+pathNewSegmMap = fullfile(dir,[name,'.labels.nii.gz']);
+cmd = ['mri_convert ' mergedLabelsMRI.fspec ' ' pathNewSegmMap ' -rl ' pathImageResliceLike ' -rt nearest -odt float'];
+[~,~] = system(cmd);
 
 end
