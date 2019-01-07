@@ -4,7 +4,7 @@ labelsList = unique(LabelsMap); % find all present labels
 labelsNum = length(labelsList); % number of present labels
 
 labelsMasks = zeros([size(LabelsMap),labelsNum]); % masks for each labels
-labelsCount = zeros([size(labelsCrop),labelsNum]); % number of neighbour voxels of this type
+labelsCount = zeros([size(LabelsMap),labelsNum]); % number of neighbour voxels of this type
 convMask = ones(3,3,3); % convolution neighbour counting mask
 
 for i=1:labelsNum
