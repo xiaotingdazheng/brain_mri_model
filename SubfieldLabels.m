@@ -27,27 +27,14 @@ addpath /home/benjamin/matlab/toolbox
 % is set to 0, then the images will direclty be generated from these. If
 % computeStatsMatrix = 1, the first path of this list should be the aseg
 % corresponding to the image used to compute the stats matrix.
-cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg.mgz'; 
-    '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg.mgz';
-    '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg.mgz';
-    '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg.mgz';
-    '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg.mgz'};
-% cellPathsLabels = {'/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz'; 
-%     '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
-%     '/home/benjamin/subjects/brain3_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
-%     '/home/benjamin/subjects/brain4_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz';
-%     '/home/benjamin/subjects/brain5_t1_to_t2.0.6/mri/aseg+subfields.smoothed.nii.gz'};
+pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*.mgz';
 
 % merge labels between aseg and hippocampal subfields (0 or 1)
 mergeHippoLabels = 1;
 % if mergeHippoLabels = 1, specify here the paths of hippocampal subfields' 
 % labels. They should be in the same order as the corresponding
 % segmentation maps specified in cellPathsLabels.
-cellPathsHippoLabels = {'/home/benjamin/data/hippocampus_labels/brain1_labels.smoothed.nii.gz';
-    '/home/benjamin/data/hippocampus_labels/brain2_labels.smoothed.nii.gz'; 
-    '/home/benjamin/data/hippocampus_labels/brain3_labels.smoothed.nii.gz'; 
-    '/home/benjamin/data/hippocampus_labels/brain4_labels.smoothed.nii.gz'; 
-    '/home/benjamin/data/hippocampus_labels/brain5_labels.smoothed.nii.gz'};
+pathDirHippoLabels = '/home/benjamin/data/CobraLab/hippocampus_labels/*labels.nii.gz';
 % set how many times you want to smooth the hippocampus labels (integer)
 subfieldsSmoothing = 1;
 
@@ -81,26 +68,33 @@ targetRes=[0.6 0.6 0.6];
 % set to 1 if you wish to compute the downsampling to target resolution
 % with the current version, and to 0 to use mri_convert
 downsampleWithMatlab = 0;
-% if downsample = 0 provide here image to us as template for downsampling
+% if downsample = 0 provide here image to use as template for downsampling
 pathImageResliceLike = '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.mgz';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~exist(pathNewImagesFolder, 'dir'), mkdir(pathNewImagesFolder), end
-for i=1:length(cellPathsLabels)
+
+structPathsLabels = dir(pathDirLabels);
+structPathsHippoLabels = dir(pathDirHippoLabels);
+
+for i=1:length(structPathsLabels)
     
     disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-    disp(['PROCESSING IMAGE ', num2str(i)])
+    disp(['processing ', structPathsLabels(i).name])
+    
+    pathLabels = fullfile(structPathsLabels(i).folder,structPathsLabels(i).name);
+    pathHippoLabels = fullfile(structPathsHippoLabels(i).folder,structPathsHippoLabels(i).name);
 
     if mergeHippoLabels == 1
         % merge general and hippocampal labels for generative image
         disp(['%%%%%%%%%%%%%%',' merge general and hippocampal labels ', '%%%%%%%%%%%%%%%']);
-        mergedLabelsMRI = mergeSubfieldLabels(cellPathsLabels{i}, cellPathsHippoLabels{i}, subfieldsSmoothing);
+        mergedLabelsMRI = mergeSubfieldLabels(pathLabels, pathHippoLabels, subfieldsSmoothing);
         mergedLabels = mergedLabelsMRI.vol;
     else
         disp(['%%%%%%%%%%%%%%%%%%%%%',' loading merged labels ', '%%%%%%%%%%%%%%%%%%%%%%%']);
-        mergedLabelsMRI = MRIread(cellPathsLabels{i});
+        mergedLabelsMRI = MRIread(pathLabels);
         mergedLabels = mergedLabelsMRI.vol;
     end
 
@@ -118,7 +112,7 @@ for i=1:length(cellPathsLabels)
     % create new images
     disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
     new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-        pathNewImagesFolder, pathStatsMatrix, cellPathsLabels{i}, pathImageResliceLike, downsampleWithMatlab, subfieldsSmoothing);
+        pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, downsampleWithMatlab, subfieldsSmoothing);
 
 end
 

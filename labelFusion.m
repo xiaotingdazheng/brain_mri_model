@@ -5,26 +5,10 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 
-% cellPathsFloatingImages = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.nii.gz';
-%     '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.nii.gz'};
-cellPathsFloatingImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
-cellPathsLabels = {'~/data/synthetic_brains_t1/brain1.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain2.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain3.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain4.synthetic.t1.0.6.smoothed_twice.labels.nii.gz';
-    '~/data/synthetic_brains_t1/brain5.synthetic.t1.0.6.smoothed_twice.labels.nii.gz'};
-cellPathsRefImages = {'~/subjects/brain1_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain2_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain3_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain4_t1_to_t2.0.6/mri/norm.384.nii.gz';
-    '~/subjects/brain5_t1_to_t2.0.6/mri/norm.384.nii.gz'};
+%pathDirFloatingImages = '~/data/CobraLab/synthetic_brains_t1/*.synthetic.t1.0.6.nii.gz';
+pathDirFloatingImages = '~/data/CobraLab/reference_images/*norm.384.nii.gz';
+pathDirLabels = '~/data/CobraLab/synthetic_brains_t1/*labels.nii.gz';
+pathDirRefImages = '~/data/CobraLab/reference_images/*norm.384.nii.gz';
 
 % set recompute to 1 if you wish to recompute all the masks and
 % registrations. The results will be saved in an automatically generated
@@ -60,9 +44,13 @@ if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
 if ~recompute, resultsFolder = dataFolder; end
 
+structPathsFloatingImages = dir(pathDirFloatingImages);
+structPathsLabels = dir(pathDirLabels);
+structPathsRefImages = dir(pathDirRefImages);
+
 if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end
 
-n_training_data = length(cellPathsLabels);
+n_training_data = length(structPathsLabels);
 leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
 refIndex = n_training_data:-1:1;
 namesList = {'background';'left cerebral WM';'left cerebral cortex';'left lateral ventricule';'left inferior lateral ventricule';...
@@ -83,11 +71,11 @@ accuracies = NaN(n_training_data, length(labelsList) + 1);
 % test label fusion on each real image
 for i=1:size(leaveOneOutIndices,1)
     
-    disp(['%%%%% testing label fusion on ',cellPathsRefImages{refIndex(i)} ' %%%%%']); disp(' ');
+    disp(['%%%%% testing label fusion on ',structPathsRefImages(refIndex(i)).name ' %%%%%']); disp(' ');
     
     % define paths of real image and corresponding labels
-    pathRefImage = cellPathsRefImages{refIndex(i)}; %path of real image
-    pathRefLabels = cellPathsLabels{refIndex(i)};
+    pathRefImage = fullfile(structPathsRefImages(refIndex(i)).folder, structPathsRefImages(refIndex(i)).name); %path of real image
+    pathRefLabels = fullfile(structPathsLabels(refIndex(i)).folder, structPathsLabels(refIndex(i)).name);
     
     % mask real image
     refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'brain')+5);
@@ -118,12 +106,13 @@ for i=1:size(leaveOneOutIndices,1)
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
         
-        disp(['%% processing floating image ',cellPathsFloatingImages{leaveOneOutIndices(i,j)} ' %%'])
+        leftOutIdx = leaveOneOutIndices(i,j);
+        disp(['%% processing floating image ',structPathsFloatingImages(leftOutIdx).name ' %%'])
         
         % paths of synthetic image and labels
-        pathFloatingImage = cellPathsFloatingImages{leaveOneOutIndices(i,j)};
-        pathFloatingLabels = cellPathsLabels{leaveOneOutIndices(i,j)};
-        
+        pathFloatingImage = fullfile(structPathsFloatingImages(leftOutIdx).folder, structPathsFloatingImages(leftOutIdx).name);
+        pathFloatingLabels = fullfile(structPathsLabels(leftOutIdx).folder, structPathsLabels(leftOutIdx).name);
+
         % extracting name of Floating image's brain number from label path
         [~,name,~] = fileparts(strrep(pathFloatingLabels,'.nii.gz','.mgz'));
         floBrainNum = name(regexp(name,'brain'):regexp(name,'brain')+5);
