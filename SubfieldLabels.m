@@ -23,28 +23,37 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % merge labels between labels and hippocampal subfields
-mergeHippoLabels = 1;
-% If mergeHippoLabels = 1, specify the paths of hippocampal subfields' 
-% labels. Make sure they are listed in same order as pathDirLabels.
-pathDirHippoLabels = '/home/benjamin/data/CobraLab/hippocampus_labels/*labels.nii.gz';
-% set how many times you want to smooth the hippocampus labels (integer)
-subfieldsSmoothing = 1;
+preprocessing = 1;
+% preprocessing type ('CobraLab' or 'OASIS')
+preprocessingType = 'CobraLab';
+% If preprocessing = 1, specify the folder containing preprocessing support
+% In cobraLab case it would be hippocampus subfields labels 
+% In OASIS case it would be corresponding images.
+pathDirPreprocessingSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*hippo_labels.nii.gz';
+% pathDirPreprocessingSupport = '/home/benjamin/data/OASIS-TRT-20/original_images/*_t1.nii.gz';
+% set how many times you want to smooth hippocampus labels (Cobra) or the
+% whole labels (OASIS)
+numberOfSmoothing = 1;
 
-% folder containing labels to generate images from. If mergeHippoLabels = 0
+% folder containing labels to generate images from. If preprocessing = 0
 % then the images will direclty be generated from these.
-pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*.mgz';
+pathDirLabels = '/home/benjamin/data/CobraLab/labels/*.mgz';
+%pathDirLabels = '/home/benjamin/data/OASIS-TRT-20/original_labels/*labels.nii.gz';
 
 % compute stats matrix from a specified image.
-computeStatsMatrix = 1;
+computeStatsMatrix = 0;
 % if computeStatsMatrix=0 path where resulting stats matrix will be stored,
 % if computeStatsMatrix=1 path of stats matrix to load
-pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1_smoothed_twice.mat';
-% if computeStatsMatrix=1, image to compute stats from. Should correspond 
+pathStatsMatrix = '~/matlab/brain_mri_model/ClassesStats_t1_smoothed.mat';
+%pathStatsMatrix = '~/matlab/brain_mri_model/OASIS.ClassesStats_t1_smoothed.mat';
+% if computeStatsMatrix=1, image to compute stats from. Should correspond
 % to the first map in pathDirLabels (at hippocampal labels' resolution).
-pathImage = '/home/benjamin/subjects/brain1_t1_to_t2.0.6/mri/norm.0.3.mgz';
+pathImage = '~/data/CobraLab/upsampled_images/brain1_norm.0.3.mgz';
+%pathImage = '/home/benjamin/data/OASIS-TRT-20/original_images/brain1_t1.nii.gz';
 
-% folder that will contain created images
+% folder that will contain created images and their corresponding labels
 pathNewImagesFolder = '/home/benjamin/data/CobraLab/synthetic_brains_t1/';
+%pathNewImagesFolder = '/home/benjamin/data/OASIS-TRT-20/synthetic_brains_t1/';
 
 % define regions that we want to study and group them by class
 ClassNames = ["Cerebral GM","Cerebral WM","Cerebellum GM","Cerebellum WM","Brainstem","Ventral PC","Thalamus","Caudate","Accumbens","Putamen","Pallidum","Ventricules","Choroid Plexus","Hippocampus","Amygdala","CSF","Optic Chiasm","Vessel"];
@@ -58,51 +67,76 @@ gaussianType = 'median';
 
 % target resolution of generated images
 targetRes=[0.6 0.6 0.6];
+%targetRes = [1, 1, 1];
 % image to use as template for downsampling
-pathImageResliceLike = '/home/benjamin/subjects/brain2_t1_to_t2.0.6/mri/norm.mgz';
+pathImageResliceLike = '~/data/CobraLab/reference_images/brain1_norm.384.nii.gz';
+% pathImageResliceLike = '/home/benjamin/data/OASIS-TRT-20/hippocampus_labels/brain1_t1.nii.gz';
+imageModality = 't1'; % t1 or t2
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if ~exist(pathNewImagesFolder, 'dir'), mkdir(pathNewImagesFolder), end
 
+% list of files in specified directories
 structPathsLabels = dir(pathDirLabels);
-structPathsHippoLabels = dir(pathDirHippoLabels);
+structPathsPreprocessingSupport = dir(pathDirPreprocessingSupport);
+
+% create name of smoothing
+if numberOfSmoothing == 0
+    smoothingName = '';
+elseif numberOfSmoothing == 1
+    smoothingName = 'smoothed_once.';
+elseif numberOfSmoothing == 2
+    smoothingName = 'smoothed_twice.';
+else
+    smoothingName = ['smoothed_', num2str(numberOfSmoothing), 'times.'];
+end
 
 for i=1:length(structPathsLabels)
     
-    disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-    disp(['processing ', structPathsLabels(i).name])
-    
+    % get filename and brain number
     pathLabels = fullfile(structPathsLabels(i).folder,structPathsLabels(i).name);
-    pathHippoLabels = fullfile(structPathsHippoLabels(i).folder,structPathsHippoLabels(i).name);
+    pathPreprocessingSupport = fullfile(structPathsPreprocessingSupport(i).folder,structPathsPreprocessingSupport(i).name);
+    brainNum = pathLabels(regexp(pathLabels,'brain'):regexp(pathLabels,'brain')+5);
+    
+    disp(['%%%%%% processing ', structPathsLabels(i).name]);
+    disp(' ');
 
-    if mergeHippoLabels == 1
-        % merge general and hippocampal labels for generative image
-        disp(['%%%%%%%%%%%%%%',' merge general and hippocampal labels ', '%%%%%%%%%%%%%%%']);
-        mergedLabelsMRI = mergeSubfieldLabels(pathLabels, pathHippoLabels, subfieldsSmoothing);
-        mergedLabels = mergedLabelsMRI.vol;
+    % preprocessing of images
+    if preprocessing == 1
+        disp('%%% preprocessing data')
+        if isequal(preprocessingType, 'CobraLab')
+            preprocessedLabelsMRI = CobraLabPreProcessing(pathLabels, pathPreprocessingSupport, numberOfSmoothing, smoothingName, brainNum);
+            preprocessedLabels = preprocessedLabelsMRI.vol;
+        elseif isequal(preprocessingType, 'OASIS')
+            preprocessedLabelsMRI = OASISpreProcessing(pathLabels, pathPreprocessingSupport, numberOfSmoothing);
+            preprocessedLabels = preprocessedLabelsMRI.vol;
+        else
+            error('preprocessingType should be either CobraLab or OASIS')
+        end
     else
-        disp(['%%%%%%%%%%%%%%%%%%%%%',' loading merged labels ', '%%%%%%%%%%%%%%%%%%%%%%%']);
-        mergedLabelsMRI = MRIread(pathLabels);
-        mergedLabels = mergedLabelsMRI.vol;
+        disp('%%% loading previously preprocessed data')
+        preprocessedLabelsMRI = MRIread(pathLabels);
+        preprocessedLabels = preprocessedLabelsMRI.vol;
     end
 
+    % calculate intensity stats for all the specified regions
     if i == 1
-        if computeStatsMatrix == 1 
-            % calculate intensity stats for all the specified regions
-            disp(['%%%%%',' calculate intensity stats for all the specified regions ', '%%%%%']);
-            classesStats = computeIntensityStats(pathImage, mergedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix );
+        if computeStatsMatrix == 1
+            disp('%%% calculating intensity stats for all the specified regions');
+            classesStats = computeIntensityStats(pathImage, preprocessedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix );
         else
-            disp(['%%%%%%%%%%%%%%%%%%%%%%%%%%',' loading stats ', '%%%%%%%%%%%%%%%%%%%%%%%%%%']);
+            disp('%%% loading stats');
             load(pathStatsMatrix,'classesStats')
         end
     end
 
     % create new images
-    disp(['%%%%%%%%%%%%%%%%%%%%%%%%%',' create new image ', '%%%%%%%%%%%%%%%%%%%%%%%%']);
-    new_image = createNewImage(mergedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
-        pathNewImagesFolder, pathStatsMatrix, pathLabels, pathImageResliceLike, downsampleWithMatlab, subfieldsSmoothing);
+    disp('%%% creating new image'); 
+    new_image = createNewImage(preprocessedLabelsMRI, classesStats, listClassesToGenerate, labelsList, labelClasses, gaussianType, targetRes,...
+        pathNewImagesFolder, pathImageResliceLike, brainNum, imageModality, smoothingName);
+    disp(' ');
 
 end
 
