@@ -1,4 +1,4 @@
-function [classesStats]=computeIntensityStats(pathImage, mergedLabels, labelsList, labelClasses, ClassNames, pathStatsMatrix)
+function [classesStats]=computeIntensityStats(pathImage, preprocessedLabelsMRI, labelsList, labelClasses, ClassNames, pathStatsMatrix)
 
 % This function compute basic intensity statistics for different regions of
 % the brain. It takes as inputs the image to derive the stats from, its
@@ -17,8 +17,10 @@ function [classesStats]=computeIntensityStats(pathImage, mergedLabels, labelsLis
 disp('loading image');
 imageMRI = MRIread(pathImage);
 image = imageMRI.vol;
-
 image = round(image);
+
+%read labels
+preprocessedLabels = preprocessedLabelsMRI.vol;
 
 number_of_classes = length(ClassNames);
 
@@ -37,27 +39,29 @@ for lC=1:number_of_classes
     
     labelsBelongingToClass = labelsList(labelClasses == lC); %labels belonging to class lC
     for l=1:length(labelsBelongingToClass)
-        temp_intensities = image(mergedLabels==labelsBelongingToClass(l))'; %find values of voxels with label l
+        temp_intensities = image(preprocessedLabels==labelsBelongingToClass(l))'; %find values of voxels with label l
         intensities = [intensities temp_intensities]; %concatenate intensities of voxels belonging to class lC
     end
     
     classesStats(:,lC) = [mean(intensities); median(intensities); std(intensities); 1.4826*mad(intensities,1)];
+    
+    if ~isempty(intensities)
+        [counts,centers] = ksdensity(intensities,min(intensities):max(intensities),'bandwidth',2); %smoothed density distribution function
+        prob = counts/sum(counts); %normalise counts 
 
-    [counts,centers] = ksdensity(intensities,min(intensities):max(intensities),'bandwidth',2); %smoothed density distribution function
-    prob = counts/sum(counts); %normalise counts 
-    
-    x=min(intensities):0.5:max(intensities);
-    g_mean = 1/sqrt(2*pi*classesStats(3,lC)^2)*exp(-(x-classesStats(1,lC)).^2/(2*classesStats(3,lC)^2)); %compute N(mean,sigma)
-    g_median = 1/sqrt(2*pi*classesStats(4,lC)^2)*exp(-(x-classesStats(2,lC)).^2/(2*classesStats(4,lC)^2)); %compute N(median, sigmaMAD)
-    
-    % Add subplot to the whole plot
-    % legends commented out because take too much space on graphs but:
-    % g_mean should be in blue
-    % g_median sould be in orange
-    % smoothed real distribution should be in yellow
-    subplot(4,5,lC);
-    plot(x,g_mean,'LineWidth',2); hold on; plot(x,g_median,'LineWidth',2); hold on; plot(centers,prob,'LineWidth',2); hold off; %legend('mean','median','real');
-    title(['prob distrib for ',ClassNames(lC)]);
+        x=min(intensities):0.5:max(intensities);
+        g_mean = 1/sqrt(2*pi*classesStats(3,lC)^2)*exp(-(x-classesStats(1,lC)).^2/(2*classesStats(3,lC)^2)); %compute N(mean,sigma)
+        g_median = 1/sqrt(2*pi*classesStats(4,lC)^2)*exp(-(x-classesStats(2,lC)).^2/(2*classesStats(4,lC)^2)); %compute N(median, sigmaMAD)
+
+        % Add subplot to the whole plot
+        % legends commented out because take too much space on graphs but:
+        % g_mean should be in blue
+        % g_median sould be in orange
+        % smoothed real distribution should be in yellow
+        subplot(4,5,lC);
+        plot(x,g_mean,'LineWidth',2); hold on; plot(x,g_median,'LineWidth',2); hold on; plot(centers,prob,'LineWidth',2); hold off; %legend('mean','median','real');
+        title(['prob distrib for ',ClassNames(lC)]);
+    end
 
 end
 

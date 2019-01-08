@@ -76,7 +76,7 @@ mriLabels = pasteHippoLabels(mriLabels, HippoLabels, CSFlabel);
 %%%%%%%%%%%%%%%%%%%%%%%% writting preprocessed file %%%%%%%%%%%%%%%%%%%%%%%
 
 [pathFusedLabels,~,~] = fileparts(pathLabels);
-pathFusedLabels = fullfile(pathFusedLabels,[brainNum,'.aseg+subfields.',smoothingName,'nii.gz']);
+pathFusedLabels = fullfile(pathFusedLabels, [brainNum, '_preprocessed_labels.', smoothingName, 'nii.gz']);
 mriLabels.fspec = pathFusedLabels;
 
 disp(['writing marged labels in ',pathFusedLabels])
