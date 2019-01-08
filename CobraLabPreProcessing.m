@@ -76,13 +76,58 @@ mriLabels = pasteHippoLabels(mriLabels, HippoLabels, CSFlabel);
 %%%%%%%%%%%%%%%%%%%%%%%% writting preprocessed file %%%%%%%%%%%%%%%%%%%%%%%
 
 [pathFusedLabels,~,~] = fileparts(pathLabels);
-if numberOfSmoothing
-    pathFusedLabels = fullfile(pathFusedLabels,['aseg+subfields.smoothed',num2str(numberOfSmoothing),'times.nii.gz']);
+if numberOfSmoothing == 1
+    pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.smoothed_once.nii.gz');
+elseif numberOfSmoothing == 2
+    pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.smoothed_twice.nii.gz');
+elseif numberOfSmoothing > 2
+    pathFusedLabels = fullfile(pathFusedLabels,['aseg+subfields.smoothed_',num2str(numberOfSmoothing),'times.nii.gz']);
 else
     pathFusedLabels = fullfile(pathFusedLabels,'aseg+subfields.nii.gz');
 end
 
 MRIwrite(mriLabels, pathFusedLabels); %write a new nii.gz file.
+
+end
+
+function mriHippoLabels = smoothHippoSubfields(mriHippoLabels, pathHippoLabels, numberOfSmoothing)
+
+labels = mriHippoLabels.vol;
+
+%find left hippocampus
+maskmri = mriHippoLabels; %copies mri
+maskmri.vol(:) = labels>0 & labels<100; 
+[~,cropping] = cropLabelVol(maskmri, 4); % crop hippocampus
+labelsCrop = labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)); % crop the labels
+
+% smoothing left side
+for i=1:numberOfSmoothing
+    labelsCrop = smoothLabels(labelsCrop);
+end
+
+% paste result back onto the image
+labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)) = labelsCrop; % paste modified labels on original image
+
+%find right hippocampus
+maskmri = mriHippoLabels; %copies mri
+maskmri.vol(:) = labels>100;
+[~,cropping] = cropLabelVol(maskmri, 4); % crop hippocampus
+labelsCrop = labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)); % crop the labels
+
+% smoothing right side
+for i=1:numberOfSmoothing
+    labelsCrop = smoothLabels(labelsCrop);
+end
+
+labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)) = labelsCrop; % paste modified labels on original image
+
+%%% save corrected labels
+mriHippoLabels.vol = labels;
+pathCorrectedLabels = strrep(pathHippoLabels,'nii.gz','mgz');
+[dir,name,~] = fileparts(pathCorrectedLabels);
+pathCorrectedLabels = fullfile(dir, [name, '.smoothed.nii.gz']);
+disp(['writing smoothed subfields ' pathCorrectedLabels]);
+MRIwrite(mriHippoLabels, pathCorrectedLabels); %write a new nii.gz file.
 
 end
 
