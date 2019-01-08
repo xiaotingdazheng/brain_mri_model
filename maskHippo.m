@@ -13,8 +13,6 @@ pathFloatingHippoLabels = fullfile(resultsFolder, [brain_num name '.hippo_segmen
 % if file doesn't exist or must be recomputed
 if ~exist(pathFloatingHippoLabels, 'file') || recompute
     
-    addpath /usr/local/freesurfer/matlab
-    addpath /home/benjamin/matlab/toolbox
     setFreeSurfer();
     
     FloatingLabels = MRIread(pathFloatingLabels); % read labels
