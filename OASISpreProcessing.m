@@ -23,6 +23,7 @@ labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)) 
 MRIlabels.vol = labels;
 
 pathLabels = fullfile(pathPreprocessedLabels, [brainNum, '_preprocessed_labels.', smoothingName, 'nii.gz']);
+MRIlabels.fspec = pathLabels;
 MRIwrite(MRIlabels, pathLabels);
 
 end

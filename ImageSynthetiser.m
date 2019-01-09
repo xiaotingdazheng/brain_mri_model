@@ -25,22 +25,22 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % path to main datafolder
-pathDataFolder = '/home/benjamin/data/CobraLab/';
-%pathDataFolder = '/home/benjamin/data/OASIS-TRT-20/';
+%pathDataFolder = '/home/benjamin/data/CobraLab/';
+pathDataFolder = '/home/benjamin/data/OASIS-TRT-20/';
 % If preprocessing = 1, specify the folder containing preprocessing support
-pathDirPreprocessingSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*hippo_labels.nii.gz';
-%pathDirPreprocessingSupport = '/home/benjamin/data/OASIS-TRT-20/original_images/*_t1.nii.gz';
+%pathDirPreprocessingSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*hippo_labels.nii.gz';
+pathDirPreprocessingSupport = '/home/benjamin/data/OASIS-TRT-20/original_images/*.nii.gz';
 % image to use as template for downsampling
-pathImageResliceLike = '~/data/CobraLab/original_images/brain1.nii.gz';
-%pathImageResliceLike = '/home/benjamin/data/OASIS-TRT-20/hippocampus_labels/brain1_t1.nii.gz';
+%pathImageResliceLike = '~/data/CobraLab/original_images/brain1.nii.gz';
+pathImageResliceLike = '/home/benjamin/data/OASIS-TRT-20/original_labels/brain1_labels.nii.gz';
 
-preprocessing = 0;               % apply preprocessing (0 or 1)
-preprocessingType = 'CobraLab';  % preprocessing type ('CobraLab' or 'OASIS')
-numberOfSmoothing = 1;           % smoothing to apply to preprocessing material (int)
-computeStatsMatrix = 0;          % compute stats matrix (0 or 1)
-gaussianType = 'median';         % select type of gaussian ('mean' or 'median')
-targetRes=[0.6 0.6 0.6];         % target resolution of generated images
-imageModality = 't1';            % naming parameter ('t1' or 't2')
+preprocessing = 1;             % apply preprocessing (0 or 1)
+preprocessingType = 'OASIS';   % preprocessing type ('CobraLab' or 'OASIS')
+numberOfSmoothing = 1;         % smoothing to apply to preprocessing material (int)
+computeStatsMatrix = 1;        % compute stats matrix (0 or 1)
+gaussianType = 'median';       % select type of gaussian ('mean' or 'median')
+targetRes=[1 1 1];             % target resolution of generated images
+imageModality = 't1';          % naming parameter ('t1' or 't2')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% initialisation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -85,7 +85,7 @@ for i=1:length(structPathsLabels)
     % get filename and brain number
     pathLabels = fullfile(structPathsLabels(i).folder,structPathsLabels(i).name);
     pathPreprocessingSupport = fullfile(structPathsPreprocessingSupport(i).folder,structPathsPreprocessingSupport(i).name);
-    brainNum = pathLabels(regexp(pathLabels,'brain'):regexp(pathLabels,'brain')+5);
+    brainNum = pathLabels(regexp(pathLabels,'brain'):regexp(pathLabels,'_')-1);
     
     disp(['%%%%%% processing ', structPathsLabels(i).name]);
     disp(' ');
