@@ -91,7 +91,8 @@ for i=1:length(structPathsLabels)
     disp(' ');
 
     % preprocessing of images
-    if preprocessing == 1
+    pathPreprocessedLabels = fullfile(pathPreprocessedLabelsFolder, [brainNum,'_preprocessed_labels.',smoothingName,'nii.gz']);
+    if preprocessing == 1 || ~exist(pathPreprocessedLabels, 'file')
         disp('%%% preprocessing data')
         if isequal(preprocessingType, 'CobraLab')
             preprocessedLabelsMRI = CobraLabPreProcessing(pathLabels, pathPreprocessingSupport, numberOfSmoothing, pathPreprocessedLabelsFolder, smoothingName, brainNum);
@@ -102,8 +103,7 @@ for i=1:length(structPathsLabels)
         end
     else
         disp('%%% loading previously preprocessed data')
-        pathLabels = fullfile(pathPreprocessedLabelsFolder, [brainNum,'_preprocessed_labels.',smoothingName,'nii.gz']);
-        preprocessedLabelsMRI = MRIread(pathLabels);
+        preprocessedLabelsMRI = MRIread(pathPreprocessedLabels);
     end
 
     % calculate intensity stats for all the specified regions
