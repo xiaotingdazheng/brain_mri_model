@@ -66,13 +66,15 @@ end
 pathDirLabels = fullfile(pathDataFolder, 'original_labels/');
 pathNewImagesFolder = fullfile(pathDataFolder, 'synthetic_images_and_labels/');
 pathPreprocessedLabelsFolder = fullfile(pathDataFolder, 'preprocessed_labels/');
-pathStatsMatrix = fullfile(pwd,['ClassesStats.',preprocessingType,'.',imageModality,'.',smoothingName,'mat']);
+pathStatsMatrixFolder = fullfile(pwd,'ClassesStats');
+pathStatsMatrix = fullfile(pathStatsMatrixFolder,['ClassesStats.',preprocessingType,'.',imageModality,'.',smoothingName,'mat']);
 pathImageFolder = fullfile(pathDataFolder, 'image_for_intensity_sampling');
 
 % subfolder creations
 if ~exist(pathNewImagesFolder, 'dir'), mkdir(pathNewImagesFolder), end
 if ~exist(pathPreprocessedLabelsFolder, 'dir'), mkdir(pathPreprocessedLabelsFolder), end
 if ~exist(pathImageFolder, 'dir'), mkdir(pathImageFolder), end
+if ~exist(pathStatsMatrixFolder, 'dir'), mkdir(pathStatsMatrixFolder), end
 
 % list of files in specified directories
 structPathsLabels = dir([pathDirLabels,'*.nii.gz']);
