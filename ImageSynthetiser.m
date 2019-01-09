@@ -32,15 +32,15 @@ pathDataFolder = '/home/benjamin/data/OASIS-TRT-20/';
 pathDirPreprocessingSupport = '/home/benjamin/data/OASIS-TRT-20/original_images/*.nii.gz';
 % image to use as template for downsampling
 %pathImageResliceLike = '~/data/CobraLab/original_images/brain1.nii.gz';
-pathImageResliceLike = '/home/benjamin/data/OASIS-TRT-20/original_labels/brain1_labels.nii.gz';
+pathImageResliceLike = '/home/benjamin/data/OASIS-TRT-20/original_images/brain01.nii.gz';
 
-preprocessing = 1;             % apply preprocessing (0 or 1)
-preprocessingType = 'OASIS';   % preprocessing type ('CobraLab' or 'OASIS')
-numberOfSmoothing = 1;         % smoothing to apply to preprocessing material (int)
-computeStatsMatrix = 1;        % compute stats matrix (0 or 1)
-gaussianType = 'median';       % select type of gaussian ('mean' or 'median')
-targetRes=[1 1 1];             % target resolution of generated images
-imageModality = 't1';          % naming parameter ('t1' or 't2')
+preprocessing = 0;              % apply preprocessing (0 or 1)
+preprocessingType = 'OASIS';    % preprocessing type ('CobraLab' or 'OASIS')
+numberOfSmoothing = 1;          % smoothing to apply to preprocessing material (int)
+computeStatsMatrix = 1;         % compute stats matrix (0 or 1)
+gaussianType = 'median';        % select type of gaussian ('mean' or 'median')
+targetRes=[1 1 1];              % target resolution of generated images
+imageModality = 't1';           % naming parameter ('t1' or 't2')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% initialisation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -66,7 +66,7 @@ end
 pathDirLabels = fullfile(pathDataFolder, 'original_labels/');
 pathNewImagesFolder = fullfile(pathDataFolder, 'synthetic_images_and_labels/');
 pathPreprocessedLabelsFolder = fullfile(pathDataFolder, 'preprocessed_labels/');
-pathStatsMatrix = fullfile(pwd,['ClassesStats.',imageModality,'.',smoothingName,'mat']);
+pathStatsMatrix = fullfile(pwd,['ClassesStats.',preprocessingType,'.',imageModality,'.',smoothingName,'mat']);
 pathImageFolder = fullfile(pathDataFolder, 'image_for_intensity_sampling');
 
 % subfolder creations
@@ -85,7 +85,7 @@ for i=1:length(structPathsLabels)
     % get filename and brain number
     pathLabels = fullfile(structPathsLabels(i).folder,structPathsLabels(i).name);
     pathPreprocessingSupport = fullfile(structPathsPreprocessingSupport(i).folder,structPathsPreprocessingSupport(i).name);
-    brainNum = pathLabels(regexp(pathLabels,'brain'):regexp(pathLabels,'_')-1);
+    brainNum = pathLabels(regexp(pathLabels,'brain'):regexp(pathLabels,'_labels.nii.gz')-1);
     
     disp(['%%%%%% processing ', structPathsLabels(i).name]);
     disp(' ');

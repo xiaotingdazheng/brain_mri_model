@@ -40,7 +40,7 @@ end
 % blurring images
 disp('blurring image to prevent alliasing');
 f=targetRes./sampleRes;
-sigmaFilt=0.9*f;
+sigmaFilt=1.1*f;
 new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
 
 disp('writting created image');

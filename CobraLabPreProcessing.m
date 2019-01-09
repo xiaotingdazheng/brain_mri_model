@@ -78,7 +78,7 @@ mriLabels = pasteHippoLabels(mriLabels, HippoLabels, CSFlabel);
 pathPreprocessedLabels = fullfile(pathPreprocessedLabels, [brainNum, '_preprocessed_labels.', smoothingName, 'nii.gz']);
 mriLabels.fspec = pathPreprocessedLabels;
 
-disp(['writing marged labels in ',pathPreprocessedLabels])
+disp(['writing merged labels in ',pathPreprocessedLabels])
 MRIwrite(mriLabels, pathPreprocessedLabels); %write a new nii.gz file.
 
 end
