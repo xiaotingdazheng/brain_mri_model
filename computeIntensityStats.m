@@ -1,4 +1,4 @@
-function [classesStats]=computeIntensityStats(pathImage, preprocessedLabelsMRI, labelsList, labelClasses, ClassNames, pathStatsMatrix)
+function [classesStats]=computeIntensityStats(pathImage, preprocessedLabelsMRI, labelsList, labelClasses, ClassNames, pathStatsMatrix, pathDataFolder, brainNum)
 
 % This function compute basic intensity statistics for different regions of
 % the brain. It takes as inputs the image to derive the stats from, its
@@ -12,6 +12,12 @@ function [classesStats]=computeIntensityStats(pathImage, preprocessedLabelsMRI, 
 % A graph is built along tses calculations to visually compare the real 
 % ditribution to the "mean" and "median" gaussian models.
 % The output is simply the matrix gathering all the computed information.
+
+if ~exist(pathImage, 'file')
+    pathOriginalImage = fullfile(pathDataFolder, 'original_images',[brainNum,'.nii.gz']);
+    cmd = ['mri_convert ', pathOriginalImage ,' ', pathImage, ' -rl ', preprocessedLabelsMRI.fspec, ' -rt nearest'];
+    [~,~] = system(cmd);
+end
 
 %read image
 disp('loading image');

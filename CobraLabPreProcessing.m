@@ -1,4 +1,4 @@
-function mriLabels = CobraLabPreProcessing(pathLabels, pathHippoLabels, numberOfSmoothing, smoothingName, brainNum)
+function mriLabels = CobraLabPreProcessing(pathLabels, pathHippoLabels, numberOfSmoothing, pathPreprocessedLabels, smoothingName, brainNum)
 
 % This function combines the labels from general image and more precise
 % hippocampal segmentations. 
@@ -75,12 +75,11 @@ mriLabels = pasteHippoLabels(mriLabels, HippoLabels, CSFlabel);
 
 %%%%%%%%%%%%%%%%%%%%%%%% writting preprocessed file %%%%%%%%%%%%%%%%%%%%%%%
 
-[pathFusedLabels,~,~] = fileparts(pathLabels);
-pathFusedLabels = fullfile(pathFusedLabels, [brainNum, '_preprocessed_labels.', smoothingName, 'nii.gz']);
-mriLabels.fspec = pathFusedLabels;
+pathPreprocessedLabels = fullfile(pathPreprocessedLabels, [brainNum, '_preprocessed_labels.', smoothingName, 'nii.gz']);
+mriLabels.fspec = pathPreprocessedLabels;
 
-disp(['writing marged labels in ',pathFusedLabels])
-MRIwrite(mriLabels, pathFusedLabels); %write a new nii.gz file.
+disp(['writing marged labels in ',pathPreprocessedLabels])
+MRIwrite(mriLabels, pathPreprocessedLabels); %write a new nii.gz file.
 
 end
 
@@ -117,13 +116,13 @@ labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)) 
 
 %%% save corrected labels
 mriHippoLabels.vol = labels;
-pathCorrectedLabels = strrep(pathHippoLabels,'nii.gz','mgz');
-[dir,~,~] = fileparts(pathCorrectedLabels);
+pathSmoothedLabels = strrep(pathHippoLabels,'nii.gz','mgz');
+[dir,~,~] = fileparts(pathSmoothedLabels);
 
-pathCorrectedLabels = fullfile(dir, [brainNum, '_hippo_labels', '.', smoothingName, 'nii.gz']);
+pathSmoothedLabels = fullfile(dir, [brainNum, '_hippo_labels', '.', smoothingName, 'nii.gz']);
 
-disp(['writing smoothed subfields ' pathCorrectedLabels]);
-MRIwrite(mriHippoLabels, pathCorrectedLabels); %write a new nii.gz file.
+disp(['writing smoothed subfields ' pathSmoothedLabels]);
+MRIwrite(mriHippoLabels, pathSmoothedLabels); %write a new nii.gz file.
 
 end
 

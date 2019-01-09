@@ -1,4 +1,4 @@
-function MRIlabels = OASISpreProcessing(pathLabels, pathImage, numberOfSmoothing, smoothingName, brainNum)
+function MRIlabels = OASISpreProcessing(pathLabels, pathImage, numberOfSmoothing, pathPreprocessedLabels, smoothingName, brainNum)
 
 MRIimage = MRIread(pathImage);
 MRIlabels = MRIread(pathLabels);
@@ -22,8 +22,7 @@ labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)) 
 
 MRIlabels.vol = labels;
 
-[dir,~,~] = fileparts(pathLabels);
-pathLabels = fullfile(dir, [brainNum, '_preprocessed_labels.', smoothingName, 'nii.gz']);
+pathLabels = fullfile(pathPreprocessedLabels, [brainNum, '_preprocessed_labels.', smoothingName, 'nii.gz']);
 MRIwrite(MRIlabels, pathLabels);
 
 end
