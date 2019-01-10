@@ -13,19 +13,19 @@ tic
 %pathDirFloatingImages = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*smoothed_twice.nii.gz';
 pathDirFloatingImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 pathDirLabels = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*labels.nii.gz';
-pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*smoothed_once.labels.nii.gz';
+pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 
 % set recompute to 1 to recompute all the masks and registrations (saved in
 % automatically generated folder '~/data/label_fusion_date_time'. If
 % recompute = 0, specify where is the data to be used.
 recompute = 1;
-dataFolder = '~/data/OASIS-TRT-20/label_fusion_11_12_18_21_logOdds_synthetic';
+dataFolder = '~/data/CobraLab/label_fusion_11_12_18_21_logOdds_synthetic';
 
 % set recomputeLogOdds to 1 to recompute the logOdds probability maps
 % (stored in LogOddsFolder). If recomputeLogOdds = 0, specify where
 % is the data to be used.
 recomputeLogOdds = 1;
-logOddsFolder = '~/data/logOdds_real_smoothed_once';
+logOddsFolder = '~/data/CobraLab/logOdds_real_smoothed_once';
 
 % apply masking to images
 computeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
@@ -83,13 +83,13 @@ accuracies = NaN(n_training_data, length(labelsList) + 1);
 % test label fusion on each real image
 for i=1:size(leaveOneOutIndices,1)
     
-    disp(['%%%%% testing label fusion on ',structPathsRefImages(refIndex(i)).name ' %%%%%']); disp(' ');
-    
     % define paths of real image and corresponding labels
     pathRefImage = fullfile(structPathsRefImages(refIndex(i)).folder, structPathsRefImages(refIndex(i)).name); %path of real image
     pathRefLabels = fullfile(structPathsLabels(refIndex(i)).folder, structPathsLabels(refIndex(i)).name);
+    refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
+    disp(['%%%%% testing label fusion on ',refBrainNum, ' %%%%%']); disp(' ');
     
-    % preparing the reference images for label fusion
+    % preparing the reference images for label fusion (masking and cropping)
     [croppedRefSegmentation, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, computeMaskRefImages, margin, resultsFolder);
     
     % initialise matrix on which label fusion will be performed
@@ -101,34 +101,27 @@ for i=1:size(leaveOneOutIndices,1)
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
         
-        leftOutIdx = leaveOneOutIndices(i,j);
-        disp(['%% processing floating image ',structPathsFloatingImages(leftOutIdx).name ' %%'])
-        
         % paths of synthetic image and labels
+        leftOutIdx = leaveOneOutIndices(i,j);
         pathFloatingImage = fullfile(structPathsFloatingImages(leftOutIdx).folder, structPathsFloatingImages(leftOutIdx).name);
         pathFloatingLabels = fullfile(structPathsLabels(leftOutIdx).folder, structPathsLabels(leftOutIdx).name);
-        
-        % extracting name of Floating image's brain number from label path
-        [~,name,~] = fileparts(strrep(pathFloatingLabels,'.nii.gz','.mgz'));
-        floBrainNum = name(regexp(name,'brain'):regexp(name,'brain')+5);
-        
-        % compute logOdds
-        temp_lab = strrep(pathFloatingLabels,'.nii.gz','');
-        [~,name,~] = fileparts(temp_lab);
-        pathLogOddsSubfolder = fullfile(logOddsFolder, name);
-        if (~exist(pathLogOddsSubfolder, 'dir') || recomputeLogOdds) && isequal(labelPriorType,'logOdds')
-            disp(['computing logOdds of ' pathFloatingLabels])
-            labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList);
-        end
+        floBrainNum = pathFloatingLabels(regexp(pathFloatingLabels,'brain'):regexp(pathFloatingLabels,'.')-1);
+        disp(['%% processing floating image ',floBrainNum, ' %%'])
         
         %mask image if specified
         if computeMaskFloatingImages
             pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder, floBrainNum);
         end
         
-        % create hippocampus segmentation map of floating image
+        % compute logOdds or create hippocampus segmentation map (for delta function)
+        temp_lab = strrep(pathFloatingLabels,'.nii.gz','');
+        [~,name,~] = fileparts(temp_lab);
+        pathLogOddsSubfolder = fullfile(logOddsFolder, name);
         pathFloatingHippoLabels = '';
-        if isequal(labelPriorType, 'delta function')
+        if (~exist(pathLogOddsSubfolder, 'dir') || recomputeLogOdds) && isequal(labelPriorType,'logOdds')
+            disp(['computing logOdds of ' pathFloatingLabels])
+            labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList);
+        elseif isequal(labelPriorType, 'delta function')
             pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, floBrainNum, recompute);
         end
         

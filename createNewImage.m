@@ -52,8 +52,8 @@ if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
 else
     resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
 end
-pathNewImage = fullfile(pathNewImagesFolder, [brainNum,'_',imageModality,'.synthetic.',resolution,'.',smoothingName,'nii.gz']);
-pathNewSegmMap = fullfile(pathNewImagesFolder, [brainNum,'_',imageModality,'.synthetic.',resolution,'.',smoothingName,'labels.nii.gz']);
+pathNewImage = fullfile(pathNewImagesFolder, [brainNum,'.',imageModality,'.synthetic.',resolution,'.',smoothingName,'nii.gz']);
+pathNewSegmMap = fullfile(pathNewImagesFolder, [brainNum,'.',imageModality,'.synthetic.',resolution,'.',smoothingName,'labels.nii.gz']);
 
 % save temporary image (at sampling resolution)
 MRIwrite(preprocessedLabelsMRI, pathNewImage); %write a new nifti file.
