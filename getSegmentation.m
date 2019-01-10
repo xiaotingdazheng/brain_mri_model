@@ -26,7 +26,7 @@ labelMapHippo = arrayfun(@(x) hippoLabelList(x), index);
 
 % save result hippocampus segmentation
 SegmentationMaskMRI.vol = labelMapHippo;
-pathResultHippoSegmentation = fullfile(resultsFolder, [refBrainNum 'hippo.labels.result.nii.gz']);
+pathResultHippoSegmentation = fullfile(resultsFolder, [refBrainNum 'hippo_labels.result.nii.gz']);
 MRIwrite(SegmentationMaskMRI, pathResultHippoSegmentation);
 
 end
