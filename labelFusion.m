@@ -4,13 +4,16 @@ addpath /home/benjamin/matlab/toolbox
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
+% path to main datafolder
+%pathDataFolder = '/home/benjamin/data/CobraLab/';
+pathDataFolder = '/home/benjamin/data/OASIS-TRT-20/';
 
 %pathDirFloatingImages = '~/data/CobraLab/synthetic_images_and_labels/*smoothed_twice.nii.gz';
 % pathDirFloatingImages = '~/data/CobraLab/original_images/*.nii.gz';
 % pathDirLabels = '~/data/CobraLab/synthetic_images_and_labels/*smoothed_twice.labels.nii.gz';
 % pathDirRefImages = '~/data/CobraLab/original_images/*.nii.gz';
 
-%pathDirFloatingImages = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*smoothed_twice.nii.gz';
+%pathDirFloatingImages = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*smoothed_once.nii.gz';
 pathDirFloatingImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 pathDirLabels = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*labels.nii.gz';
 pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
@@ -21,13 +24,8 @@ pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 recompute = 1;
 dataFolder = '~/data/CobraLab/label_fusion_11_12_18_21_logOdds_synthetic';
 
-% set recomputeLogOdds to 1 to recompute the logOdds probability maps
-% (stored in LogOddsFolder). If recomputeLogOdds = 0, specify where
-% is the data to be used.
-recomputeLogOdds = 1;
-logOddsFolder = '~/data/CobraLab/logOdds_real_smoothed_once';
-
 % apply masking to images
+recomputeLogOdds = 1;          % LogOdds folder is automatically created
 computeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
 computeMaskFloatingImages = 1; % apply masking to floating images (0 or 1)
 cropAll = 1;                   % apply cropping to all images and labels (0 or 1)
@@ -44,10 +42,13 @@ threshold = 0.3;               % threshold for prob logOdds
 
 % folders handling
 now = clock;
-resultsFolder = ['~/data/label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))];
+if contains(pathDirFloatingImages,'original'), realOrSynthetic = 'real'; else, realOrSynthetic = 'synthetic'; end
+if contains(pathDirLabels,'smoothed'),smoothingName = pathDirLabels(regexp(pathDirLabels,'smoothed'):regexp(pathDirLabels,'.labels.nii.gz')-1);elsesmoothingName = '';end
+preprocessingTyperesultsFolder = fullfile(pathDataFolder,['label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))]);
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end % create result folder
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat'); % accuracies will be saved here
 if ~recompute, resultsFolder = dataFolder; end % if we don't recompute switch to previous datafolder
+logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic, '_', smoothingName]);
 if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end % logOdds folder
 
 % listing images and labels
@@ -93,8 +94,7 @@ for i=1:size(leaveOneOutIndices,1)
     [croppedRefSegmentation, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, computeMaskRefImages, margin, resultsFolder);
     
     % initialise matrix on which label fusion will be performed
-    % initialising with zeros to start with a background image
-    % (because 0 is the background label).
+    % initialising with zeros to start image with background label
     labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]);
     labelMapHippo = zeros([size(croppedRefSegmentation), 2]);
     
@@ -110,7 +110,7 @@ for i=1:size(leaveOneOutIndices,1)
         
         %mask image if specified
         if computeMaskFloatingImages
-            pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder, floBrainNum);
+            pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder);
         end
         
         % compute logOdds or create hippocampus segmentation map (for delta function)
@@ -122,12 +122,12 @@ for i=1:size(leaveOneOutIndices,1)
             disp(['computing logOdds of ' pathFloatingLabels])
             labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList);
         elseif isequal(labelPriorType, 'delta function')
-            pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, floBrainNum, recompute);
+            pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, recompute);
         end
         
         % registration of synthetic image and labels to real image
         [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels, pathTransformation] = register(pathRefMaskedImage, ...
-            pathFloatingImage, pathFloatingLabels, pathFloatingHippoLabels, labelPriorType, resultsFolder, refIndex(i), recompute, floBrainNum);
+            pathFloatingImage, pathFloatingLabels, pathFloatingHippoLabels, labelPriorType, resultsFolder, recompute, refBrainNum);
         
         % registration of loggOdds
         pathRegisteredLogOddsSubfolder = '';
