@@ -5,22 +5,27 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 
-%pathDirFloatingImages = '~/data/CobraLab/synthetic_brains_t1/*.synthetic.t1.0.6.nii.gz';
-pathDirFloatingImages = '~/data/CobraLab/reference_images/*norm.384.nii.gz';
-pathDirLabels = '~/data/CobraLab/synthetic_brains_t1/*labels.nii.gz';
-pathDirRefImages = '~/data/CobraLab/reference_images/*norm.384.nii.gz';
+%pathDirFloatingImages = '~/data/CobraLab/synthetic_images_and_labels/*smoothed_twice.nii.gz';
+% pathDirFloatingImages = '~/data/CobraLab/original_images/*.nii.gz';
+% pathDirLabels = '~/data/CobraLab/synthetic_images_and_labels/*smoothed_twice.labels.nii.gz';
+% pathDirRefImages = '~/data/CobraLab/original_images/*.nii.gz';
+
+%pathDirFloatingImages = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*smoothed_twice.nii.gz';
+pathDirFloatingImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
+pathDirLabels = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*labels.nii.gz';
+pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*smoothed_once.labels.nii.gz';
 
 % set recompute to 1 to recompute all the masks and registrations (saved in
 % automatically generated folder '~/data/label_fusion_date_time'. If 
 % recompute = 0, specify where is the data to be used.
 recompute = 1;
-dataFolder = '~/data/label_fusion_11_12_18_21_logOdds_synthetic';
+dataFolder = '~/data/OASIS-TRT-20/label_fusion_11_12_18_21_logOdds_synthetic';
 
 % set recomputeLogOdds to 1 to recompute the logOdds probability maps 
 % (stored in LogOddsFolder). If recomputeLogOdds = 0, specify where
 % is the data to be used.
 recomputeLogOdds = 1;
-logOddsFolder = '~/data/logOdds_real_smoothed_twice';
+logOddsFolder = '~/data/logOdds_real_smoothed_once';
 
 % set to 1 if you wish to apply masking to floating images.
 computeMaskFloatingImages = 1;
@@ -28,28 +33,27 @@ computeMaskFloatingImages = 1;
 % label fusion parameter
 sigma = 15;                   % std dev of gaussian similarity meaure
 margin = 30;                  % margin introduced when hippocampus are cropped
-labelPriorType = 'logOdds';   %'delta function' or 'logOdds'
+labelPriorType = 'logOdds';   % 'delta function' or 'logOdds'
 rho = 0.5;                    % exponential decay for prob logOdds
 threshold = 0.3;              % threshold for prob logOdds
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% initialisation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% initialisation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% folders handling
 now = clock;
 resultsFolder = ['~/data/label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))];
-if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end
-pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat');
-if ~recompute, resultsFolder = dataFolder; end
+if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end % create result folder
+pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat'); % accuracies will be saved here
+if ~recompute, resultsFolder = dataFolder; end % if we don't recompute switch to previous datafolder
+if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end % logOdds folder
 
+% listing images and labels
 structPathsFloatingImages = dir(pathDirFloatingImages);
 structPathsLabels = dir(pathDirLabels);
 structPathsRefImages = dir(pathDirRefImages);
 
-if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end
-
-n_training_data = length(structPathsLabels);
-leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
-refIndex = n_training_data:-1:1;
+% region names and associated labels
 namesList = {'background';'left cerebral WM';'left cerebral cortex';'left lateral ventricule';'left inferior lateral ventricule';...
     'left cerebellum WM';'left cerebellum cortex';'left thalamus proper';'left caudate';'left putamen';...
     'left pallidum';'3rd ventricule';'4th ventricule';'brain stem';'left amygdala';...
@@ -63,7 +67,16 @@ namesList = {'background';'left cerebral WM';'left cerebral cortex';'left latera
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
     58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
 
+% leave one out indices
+n_training_data = length(structPathsLabels);
+leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
+refIndex = n_training_data:-1:1;
+
+% result matrix
 accuracies = NaN(n_training_data, length(labelsList) + 1);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % test label fusion on each real image
 for i=1:size(leaveOneOutIndices,1)

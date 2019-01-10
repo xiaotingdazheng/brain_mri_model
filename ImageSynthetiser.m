@@ -34,7 +34,7 @@ pathDirPreprocessingSupport = '/home/benjamin/data/OASIS-TRT-20/original_images/
 %pathImageResliceLike = '~/data/CobraLab/original_images/brain1.nii.gz';
 pathImageResliceLike = '/home/benjamin/data/OASIS-TRT-20/original_images/brain01.nii.gz';
 
-preprocessing = 0;              % apply preprocessing (0 or 1)
+preprocessing = 1;              % apply preprocessing (0 or 1)
 preprocessingType = 'OASIS';    % preprocessing type ('CobraLab' or 'OASIS')
 numberOfSmoothing = 1;          % smoothing to apply to preprocessing material (int)
 computeStatsMatrix = 1;         % compute stats matrix (0 or 1)
