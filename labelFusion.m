@@ -16,26 +16,28 @@ pathDirLabels = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*labels.nii.gz'
 pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*smoothed_once.labels.nii.gz';
 
 % set recompute to 1 to recompute all the masks and registrations (saved in
-% automatically generated folder '~/data/label_fusion_date_time'. If 
+% automatically generated folder '~/data/label_fusion_date_time'. If
 % recompute = 0, specify where is the data to be used.
 recompute = 1;
 dataFolder = '~/data/OASIS-TRT-20/label_fusion_11_12_18_21_logOdds_synthetic';
 
-% set recomputeLogOdds to 1 to recompute the logOdds probability maps 
+% set recomputeLogOdds to 1 to recompute the logOdds probability maps
 % (stored in LogOddsFolder). If recomputeLogOdds = 0, specify where
 % is the data to be used.
 recomputeLogOdds = 1;
 logOddsFolder = '~/data/logOdds_real_smoothed_once';
 
-% set to 1 if you wish to apply masking to floating images.
-computeMaskFloatingImages = 1;
+% apply masking to images
+computeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
+computeMaskFloatingImages = 1; % apply masking to floating images (0 or 1)
+cropAll = 1;                   % apply cropping to all images and labels (0 or 1)
 
 % label fusion parameter
-sigma = 15;                   % std dev of gaussian similarity meaure
-margin = 30;                  % margin introduced when hippocampus are cropped
-labelPriorType = 'logOdds';   % 'delta function' or 'logOdds'
-rho = 0.5;                    % exponential decay for prob logOdds
-threshold = 0.3;              % threshold for prob logOdds
+sigma = 15;                    % std dev of gaussian similarity meaure
+margin = 30;                   % margin introduced when hippocampus are cropped
+labelPriorType = 'logOdds';    % 'delta function' or 'logOdds'
+rho = 0.5;                     % exponential decay for prob logOdds
+threshold = 0.3;               % threshold for prob logOdds
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% initialisation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,28 +89,11 @@ for i=1:size(leaveOneOutIndices,1)
     pathRefImage = fullfile(structPathsRefImages(refIndex(i)).folder, structPathsRefImages(refIndex(i)).name); %path of real image
     pathRefLabels = fullfile(structPathsLabels(refIndex(i)).folder, structPathsLabels(refIndex(i)).name);
     
-    % mask real image
-    refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'brain')+5);
-    temp_ref = strrep(pathRefImage,'.nii.gz','.mgz');
-    [~,name,~] = fileparts(temp_ref);
-    pathRefMaskedImage = fullfile(resultsFolder, [refBrainNum '_' name '.masked.nii.gz']); %path of binary mask
-    if ~exist(pathRefMaskedImage, 'file') || recompute == 1
-        setFreeSurfer();
-        disp(['masking reference image ' pathRefImage])
-        cmd = ['mri_mask ' pathRefImage ' ' pathRefLabels ' ' pathRefMaskedImage];
-        system(cmd); %mask real ref image
-    end
-    
-    % open reference labels
-    refSegmentation = MRIread(pathRefLabels);
-    refMaskedImage = MRIread(pathRefMaskedImage);
-    
-    % open corresponding segmentation and crop ref image/labels around hippocampus
-    refSegmentation = refSegmentation.vol; refMaskedImage = refMaskedImage.vol;
-    [croppedRefSegmentation, croppedRefMaskedImage, cropping] = cropHippo(refSegmentation, refMaskedImage, margin, resultsFolder, refBrainNum);
+    % preparing the reference images for label fusion
+    [croppedRefSegmentation, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, computeMaskRefImages, margin, resultsFolder);
     
     % initialise matrix on which label fusion will be performed
-    % initialising with zeros correspond to start with a background image 
+    % initialising with zeros to start with a background image
     % (because 0 is the background label).
     labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]);
     labelMapHippo = zeros([size(croppedRefSegmentation), 2]);
@@ -122,7 +107,7 @@ for i=1:size(leaveOneOutIndices,1)
         % paths of synthetic image and labels
         pathFloatingImage = fullfile(structPathsFloatingImages(leftOutIdx).folder, structPathsFloatingImages(leftOutIdx).name);
         pathFloatingLabels = fullfile(structPathsLabels(leftOutIdx).folder, structPathsLabels(leftOutIdx).name);
-
+        
         % extracting name of Floating image's brain number from label path
         [~,name,~] = fileparts(strrep(pathFloatingLabels,'.nii.gz','.mgz'));
         floBrainNum = name(regexp(name,'brain'):regexp(name,'brain')+5);
@@ -144,7 +129,7 @@ for i=1:size(leaveOneOutIndices,1)
         % create hippocampus segmentation map of floating image
         pathFloatingHippoLabels = '';
         if isequal(labelPriorType, 'delta function')
-            pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, floBrainNum, recompute);      
+            pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, floBrainNum, recompute);
         end
         
         % registration of synthetic image and labels to real image

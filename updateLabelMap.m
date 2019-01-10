@@ -15,7 +15,11 @@ function [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, cro
 
 % read registered floating image and crop it around hippocampus
 registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
-croppedRegisteredFloatingImage = registeredFloatingImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+if cropping
+    croppedRegisteredFloatingImage = registeredFloatingImage.vol(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+else
+    croppedRegisteredFloatingImage = registeredFloatingImage.vol;
+end
 
 % calculate similarity between test (real) image and training (synthetic) image
 likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRefMaskedImage-croppedRegisteredFloatingImage).^2/(2*sigma^2));
