@@ -5,18 +5,18 @@ addpath /home/benjamin/matlab/toolbox
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% parameters %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 % path to main datafolder
-%pathDataFolder = '/home/benjamin/data/CobraLab/';
-pathDataFolder = '/home/benjamin/data/OASIS-TRT-20/';
+pathDataFolder = '/home/benjamin/data/CobraLab/';
+%pathDataFolder = '/home/benjamin/data/OASIS-TRT-20/';
 
 %pathDirFloatingImages = '~/data/CobraLab/synthetic_images_and_labels/*smoothed_twice.nii.gz';
-% pathDirFloatingImages = '~/data/CobraLab/original_images/*.nii.gz';
-% pathDirLabels = '~/data/CobraLab/synthetic_images_and_labels/*smoothed_twice.labels.nii.gz';
-% pathDirRefImages = '~/data/CobraLab/original_images/*.nii.gz';
+pathDirFloatingImages = '~/data/CobraLab/original_images/*.nii.gz';
+pathDirLabels = '~/data/CobraLab/synthetic_images_and_labels/*smoothed_twice.labels.nii.gz';
+pathDirRefImages = '~/data/CobraLab/original_images/*.nii.gz';
 
 %pathDirFloatingImages = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*smoothed_once.nii.gz';
-pathDirFloatingImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
-pathDirLabels = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*labels.nii.gz';
-pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
+% pathDirFloatingImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
+% pathDirLabels = '~/data/OASIS-TRT-20/synthetic_images_and_labels/*labels.nii.gz';
+% pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 
 % set recompute to 1 to recompute all the masks and registrations (saved in
 % automatically generated folder '~/data/label_fusion_date_time'. If
@@ -24,10 +24,10 @@ pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 recompute = 1;
 
 % apply masking to images
-recomputeLogOdds = 1;            % LogOdds folder is automatically created
+cropAll = 1;                     % apply cropping to all images and labels (0 or 1)
 recomputeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
 recomputeMaskFloatingImages = 1; % apply masking to floating images (0 or 1)
-cropAll = 1;                     % apply cropping to all images and labels (0 or 1)
+recomputeLogOdds = 1;            % LogOdds folder is automatically created
 
 % label fusion parameter
 sigma = 15;                    % std dev of gaussian similarity meaure
@@ -42,18 +42,22 @@ threshold = 0.3;               % threshold for prob logOdds
 % folders handling
 now = clock;
 if contains(pathDirFloatingImages,'original'), realOrSynthetic = 'real'; else, realOrSynthetic = 'synthetic'; end
-if contains(pathDirLabels,'smoothed'),smoothingName = pathDirLabels(regexp(pathDirLabels,'smoothed'):regexp(pathDirLabels,'.labels.nii.gz')-1);else, smoothingName = '';end
+if contains(pathDirLabels,'smoothed')
+    smoothingName = ['_', pathDirLabels(regexp(pathDirLabels,'smoothed'):regexp(pathDirLabels,'.labels.nii.gz')-1)];
+else
+    smoothingName = '';
+end
 resultsFolder = fullfile(pathDataFolder,['label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))]);
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end % create result folder
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat'); % accuracies will be saved here
 if isequal(smoothingName,'')
     logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic]); 
 else
-    logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic, '_', smoothingName]);
+    logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic, smoothingName]);
 end
-registrationFolder = fullfile(pathDataFolder,'registrations',['registrations_',realOrSynthetic,'_',smoothingName]);
+registrationFolder = fullfile(pathDataFolder,'registrations',['registrations_', realOrSynthetic, smoothingName]);
 maskedImageFolder = fullfile(pathDataFolder, 'masked_images');
-croppedFolder = fullfile(pathDataFolder,'cropped_images_and_labels'); 
+croppedFolder = fullfile(pathDataFolder,'cropped_images_and_labels',['croppings_', realOrSynthetic, smoothingName]); 
 if ~exist(croppedFolder, 'dir') && cropAll, mkdir(croppedFolder), end
 
 % listing images and labels
@@ -96,7 +100,7 @@ for i=1:size(leaveOneOutIndices,1)
     disp(['%%%%% testing label fusion on ',refBrainNum, ' %%%%%']); disp(' ');
     
     % preparing the reference images for label fusion (masking and cropping)
-    [croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, computeMaskRefImages, margin, croppedFolder);
+    [croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, recomputeMaskRefImages, margin, croppedFolder);
     
     % initialise matrix on which label fusion will be performed
     % initialising with zeros to start image with background label
@@ -114,9 +118,7 @@ for i=1:size(leaveOneOutIndices,1)
         disp(['%% processing floating image ',floBrainNum, ' %%'])
         
         %mask image if specified
-        if computeMaskFloatingImages
-            pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedImageFolder);
-        end
+        pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedImageFolder, recomputeMaskFloatingImages);
         
         % compute logOdds or create hippocampus segmentation map (for delta function)
         logOddsSubfolder = fullfile(logOddsFolder, floBrainNum);
