@@ -22,7 +22,6 @@ pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 % automatically generated folder '~/data/label_fusion_date_time'. If
 % recompute = 0, specify where is the data to be used.
 recompute = 1;
-dataFolder = '~/data/CobraLab/label_fusion_11_12_18_21_logOdds_synthetic';
 
 % apply masking to images
 recomputeLogOdds = 1;          % LogOdds folder is automatically created
@@ -43,13 +42,21 @@ threshold = 0.3;               % threshold for prob logOdds
 % folders handling
 now = clock;
 if contains(pathDirFloatingImages,'original'), realOrSynthetic = 'real'; else, realOrSynthetic = 'synthetic'; end
-if contains(pathDirLabels,'smoothed'),smoothingName = pathDirLabels(regexp(pathDirLabels,'smoothed'):regexp(pathDirLabels,'.labels.nii.gz')-1);elsesmoothingName = '';end
-preprocessingTyperesultsFolder = fullfile(pathDataFolder,['label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))]);
+if contains(pathDirLabels,'smoothed'),smoothingName = pathDirLabels(regexp(pathDirLabels,'smoothed'):regexp(pathDirLabels,'.labels.nii.gz')-1);else, smoothingName = '';end
+resultsFolder = fullfile(pathDataFolder,['label_fusion_' num2str(now(3)) '_' num2str(now(2)) '_' num2str(now(4)) '_' num2str(now(5))]);
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end % create result folder
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat'); % accuracies will be saved here
-if ~recompute, resultsFolder = dataFolder; end % if we don't recompute switch to previous datafolder
-logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic, '_', smoothingName]);
-if ~exist(logOddsFolder, 'dir'), mkdir(logOddsFolder), end % logOdds folder
+if isequal(smoothingName,'')
+    logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic]); 
+else
+    logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic, '_', smoothingName]);
+end
+registrationFolder = fullfile(pathDataFolder,'registrations',['registrations_',realOrSynthetic,'_',smoothingName]);
+maskedRefImageFolder = fullfile(pathDataFolder, 'original_images_masked');
+if computeMaskRefImages && ~exist(maskedRefImageFolder, 'dir'), mkdir(maskedRefImageFolder), end
+[floImageFolder,~,~] = fileparts(pathDirFloatingImages);
+maskedFloImageFolder = [floImageFolder, '_'];
+if computeMaskFloatingImages && ~exist(maskedFloImageFolder, 'dir'), mkdir(maskedFloImageFolder), end
 
 % listing images and labels
 structPathsFloatingImages = dir(pathDirFloatingImages);
@@ -114,33 +121,32 @@ for i=1:size(leaveOneOutIndices,1)
         end
         
         % compute logOdds or create hippocampus segmentation map (for delta function)
-        temp_lab = strrep(pathFloatingLabels,'.nii.gz','');
-        [~,name,~] = fileparts(temp_lab);
-        pathLogOddsSubfolder = fullfile(logOddsFolder, name);
+        logOddsSubfolder = fullfile(logOddsFolder, floBrainNum);
         pathFloatingHippoLabels = '';
-        if (~exist(pathLogOddsSubfolder, 'dir') || recomputeLogOdds) && isequal(labelPriorType,'logOdds')
+        if (~exist(logOddsSubfolder, 'dir') || recomputeLogOdds) && isequal(labelPriorType,'logOdds')
             disp(['computing logOdds of ' pathFloatingLabels])
-            labels2prob(pathFloatingLabels, pathLogOddsSubfolder, rho, threshold, labelsList);
+            labels2prob(pathFloatingLabels, logOddsSubfolder, rho, threshold, labelsList);
         elseif isequal(labelPriorType, 'delta function')
             pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, recompute);
         end
         
         % registration of synthetic image and labels to real image
+        registrationSubFolder = fullfile(registrationFolder, [floBrainNum, 'registered_to_', refBrainNum]);
         [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels, pathTransformation] = register(pathRefMaskedImage, ...
-            pathFloatingImage, pathFloatingLabels, pathFloatingHippoLabels, labelPriorType, resultsFolder, recompute, refBrainNum);
+            pathFloatingImage, pathFloatingLabels, pathFloatingHippoLabels, labelPriorType, registrationSubFolder, recompute, refBrainNum, floBrainNum);
         
         % registration of loggOdds
-        pathRegisteredLogOddsSubfolder = '';
+        registeredLogOddsSubFolder = '';
         if isequal(labelPriorType, 'logOdds')
             disp('applying registration warping to logOdds')
-            pathRegisteredLogOddsSubfolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, pathLogOddsSubfolder, logOddsFolder,...
-                resultsFolder, recompute, refBrainNum, floBrainNum);
+            registeredLogOddsSubFolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, logOddsSubfolder, ...
+                registrationSubFolder, recompute, refBrainNum, floBrainNum);
         end
         
         % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
         [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
-            pathRegisteredFloatingHippoLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
+            pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
         
     end
     
