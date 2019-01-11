@@ -1,29 +1,38 @@
-function [croppedSegmentation, croppedImage, cropping] = cropHippo(Segmentation, Image, margin, resultsFolder, refBrainNum)
+function [croppedRefLabels, croppedImage, cropping] = cropHippo(pathRefLabels, pathRefMaskedImage, margin, croppedFolder)
 
 % This function takes as inputs an image and its correpsonding
 % segmentation map, locates the hippocampus (or  hippocampi if both
 % hemishperes) and saves the cropped images and segmentation in specified
 % resul folder. The cropping is done with a specified margin.
 
-SegmentationMask = Segmentation > 20000 | Segmentation == 17 | Segmentation == 53 ; % detect hippocampus labels (17 or 43) and subfields labels (>20000)
-SegmentationMaskMRI.vol = SegmentationMask; % builds MRI object to be read by cropLabelVol function
-z = zeros(4); z(1:3,1:3) = eye(3);
-SegmentationMaskMRI.vox2ras0 = z;
+refLabels = MRIread(pathRefLabels);
+refMaskedImage = MRIread(pathRefMaskedImage);
+Labels = refLabels.vol; 
+Image = refMaskedImage.vol;
 
-[~, cropping] = cropLabelVol(SegmentationMaskMRI, margin); % finds cropping around hippocampus
+LabelsMask = Labels > 20000 | Labels == 17 | Labels == 53 ; % detect hippocampus labels (17 or 43) and subfields labels (>20000)
+LabelsMaskMRI.vol = LabelsMask; % builds MRI object to be read by cropLabelVol function
+z = zeros(4); z(1:3,1:3) = eye(3);
+LabelsMaskMRI.vox2ras0 = z;
+
+[~, cropping] = cropLabelVol(LabelsMaskMRI, margin); % finds cropping around hippocampus
 
 % crop both image and corresponding segmentation
-croppedSegmentation = Segmentation(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+croppedRefLabels = Labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
 croppedImage = Image(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
 
 % save cropped segmentation
-SegmentationMaskMRI.vol = croppedSegmentation;
-pathCroppedSegmentation = fullfile(resultsFolder, [refBrainNum '.labels.cropped.nii.gz']);
-MRIwrite(SegmentationMaskMRI, pathCroppedSegmentation);
+LabelsMaskMRI.vol = croppedRefLabels;
+temp_pathRefLabels = strrep(pathRefLabels,'.nii.gz', '.mgz');
+[~,name,~] = fileparts(temp_pathRefLabels);
+pathCroppedLabels = fullfile(croppedFolder, [name '.cropped.nii.gz']);
+MRIwrite(LabelsMaskMRI, pathCroppedLabels);
 
 % save cropped image
-SegmentationMaskMRI.vol = croppedImage;
-pathCroppedImage = fullfile(resultsFolder, [refBrainNum '.cropped.nii.gz']);
-MRIwrite(SegmentationMaskMRI, pathCroppedImage);
+LabelsMaskMRI.vol = croppedImage;
+temp_pathRefMaskedImage = strrep(pathRefMaskedImage,'.nii.gz', '.mgz');
+[~,name,~] = fileparts(temp_pathRefMaskedImage);
+pathCroppedImage = fullfile(croppedFolder, [name '.cropped.nii.gz']);
+MRIwrite(LabelsMaskMRI, pathCroppedImage);
 
 end

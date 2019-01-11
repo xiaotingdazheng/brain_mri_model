@@ -24,10 +24,10 @@ pathDirRefImages = '~/data/OASIS-TRT-20/original_images/*.nii.gz';
 recompute = 1;
 
 % apply masking to images
-recomputeLogOdds = 1;          % LogOdds folder is automatically created
-computeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
-computeMaskFloatingImages = 1; % apply masking to floating images (0 or 1)
-cropAll = 1;                   % apply cropping to all images and labels (0 or 1)
+recomputeLogOdds = 1;            % LogOdds folder is automatically created
+recomputeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
+recomputeMaskFloatingImages = 1; % apply masking to floating images (0 or 1)
+cropAll = 1;                     % apply cropping to all images and labels (0 or 1)
 
 % label fusion parameter
 sigma = 15;                    % std dev of gaussian similarity meaure
@@ -52,11 +52,9 @@ else
     logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic, '_', smoothingName]);
 end
 registrationFolder = fullfile(pathDataFolder,'registrations',['registrations_',realOrSynthetic,'_',smoothingName]);
-maskedRefImageFolder = fullfile(pathDataFolder, 'original_images_masked');
-if computeMaskRefImages && ~exist(maskedRefImageFolder, 'dir'), mkdir(maskedRefImageFolder), end
-[floImageFolder,~,~] = fileparts(pathDirFloatingImages);
-maskedFloImageFolder = [floImageFolder, '_'];
-if computeMaskFloatingImages && ~exist(maskedFloImageFolder, 'dir'), mkdir(maskedFloImageFolder), end
+maskedImageFolder = fullfile(pathDataFolder, 'masked_images');
+croppedFolder = fullfile(pathDataFolder,'cropped_images_and_labels'); 
+if ~exist(croppedFolder, 'dir') && cropAll, mkdir(croppedFolder), end
 
 % listing images and labels
 structPathsFloatingImages = dir(pathDirFloatingImages);
@@ -98,12 +96,12 @@ for i=1:size(leaveOneOutIndices,1)
     disp(['%%%%% testing label fusion on ',refBrainNum, ' %%%%%']); disp(' ');
     
     % preparing the reference images for label fusion (masking and cropping)
-    [croppedRefSegmentation, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, computeMaskRefImages, margin, resultsFolder);
+    [croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, computeMaskRefImages, margin, croppedFolder);
     
     % initialise matrix on which label fusion will be performed
     % initialising with zeros to start image with background label
-    labelMap = zeros([size(croppedRefSegmentation), length(labelsList)]);
-    labelMapHippo = zeros([size(croppedRefSegmentation), 2]);
+    labelMap = zeros([size(croppedRefLabels), length(labelsList)]);
+    labelMapHippo = zeros([size(croppedRefLabels), 2]);
     
     % registration and similarity between ref image and each synthetic image in turn
     for j=1:size(leaveOneOutIndices,2)
@@ -117,7 +115,7 @@ for i=1:size(leaveOneOutIndices,1)
         
         %mask image if specified
         if computeMaskFloatingImages
-            pathFloatingImage = maskFloatingImage(pathFloatingImage, pathFloatingLabels, resultsFolder);
+            pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedImageFolder);
         end
         
         % compute logOdds or create hippocampus segmentation map (for delta function)
@@ -146,13 +144,13 @@ for i=1:size(leaveOneOutIndices,1)
         % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
         [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
-            pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefSegmentation);
+            pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefLabels);
         
     end
     
     disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');
     [labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum); % argmax operation
-    accuracies(i,:) = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedRefSegmentation, labelsList); % compute Dice coef for all structures
+    accuracies(i,:) = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedRefLabels, labelsList); % compute Dice coef for all structures
     
 end
 
