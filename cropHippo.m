@@ -1,4 +1,4 @@
-function [croppedRefLabels, croppedImage, cropping] = cropHippo(pathRefLabels, pathRefMaskedImage, margin, croppedFolder)
+function [croppedRefLabels, croppedImage, cropping] = cropHippo(pathRefMaskedImage, pathRefLabels, margin, croppedFolder)
 
 % This function takes as inputs an image and its correpsonding
 % segmentation map, locates the hippocampus (or  hippocampi if both
