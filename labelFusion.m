@@ -122,12 +122,7 @@ for i=1:size(leaveOneOutIndices,1)
         
         % compute logOdds or create hippocampus segmentation map (for delta function)
         logOddsSubfolder = fullfile(logOddsFolder, floBrainNum);
-        if isequal(labelPriorType,'logOdds')
-            labels2prob(pathFloatingLabels, logOddsSubfolder, rho, threshold, labelsList, recomputeLogOdds);
-            pathFloatingHippoLabels = '';
-        elseif isequal(labelPriorType, 'delta function')
-            pathFloatingHippoLabels = maskHippo(pathFloatingLabels, resultsFolder, recompute);
-        end
+        pathFloatingHippoLabels = calculatePrior(labelPriorType, pathFloatingLabels, logOddsSubfolder, rho, threshold, labelsList, resultsFolder, recompute);
         
         % registration of synthetic image and labels to real image
         registrationSubFolder = fullfile(registrationFolder, [floBrainNum, 'registered_to_', refBrainNum]);
