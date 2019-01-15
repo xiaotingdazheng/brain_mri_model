@@ -1,3 +1,4 @@
+
 % This script is a tool to generate synthetic images simulating brain MRIs.
 
 % First, it preprocesses the data. This step depends on the type of used
