@@ -24,7 +24,7 @@ MRIwrite(SegmentationMaskMRI, pathResultSegmentation);
 [~,index] = max(labelMapHippo, [], 4);
 labelMapHippo = arrayfun(@(x) hippoLabelList(x), index);
 
-% save result hippocampus segmentation
+% save result hippocampus segmentation 
 SegmentationMaskMRI.vol = labelMapHippo;
 pathResultHippoSegmentation = fullfile(resultsFolder, [refBrainNum 'hippo_labels.result.nii.gz']);
 MRIwrite(SegmentationMaskMRI, pathResultHippoSegmentation);

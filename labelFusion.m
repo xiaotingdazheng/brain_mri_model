@@ -51,13 +51,13 @@ resultsFolder = fullfile(pathDataFolder,['label_fusion_' num2str(now(3)) '_' num
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder), end % create result folder
 pathAccuracies = fullfile(resultsFolder, 'LabelFusionAccuracy.mat'); % accuracies will be saved here
 if isequal(smoothingName,'')
-    logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic]); 
+    logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic]);
 else
     logOddsFolder = fullfile(pathDataFolder,'logOdds',['logOdds_', realOrSynthetic, smoothingName]);
 end
 registrationFolder = fullfile(pathDataFolder,'registrations',['registrations_', realOrSynthetic, smoothingName]);
 maskedImageFolder = fullfile(pathDataFolder, 'masked_images');
-croppedFolder = fullfile(pathDataFolder,'cropped_images_and_labels',['croppings_', realOrSynthetic, smoothingName]); 
+croppedFolder = fullfile(pathDataFolder,'cropped_images_and_labels',['croppings_', realOrSynthetic, smoothingName]);
 if ~exist(croppedFolder, 'dir') && cropAll, mkdir(croppedFolder), end
 
 % listing images and labels
@@ -100,7 +100,7 @@ for i=1:size(leaveOneOutIndices,1)
     disp(['%%%%% testing label fusion on ',refBrainNum, ' %%%%%']); disp(' ');
     
     % preparing the reference images for label fusion (masking and cropping)
-    [croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, recomputeMaskRefImages, margin, croppedFolder);
+    [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, recomputeMaskRefImages, margin, croppedFolder);
     
     % initialise matrix on which label fusion will be performed
     % initialising with zeros to start image with background label
@@ -131,16 +131,12 @@ for i=1:size(leaveOneOutIndices,1)
         
         % registration of synthetic image and labels to real image
         registrationSubFolder = fullfile(registrationFolder, [floBrainNum, 'registered_to_', refBrainNum]);
-        [pathRegisteredFloatingImage, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels, pathTransformation] = register(pathRefMaskedImage, ...
-            pathFloatingImage, pathFloatingLabels, pathFloatingHippoLabels, labelPriorType, registrationSubFolder, recompute, refBrainNum, floBrainNum);
+        [pathRegisteredFloatingImage, pathTransformation] = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder,...
+            recompute, refBrainNum, floBrainNum);
         
         % registration of loggOdds
-        registeredLogOddsSubFolder = '';
-        if isequal(labelPriorType, 'logOdds')
-            disp('applying registration warping to logOdds')
-            registeredLogOddsSubFolder = registerLogOdds(pathTransformation, pathRefMaskedImage, labelsList, logOddsSubfolder, ...
-                registrationSubFolder, recompute, refBrainNum, floBrainNum);
-        end
+        [registeredLogOddsSubFolder, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels] = registerLabels(pathFloatingLabels, pathFloatingHippoLabels,...
+            pathTransformation, pathRefMaskedImage, labelsList, pathlogOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum);
         
         % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
