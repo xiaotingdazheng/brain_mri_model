@@ -1,74 +1,57 @@
-function [classesStats]=computeIntensityStats(pathImage, preprocessedLabelsMRI, labelsList, labelClasses, ClassNames, pathStatsMatrix, pathDataFolder, brainNum)
+function classesStats = computeIntensityStats(pathImage, pathFirstLabels, pathClassesTable, pathStatsMatrix)
 
 % This function compute basic intensity statistics for different regions of
-% the brain. It takes as inputs the image to derive the stats from, its
-% corresponding segmentation map, and the list of label classes.
+% the brain. It takes as inputs the image to derive the stats from, a first
+% segmentation map (obtained by Freesurfer).
 % For each class, this script computes the mean intensity, the median, the
 % std deviation and the median absolute deviation. These parameters are
 % then used to model the intensity distribution of each class as Gaussians.
 % Here we use two types of parameters to build the Gaussians: either the
 % ususal mean and std deviation, or ths median and a std deviation based on
 % the MAD, which allows us to be more robust to outliers.
-% A graph is built along tses calculations to visually compare the real 
-% ditribution to the "mean" and "median" gaussian models.
-% The output is simply the matrix gathering all the computed information.
-
-if ~exist(pathImage, 'file')
-    pathOriginalImage = fullfile(pathDataFolder, 'original_images',[brainNum,'.nii.gz']);
-    cmd = ['mri_convert ', pathOriginalImage ,' ', pathImage, ' -rl ', preprocessedLabelsMRI.fspec, ' -rt nearest'];
-    [~,~] = system(cmd);
-end
 
 %read image
-disp('loading image');
 imageMRI = MRIread(pathImage);
 image = imageMRI.vol;
 image = round(image);
 
 %read labels
-preprocessedLabels = preprocessedLabelsMRI.vol;
+firstLabelsMRI = MRIread(pathFirstLabels);
+firstLabels = firstLabelsMRI.vol;
 
-number_of_classes = length(ClassNames);
+%read classes
+fid = fopen(pathClassesTable,'r');
+txt = textscan(fid,'%d %d');
+fclose(fid);
+labelsList = txt{1};
+labelClasses = txt{2};
+classesNumber = length(unique(labelClasses));
 
 %define stat vectors
-classesStats = zeros(4, number_of_classes);
 % 1st row = mean
 % 2nd row = median
 % 3rd row = standard deviation
 % 4th row = 1.4826*median absolute deviation (ie sigmaMAD)
+classesStats = zeros(4, classesNumber);
 
-figure;
-for lC=1:number_of_classes
+
+for lC=1:classesNumber
     
     disp(['processing class ', num2str(lC)]);
-    intensities = [];
     
-    labelsBelongingToClass = labelsList(labelClasses == lC); %labels belonging to class lC
+    %find labels belonging to class lC
+    labelsBelongingToClass = labelsList(labelClasses == lC);
+    
+    % collect intensities of voxels belonging to label l
+    intensities = [];
     for l=1:length(labelsBelongingToClass)
-        temp_intensities = image(preprocessedLabels==labelsBelongingToClass(l))'; %find values of voxels with label l
-        intensities = [intensities temp_intensities]; %concatenate intensities of voxels belonging to class lC
+        temp_intensities = image(firstLabels==labelsBelongingToClass(l))';
+        intensities = [intensities temp_intensities];
     end
     
+    % compute basic stats and save it in matrix
     classesStats(:,lC) = [mean(intensities); median(intensities); std(intensities); 1.4826*mad(intensities,1)];
     
-    if ~isempty(intensities)
-        [counts,centers] = ksdensity(intensities,min(intensities):max(intensities),'bandwidth',2); %smoothed density distribution function
-        prob = counts/sum(counts); %normalise counts 
-
-        x=min(intensities):0.5:max(intensities);
-        g_mean = 1/sqrt(2*pi*classesStats(3,lC)^2)*exp(-(x-classesStats(1,lC)).^2/(2*classesStats(3,lC)^2)); %compute N(mean,sigma)
-        g_median = 1/sqrt(2*pi*classesStats(4,lC)^2)*exp(-(x-classesStats(2,lC)).^2/(2*classesStats(4,lC)^2)); %compute N(median, sigmaMAD)
-
-        % Add subplot to the whole plot
-        % legends commented out because take too much space on graphs but:
-        % g_mean should be in blue
-        % g_median sould be in orange
-        % smoothed real distribution should be in yellow
-        subplot(4,5,lC);
-        plot(x,g_mean,'LineWidth',2); hold on; plot(x,g_median,'LineWidth',2); hold on; plot(centers,prob,'LineWidth',2); hold off; %legend('mean','median','real');
-        title(['prob distrib for ',ClassNames(lC)]);
-    end
-
 end
 
 save(pathStatsMatrix, 'classesStats')
