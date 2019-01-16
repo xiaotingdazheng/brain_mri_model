@@ -27,7 +27,6 @@ recompute = 1;
 cropAll = 1;                     % apply cropping to all images and labels (0 or 1)
 recomputeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
 recomputeMaskFloatingImages = 1; % apply masking to floating images (0 or 1)
-recomputeLogOdds = 1;            % LogOdds folder is automatically created
 
 % label fusion parameter
 sigma = 15;                    % std dev of gaussian similarity meaure
@@ -99,7 +98,7 @@ for i=1:size(leaveOneOutIndices,1)
     refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
     disp(['%%%%% testing label fusion on ',refBrainNum, ' %%%%%']); disp(' ');
     
-    % preparing the reference images for label fusion (masking and cropping)
+    % preparing the reference image for label fusion (masking and cropping)
     [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, recomputeMaskRefImages, margin, croppedFolder);
     
     % initialise matrix on which label fusion will be performed
@@ -124,7 +123,7 @@ for i=1:size(leaveOneOutIndices,1)
         logOddsSubfolder = fullfile(logOddsFolder, floBrainNum);
         pathFloatingHippoLabels = calculatePrior(labelPriorType, pathFloatingLabels, logOddsSubfolder, rho, threshold, labelsList, resultsFolder, recompute);
         
-        % registration of synthetic image and labels to real image
+        % registration of synthetic image to real image
         registrationSubFolder = fullfile(registrationFolder, [floBrainNum, 'registered_to_', refBrainNum]);
         [pathRegisteredFloatingImage, pathTransformation] = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder,...
             recompute, refBrainNum, floBrainNum);
