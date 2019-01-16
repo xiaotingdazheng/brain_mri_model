@@ -20,11 +20,12 @@ labels = labelsMRI.vol;
 
 % create new image by sampling from intensity prob distribution
 new_image = zeros(size(labels));
-for lC=1:length(unique(labelClasses))
+uniqueClasses = unique(labelClasses);
+for lC=1:length(uniqueClasses)
     disp(['generating voxel intensities for class ', num2str(lC)]);
     
     % find labels belonging to class lC
-    classLabel = listClassesToGenerate(lC);
+    classLabel = uniqueClasses(lC);
     labelsBelongingToClass = labelsList(labelClasses == classLabel); 
     
     % sample from prob distribution lC
