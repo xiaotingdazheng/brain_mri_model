@@ -1,13 +1,12 @@
-function [pathRegisteredFloatingImage, pathTransformation] = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder,...
+function pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder,...
     recompute, refBrainNum, floBrainNum)
 
 % names of files that will be used/saved during registration
 if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % logOdds folder
-temp_pathSyntheticImage = strrep(pathFloatingImage,'.nii.gz','.mgz');
-[~,filename,~] = fileparts(temp_pathSyntheticImage);
-pathRegisteredFloatingImage = fullfile(registrationSubFolder,[filename '.registered_to_' refBrainNum '.nii.gz']); %path of registered floating image
-aff = fullfile(registrationSubFolder, [filename,'.aff']); %deformation of first registration
-pathTransformation = fullfile(registrationSubFolder, [filename '.registered_to_' refBrainNum '.cpp.nii.gz']); %modify name of the saved aff file
+filename = [floBrainNum '_to_' refBrainNum];
+pathRegisteredFloatingImage = fullfile(registrationSubFolder,[filename '.nii.gz']); %path of registered floating image
+aff = fullfile(registrationSubFolder, [filename '.aff']); %deformation of first registration
+pathTransformation = fullfile(registrationSubFolder, [filename '.cpp.nii.gz']); %modify name of the saved aff file
 
 % compute first rigid registration
 if ~exist(aff, 'file') || recompute
