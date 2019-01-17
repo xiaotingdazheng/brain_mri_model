@@ -1,4 +1,4 @@
-function [labelMap, labelMapHippo] = performLabelFusion(pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, pathMaskRefImage)
+function [labelMap, labelMapHippo] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, cropImage)
 
 % hardcoded parameters
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
@@ -7,7 +7,6 @@ margin = 30;
 rho = 0.5;
 threshold = 0.3;
 sigma = 15;
-recomputeMaskRefImage = 1;
 labelPriorType = 'logOdds';
 
 % handling paths
@@ -23,12 +22,12 @@ maskedTrainingImagesFolder = fullfile(pathTempImageSubfolder, 'training_images_m
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
 
 % preparing the reference image for label fusion (masking and cropping)
-[pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, recomputeMaskRefImage, margin, preprocessedRefBrainFolder);
+[pathRefMaskedImage, ~, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathFirstRefLabels, cropImage, margin, preprocessedRefBrainFolder);
 
 % initialise matrix on which label fusion will be performed
 % initialising with zeros to start image with background label
-labelMap = zeros([size(croppedRefLabels), length(labelsList)]);
-labelMapHippo = zeros([size(croppedRefLabels), 2]);
+labelMap = zeros([size(croppedRefMaskedImage), length(labelsList)]);
+labelMapHippo = zeros([size(croppedRefMaskedImage), 2]);
 
 for i=1:length(structPathsFloatingImages)
     

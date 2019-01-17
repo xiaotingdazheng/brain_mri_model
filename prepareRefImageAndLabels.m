@@ -1,5 +1,6 @@
-function [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, ...
-    recomputeMaskRefImages, cropAll, margin, preprocessedRefBrainFolder)
+function [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, cropAll, margin, preprocessedRefBrainFolder)
+
+recomputeMaskRefImages = 1;
 
 % mask real image if told so or if it doesn't exist
 pathRefMaskedImage = maskImage(pathRefImage, pathRefLabels, preprocessedRefBrainFolder, recomputeMaskRefImages);
