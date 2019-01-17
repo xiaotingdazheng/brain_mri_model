@@ -141,7 +141,7 @@ for i=1:size(leaveOneOutIndices,1)
     
     disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');
     [labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum); % argmax operation
-    accuracies(i,:) = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedRefLabels, labelsList); % compute Dice coef for all structures
+    accuracies(i,:) = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedRefLabels); % compute Dice coef for all structures
     
 end
 

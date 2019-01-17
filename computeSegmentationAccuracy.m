@@ -1,7 +1,10 @@
-function accuracy = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedGTSegmentation, labelsList)
+function accuracy = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedGTSegmentation)
 
 % This function computes the dice coefficient between the segmented image
 % and the provided GT.
+
+labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
+    58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
 
 accuracy = NaN(1,length(labelsList)+1);
 

@@ -1,4 +1,4 @@
-function [labelMap, labelMapHippo] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, cropImage)
+function [labelMap, labelMapHippo, cropping] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, cropImage)
 
 % hardcoded parameters
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
