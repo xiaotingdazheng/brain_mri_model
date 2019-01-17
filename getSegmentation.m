@@ -8,7 +8,7 @@ function [labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, la
 
 hippoLabelList= [0, 1];
 
-z = zeros(4); z(1:3,1:3) = eye(3);
+z = zeros(4); z(1:3,1:3) = eye(3); z(4,4) = 1;
 SegmentationMaskMRI.vox2ras0 = z; % initialse nifty files to be saved
 
 % argmax on labelMap to get final segmentation
@@ -17,7 +17,8 @@ labelMap = arrayfun(@(x) labelsList(x), index);
 
 % save result whole brain segmentation
 SegmentationMaskMRI.vol = labelMap;
-pathResultSegmentation = fullfile(resultsFolder, [refBrainNum 'labels.result.nii.gz']);
+pathResultSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.segmentation.nii.gz']);
+if ~exist(resultsFolder, 'folder'), mkdir(resultsFolder); end
 MRIwrite(SegmentationMaskMRI, pathResultSegmentation);
 
 % argmax on labelMapHippo to get final hippocampus segmentation
@@ -26,7 +27,7 @@ labelMapHippo = arrayfun(@(x) hippoLabelList(x), index);
 
 % save result hippocampus segmentation 
 SegmentationMaskMRI.vol = labelMapHippo;
-pathResultHippoSegmentation = fullfile(resultsFolder, [refBrainNum 'hippo_labels.result.nii.gz']);
+pathResultHippoSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.hippo_segmentation.nii.gz']);
 MRIwrite(SegmentationMaskMRI, pathResultHippoSegmentation);
 
 end
