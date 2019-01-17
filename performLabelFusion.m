@@ -56,7 +56,7 @@ for i=1:length(structPathsFloatingImages)
     % perform summation of posterior on the fly
     disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
     [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
-        pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType, refBrainNum, floBrainNum, croppedRefLabels);
+        pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType);
     
 end
 
