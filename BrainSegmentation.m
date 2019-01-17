@@ -6,10 +6,10 @@ addpath /home/benjamin/matlab/toolbox
 pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion/test_images/*nii.gz';
 pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion/test_first_labels/*nii.gz';
 pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion/training_labels/*nii.gz';
-pathClassesTable = '/home/benjamin/data/OASIS/label_fusion/labels_table.txt';
+pathClassesTable = '/home/benjamin/data/OASIS/label_fusion/classesTable.txt';
 
 % parameters
-targetResolution = 0.6;
+targetResolution = [1 1 1];
 cropImage = 1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,7 +24,9 @@ for i=1:length(structPathsTestImages)
     pathTestFirstLabels = fullfile(structPathsFirstRefLabels(i).folder, structPathsFirstRefLabels(i).name);
     
     % floating images generation
-    [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
+    %[pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
+    pathDirSyntheticImages = '/home/benjamin/data/OASIS/label_fusion/temp_brain01/synthetic_images';
+    pathDirSyntheticLabels = '/home/benjamin/data/OASIS/label_fusion/temp_brain01/synthetic_images';
     
     % labelFusion
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');

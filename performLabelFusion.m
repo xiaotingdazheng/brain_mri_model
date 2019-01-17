@@ -17,8 +17,8 @@ refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.ni
 % handling paths
 structPathsFloatingImages = dir(pathDirFloatingImages);
 structPathsFloatingLabels = dir(pathDirFloatingLabels);
-mainFolder = fileparts(structPathsFloatingLabels(1).folder);
-tempImageSubfolder = fullfile(mainFolder, ['temp_test_' refBrainNum]);
+tempImageSubfolder = fileparts(structPathsFloatingLabels(1).folder);
+mainFolder = fileparts(tempImageSubfolder);
 hippoLabelsFolder = fullfile(tempImageSubfolder, 'hippo_labels_delta');
 logOddsFolder = fullfile(tempImageSubfolder,'logOdds');
 registrationFolder = fullfile(tempImageSubfolder, 'registrations');
@@ -39,12 +39,12 @@ for i=1:length(structPathsFloatingImages)
     % paths of synthetic image and labels
     pathFloatingImage = fullfile(structPathsFloatingImages(i).folder, structPathsFloatingImages(i).name);
     pathFloatingLabels = fullfile(structPathsFloatingLabels(i).folder, structPathsFloatingLabels(i).name);
-    floBrainNum = pathFloatingLabels(regexp(pathFloatingLabels,'brain'):regexp(pathFloatingLabels,'.')-1);
-    disp(['%% processing floating image ',floBrainNum, ' %%'])
+    floBrainNum = pathFloatingLabels(regexp(pathFloatingLabels,'brain'):regexp(pathFloatingLabels,'.synthetic')-1);
+    disp(['%% processing floating ' floBrainNum ' %%'])
     
     %mask image if specified
     maskedTrainingImagesSubfolder = fullfile(maskedTrainingImagesFolder);
-    pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedTrainingImagesSubfolder, recomputeMaskFloatingImages);
+    pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedTrainingImagesSubfolder);
     
     % compute logOdds or create hippocampus segmentation map (for delta function)
     logOddsSubfolder = fullfile(logOddsFolder, ['training_' floBrainNum]);

@@ -25,7 +25,7 @@ croppedImage = Image(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5)
 LabelsMaskMRI.vol = croppedRefLabels;
 temp_pathRefLabels = strrep(pathRefLabels,'.nii.gz', '.mgz');
 [~,name,~] = fileparts(temp_pathRefLabels);
-if ~exist(croppedFolder, 'folder'), mkdir(croppedFolder); end
+if ~exist(croppedFolder, 'dir'), mkdir(croppedFolder); end
 pathCroppedLabels = fullfile(croppedFolder, [name '.cropped.nii.gz']);
 MRIwrite(LabelsMaskMRI, pathCroppedLabels);
 

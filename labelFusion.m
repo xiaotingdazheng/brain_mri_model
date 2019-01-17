@@ -25,8 +25,6 @@ recompute = 1;
 
 % apply masking to images
 cropAll = 1;                     % apply cropping to all images and labels (0 or 1)
-recomputeMaskRefImages = 1;      % apply masking to floating images (0 or 1)
-recomputeMaskFloatingImages = 1; % apply masking to floating images (0 or 1)
 
 % label fusion parameter
 sigma = 15;                    % std dev of gaussian similarity meaure
@@ -99,7 +97,7 @@ for i=1:size(leaveOneOutIndices,1)
     disp(['%%%%% testing label fusion on ',refBrainNum, ' %%%%%']); disp(' ');
     
     % preparing the reference image for label fusion (masking and cropping)
-    [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, recomputeMaskRefImages, margin, croppedFolder);
+    [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, margin, croppedFolder);
     
     % initialise matrix on which label fusion will be performed
     % initialising with zeros to start image with background label
@@ -117,7 +115,7 @@ for i=1:size(leaveOneOutIndices,1)
         disp(['%% processing floating image ',floBrainNum, ' %%'])
         
         %mask image if specified
-        pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedImageFolder, recomputeMaskFloatingImages);
+        pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedImageFolder);
         
         % compute logOdds or create hippocampus segmentation map (for delta function)
         logOddsSubfolder = fullfile(logOddsFolder, floBrainNum);

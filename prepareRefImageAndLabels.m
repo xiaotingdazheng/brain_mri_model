@@ -1,9 +1,7 @@
 function [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, cropAll, margin, preprocessedRefBrainFolder)
 
-recomputeMaskRefImages = 1;
-
 % mask real image if told so or if it doesn't exist
-pathRefMaskedImage = maskImage(pathRefImage, pathRefLabels, preprocessedRefBrainFolder, recomputeMaskRefImages);
+pathRefMaskedImage = maskImage(pathRefImage, pathRefLabels, preprocessedRefBrainFolder);
 
 % crop ref image/labels around hippocampus if specified, otherwise read images
 if cropAll

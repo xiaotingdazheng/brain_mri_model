@@ -20,7 +20,7 @@ firstLabelsMRI = MRIread(pathFirstLabels);
 firstLabels = firstLabelsMRI.vol;
 
 %read classes
-fid = fopen(pathClassesTable,'r');
+fid = fopen(pathClassesTable, 'r');
 txt = textscan(fid,'%d %d');
 fclose(fid);
 labelsList = txt{1};
@@ -46,6 +46,7 @@ for lC=1:classesNumber
     intensities = [];
     for l=1:length(labelsBelongingToClass)
         temp_intensities = image(firstLabels==labelsBelongingToClass(l))';
+        temp_intensities = temp_intensities(temp_intensities > 0);
         intensities = [intensities temp_intensities];
     end
     

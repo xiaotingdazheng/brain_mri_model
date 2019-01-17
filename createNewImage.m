@@ -44,15 +44,17 @@ sigmaFilt=0.9*f;
 new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
 
 % names of created files (image and segmentation)
-TrainingBrainNum = pathTrainingLabels(regexp(pathTrainingLabels,'brain'):regexp(pathTrainingLabels,'_labels')-1);
+TrainingBrainNum = pathTrainingLabels(regexp(pathTrainingLabels,'brain'):regexp(pathTrainingLabels,'_labels.nii.gz')-1);
 if targetResolution(1) == targetResolution(2) && targetResolution(1) == targetResolution(3)
     resolution = num2str(targetResolution(1),'%.1f');
 else
     resolution = [num2str(targetResolution(1),'%.1f'), 'x',num2str(targetResolution(2),'%.1f'), 'x',num2str(targetResolution(3),'%.1f')];
 end
 pathDirSyntheticImages = fullfile(pathTempImageSubfolder, 'synthetic_images');
+if ~exist(pathDirSyntheticImages, 'dir'), mkdir(pathDirSyntheticImages); end
 pathNewImage = fullfile(pathDirSyntheticImages, ['training_' TrainingBrainNum '.synthetic.' resolution '.nii.gz']);
 pathDirSyntheticLabels = fullfile(pathTempImageSubfolder, 'synthetic_labels');
+if ~exist(pathDirSyntheticLabels, 'dir'), mkdir(pathDirSyntheticLabels); end
 pathNewSegmMap = fullfile(pathDirSyntheticLabels, ['training_' TrainingBrainNum '_labels.synthetic.' resolution '.nii.gz']);
 voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
 
