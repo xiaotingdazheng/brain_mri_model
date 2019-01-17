@@ -121,7 +121,7 @@ for i=1:size(leaveOneOutIndices,1)
         
         % compute logOdds or create hippocampus segmentation map (for delta function)
         logOddsSubfolder = fullfile(logOddsFolder, floBrainNum);
-        pathFloatingHippoLabels = calculatePrior(labelPriorType, pathFloatingLabels, logOddsSubfolder, rho, threshold, labelsList, resultsFolder, recompute);
+        pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, resultsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute);
         
         % registration of synthetic image to real image
         registrationSubFolder = fullfile(registrationFolder, [floBrainNum, 'registered_to_', refBrainNum]);

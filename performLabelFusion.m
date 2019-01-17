@@ -8,18 +8,23 @@ rho = 0.5;
 threshold = 0.3;
 sigma = 15;
 labelPriorType = 'logOdds';
+deleteSubfolder = 0;
+recompute = 1;
+
+% define paths of real image and corresponding labels
+refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
 
 % handling paths
 structPathsFloatingImages = dir(pathDirFloatingImages);
 structPathsFloatingLabels = dir(pathDirFloatingLabels);
-pathTempImageSubfolder = fileparts(structPathsFloatingLabels(1).folder);
-logOddsFolder = fullfile(pathTempImageSubfolder,'logOdds');
-registrationFolder = fullfile(pathTempImageSubfolder, 'registrations');
-preprocessedRefBrainFolder = fullfile(pathTempImageSubfolder, 'preprocessed_test_brain');
-maskedTrainingImagesFolder = fullfile(pathTempImageSubfolder, 'training_images_masked');
-
-% define paths of real image and corresponding labels
-refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
+mainFolder = fileparts(structPathsFloatingLabels(1).folder);
+tempImageSubfolder = fullfile(mainFolder, ['temp_test_' refBrainNum]);
+hippoLabelsFolder = fullfile(tempImageSubfolder, 'hippo_labels_delta');
+logOddsFolder = fullfile(tempImageSubfolder,'logOdds');
+registrationFolder = fullfile(tempImageSubfolder, 'registrations');
+preprocessedRefBrainFolder = fullfile(tempImageSubfolder, 'preprocessed_test_brain');
+maskedTrainingImagesFolder = fullfile(tempImageSubfolder, 'training_images_masked');
+segmentationsFolder = fullfile(mainFolder, ['test_'  refBrainNum]);
 
 % preparing the reference image for label fusion (masking and cropping)
 [pathRefMaskedImage, ~, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathFirstRefLabels, cropImage, margin, preprocessedRefBrainFolder);
@@ -43,7 +48,7 @@ for i=1:length(structPathsFloatingImages)
     
     % compute logOdds or create hippocampus segmentation map (for delta function)
     logOddsSubfolder = fullfile(logOddsFolder, ['training_' floBrainNum]);
-    pathFloatingHippoLabels = calculatePrior(labelPriorType, pathFloatingLabels, logOddsSubfolder, rho, threshold, labelsList, resultsFolder, recompute);
+    pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute);
     
     % registration of synthetic image to real image
     registrationSubFolder = fullfile(registrationFolder, ['training_' floBrainNum 'reg_to_test_' refBrainNum]);
@@ -61,6 +66,8 @@ for i=1:length(structPathsFloatingImages)
 end
 
 disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');
-[labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum); % argmax operation
+[labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum); % argmax operation
+
+if deleteSubfolder, rmdir(tempImageSubfolder,'s'); end
 
 end

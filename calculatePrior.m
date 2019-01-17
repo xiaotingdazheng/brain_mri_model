@@ -1,4 +1,4 @@
-function pathFloatingHippoLabels = calculatePrior(labelPriorType, pathFloatingLabels, logOddsSubfolder, rho, threshold, labelsList, resultsFolder, recompute)
+function pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute)
 
 switch labelPriorType
     
@@ -45,7 +45,7 @@ switch labelPriorType
         temp_lab = strrep(pathFloatingLabels,'.nii.gz','');
         [~,name,~] = fileparts(temp_lab);
         strrep(name, 'labels', 'hippo_labels');
-        pathFloatingHippoLabels = fullfile(resultsFolder, [name, '.nii.gz']);
+        pathFloatingHippoLabels = fullfile(hippoLabelsFolder, [name, '.nii.gz']);
         
         % if file doesn't exist or must be recomputed
         if ~exist(pathFloatingHippoLabels, 'file') || recompute

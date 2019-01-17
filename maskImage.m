@@ -4,6 +4,7 @@ function pathMaskedImage = maskImage(pathImage, pathLabels, maskedImageFolder, r
 temp_path = strrep(pathImage,'.nii.gz','.mgz');
 [~,name,~] = fileparts(temp_path);
 pathMaskedImage = fullfile(maskedImageFolder, [name '.masked.nii.gz']); %path of mask
+if ~exist(maskedImageFolder, 'folder'), mkdir(maskedImageFolder); end
 
 % mask image
 if ~exist(pathMaskedImage, 'file') || recomputeMask
