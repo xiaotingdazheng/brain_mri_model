@@ -1,9 +1,10 @@
-function synthetiseTrainingImages(pathRefImage, pathFirstLabels, pathDirLabels, pathClassesTable, targetResolution)
+function [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathFirstLabels, pathDirLabels, pathClassesTable, targetResolution)
 
 % files handling
 structPathsTrainingLabels = dir(pathDirLabels);
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
-pathTempImageSubfolder = fullfile(fileparts(structPathsFloatingImages(1).folder), ['temp_' refBrainNum]);
+pathTempImageSubfolder = fullfile(fileparts(structPathsTrainingLabels(1).folder), ['temp_' refBrainNum]);
+if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 pathStatsMatrix = fullfile(pathTempImageSubfolder, 'ClassesStats.mat');
 
 % compute stats from reference image
@@ -14,7 +15,7 @@ for i=1:length(structPathsTrainingLabels)
     
     pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
     
-    createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder)
+    [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder);
 
 end
 

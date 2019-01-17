@@ -1,4 +1,4 @@
-function createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder)
+function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -50,8 +50,10 @@ if targetResolution(1) == targetResolution(2) && targetResolution(1) == targetRe
 else
     resolution = [num2str(targetResolution(1),'%.1f'), 'x',num2str(targetResolution(2),'%.1f'), 'x',num2str(targetResolution(3),'%.1f')];
 end
-pathNewImage = fullfile(pathTempImageSubfolder, 'synthetic_images', ['training_' TrainingBrainNum '.synthetic.' resolution '.nii.gz']);
-pathNewSegmMap = fullfile(pathTempImageSubfolder, 'synthetic_labels', ['training_' TrainingBrainNum '_labels.synthetic.' resolution '.nii.gz']);
+pathDirSyntheticImages = fullfile(pathTempImageSubfolder, 'synthetic_images');
+pathNewImage = fullfile(pathDirSyntheticImages, ['training_' TrainingBrainNum '.synthetic.' resolution '.nii.gz']);
+pathDirSyntheticLabels = fullfile(pathTempImageSubfolder, 'synthetic_labels');
+pathNewSegmMap = fullfile(pathDirSyntheticLabels, ['training_' TrainingBrainNum '_labels.synthetic.' resolution '.nii.gz']);
 voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
 
 % save temporary image (at sampling resolution)
