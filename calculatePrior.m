@@ -4,12 +4,12 @@ switch labelPriorType
     
     case 'logOdds'
         
-        if (~exist(LogOddsSubfolder, 'dir') || recompute)
+        if (~exist(logOddsSubfolder, 'dir') || recompute)
             
             disp(['computing logOdds of ' pathFloatingLabels])
             
             % create sufolder if it doesn't exist
-            if ~exist(logOddsSubfolder, 'dir'), mkdir(LogOddsSubfolder), end
+            if ~exist(logOddsSubfolder, 'dir'), mkdir(logOddsSubfolder), end
             
             % produce a mask of the brain with margin of 5 voxels
             LabelsMRI = MRIread(pathFloatingLabels);
@@ -19,18 +19,18 @@ switch labelPriorType
             
             % loop over all the labels
             for l=1:length(labelsList)
-                temp_path = fullfile(LogOddsSubfolder, ['logOdds_' num2str(labelsList(l)) '.nii.gz']);
+                temp_path = fullfile(logOddsSubfolder, ['logOdds_' num2str(labelsList(l)) '.nii.gz']);
                 mask = (Labels == labelsList(l)); % find mask of current label
                 computeLogOdds(mask, brainMask, temp_path, LabelsMRI, rho, threshold)
             end
             
             % calculate logOdds for whole hippocampus
-            temp_path = fullfile(LogOddsSubfolder, 'logOdds_hippo.nii.gz');
+            temp_path = fullfile(logOddsSubfolder, 'logOdds_hippo.nii.gz');
             maskHippo = Labels > 20000;
             computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
             
             % calculate logOdds for non-hippocampus structures
-            temp_path = fullfile(LogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
+            temp_path = fullfile(logOddsSubfolder, 'logOdds_non_hippo.nii.gz');
             maskNonHippo = ~maskHippo;
             computeLogOdds(maskNonHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
             
@@ -79,7 +79,7 @@ probMap = probMap.*brainMask;
 
 thresholdMap = probMap > threshold;
 probMap = probMap.*thresholdMap; % threshold prob map
-
+probMap(probMap > 200) = 200; % set upper value to 200
 
 % write new prob map in mgz file
 LabelsMRI.vol = probMap;

@@ -9,7 +9,7 @@ threshold = 0.3;
 sigma = 15;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
-recompute = 1;
+recompute = 0;
 
 % define paths of real image and corresponding labels
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
