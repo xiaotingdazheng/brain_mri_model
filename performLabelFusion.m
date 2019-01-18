@@ -24,7 +24,7 @@ logOddsFolder = fullfile(tempImageSubfolder,'logOdds');
 registrationFolder = fullfile(tempImageSubfolder, 'registrations');
 preprocessedRefBrainFolder = fullfile(tempImageSubfolder, 'preprocessed_test_brain');
 maskedTrainingImagesFolder = fullfile(tempImageSubfolder, 'training_images_masked');
-segmentationsFolder = fullfile(mainFolder, ['test_'  refBrainNum]);
+segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNum]);
 
 % preparing the reference image for label fusion (masking and cropping)
 [pathRefMaskedImage, ~, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathFirstRefLabels, cropImage, margin, preprocessedRefBrainFolder);
