@@ -145,6 +145,6 @@ end
 
 % formating and saving result matrix
 disp(['%%%% summarising all accuracies in ' pathAccuracies ' %%%%']); disp(' '); disp(' ');
-accuracy = saveAccuracy(accuracies, namesList, labelsList, pathAccuracies);
+accuracy = saveAccuracy(accuracies, pathAccuracies);
 
 toc

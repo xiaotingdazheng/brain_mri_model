@@ -1,4 +1,4 @@
-function [labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum)
+function [pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum)
 
 % This function performs the argmax operation on the labels posterior
 % probability, to obtain the most probable segmentation. It takes as inputs
@@ -17,9 +17,9 @@ labelMap = arrayfun(@(x) labelsList(x), index);
 
 % save result whole brain segmentation
 SegmentationMaskMRI.vol = labelMap;
-pathResultSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.segmentation.nii.gz']);
+pathSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.segmentation.nii.gz']);
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder); end
-MRIwrite(SegmentationMaskMRI, pathResultSegmentation);
+MRIwrite(SegmentationMaskMRI, pathSegmentation);
 
 % argmax on labelMapHippo to get final hippocampus segmentation
 [~,index] = max(labelMapHippo, [], 4);
@@ -27,7 +27,7 @@ labelMapHippo = arrayfun(@(x) hippoLabelList(x), index);
 
 % save result hippocampus segmentation 
 SegmentationMaskMRI.vol = labelMapHippo;
-pathResultHippoSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.hippo_segmentation.nii.gz']);
-MRIwrite(SegmentationMaskMRI, pathResultHippoSegmentation);
+pathHippoSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.hippo_segmentation.nii.gz']);
+MRIwrite(SegmentationMaskMRI, pathHippoSegmentation);
 
 end

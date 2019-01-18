@@ -1,4 +1,4 @@
-function [labelMap, labelMapHippo, cropping] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, cropImage)
+function [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, cropImage)
 
 % hardcoded parameters
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
@@ -66,7 +66,7 @@ for i=1:length(structPathsFloatingImages)
 end
 
 disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');
-[labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum); % argmax operation
+[pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum); % argmax operation
 
 if deleteSubfolder, rmdir(tempImageSubfolder,'s'); end
 
