@@ -24,9 +24,9 @@ for i=1:length(structPathsTestImages)
     pathTestFirstLabels = fullfile(structPathsFirstRefLabels(i).folder, structPathsFirstRefLabels(i).name);
     
     % floating images generation
-    %[pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
-    pathDirSyntheticImages = '/home/benjamin/data/OASIS/label_fusion/temp_brain01/synthetic_images';
-    pathDirSyntheticLabels = '/home/benjamin/data/OASIS/label_fusion/temp_brain01/synthetic_labels';
+    [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
+%     pathDirSyntheticImages = '/home/benjamin/data/OASIS/label_fusion/temp_brain01/synthetic_images';
+%     pathDirSyntheticLabels = '/home/benjamin/data/OASIS/label_fusion/temp_brain01/synthetic_labels';
     
     % labelFusion
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');

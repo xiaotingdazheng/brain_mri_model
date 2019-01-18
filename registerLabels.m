@@ -1,5 +1,5 @@
 function [registeredLogOddsSubFolder, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels] = registerLabels(pathFloatingLabels, pathFloatingHippoLabels,...
-    pathRefMaskedImage, labelsList, pathlogOddsSubfolder, registrationSubfolder, recompute, refBrainNum, floBrainNum)
+    pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubfolder, recompute, refBrainNum, floBrainNum, labelPriorType)
 
 % This function is called only if labelPriorType was set to 'logOdds'. It
 % applies to the logOdds files the warping computed during the registration
@@ -43,7 +43,7 @@ switch labelPriorType
         for k=1:length(labelsList)
             pathRegisteredLogOdds = fullfile(registeredLogOddsSubFolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
             if ~exist(pathRegisteredLogOdds, 'file') || recompute
-                temp_pathLogOdds = fullfile(pathlogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']); % path of file to register
+                temp_pathLogOdds = fullfile(logOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']); % path of file to register
                 cmd = ['reg_resample -ref ' pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
                 [~,~] = system(cmd);
             end
@@ -52,13 +52,13 @@ switch labelPriorType
         % apply same mechanism to hippo and non-hippo logOdds
         pathRegisteredLogOdds = fullfile(registeredLogOddsSubFolder, 'logOdds_hippo.nii.gz');
         if ~exist(pathRegisteredLogOdds, 'file') || recompute
-            temp_pathLogOdds = fullfile(pathlogOddsSubfolder, 'logOdds_hippo.nii.gz');
+            temp_pathLogOdds = fullfile(logOddsSubfolder, 'logOdds_hippo.nii.gz');
             cmd = ['reg_resample -ref ' pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
             [~,~] = system(cmd);
         end
         pathRegisteredLogOdds = fullfile(registeredLogOddsSubFolder, 'logOdds_non_hippo.nii.gz');
         if ~exist(pathRegisteredLogOdds, 'file') || recompute
-            temp_pathLogOdds = fullfile(pathlogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
+            temp_pathLogOdds = fullfile(logOddsSubfolder, 'logOdds_non_hippo.nii.gz');
             cmd = ['reg_resample -ref ',pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
             [~,~] = system(cmd);
         end

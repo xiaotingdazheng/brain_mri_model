@@ -39,7 +39,7 @@ for i=1:length(structPathsFloatingImages)
     % paths of synthetic image and labels
     pathFloatingImage = fullfile(structPathsFloatingImages(i).folder, structPathsFloatingImages(i).name);
     pathFloatingLabels = fullfile(structPathsFloatingLabels(i).folder, structPathsFloatingLabels(i).name);
-    floBrainNum = pathFloatingLabels(regexp(pathFloatingLabels,'brain'):regexp(pathFloatingLabels,'.synthetic')-1);
+    floBrainNum = structPathsFloatingLabels(i).name(regexp(structPathsFloatingLabels(i).name,'brain'):regexp(structPathsFloatingLabels(i).name,'_labels')-1);
     disp(['%% processing floating ' floBrainNum ' %%'])
     
     %mask image if specified
@@ -51,12 +51,12 @@ for i=1:length(structPathsFloatingImages)
     pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute);
     
     % registration of synthetic image to real image
-    registrationSubFolder = fullfile(registrationFolder, ['training_' floBrainNum 'reg_to_test_' refBrainNum]);
+    registrationSubFolder = fullfile(registrationFolder, ['training_' floBrainNum '_reg_to_test_' refBrainNum]);
     pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, recompute, refBrainNum, floBrainNum);
     
     % registration of loggOdds
     [registeredLogOddsSubFolder, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels] = registerLabels(pathFloatingLabels, pathFloatingHippoLabels,...
-        pathRefMaskedImage, labelsList, pathlogOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum);
+        pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum, labelPriorType);
     
     % perform summation of posterior on the fly
     disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
