@@ -26,7 +26,12 @@ for lC=1:length(uniqueClasses)
     
     % find labels belonging to class lC
     classLabel = uniqueClasses(lC);
-    labelsBelongingToClass = labelsList(labelClasses == classLabel); 
+    labelsBelongingToClass = labelsList(labelClasses == classLabel);
+    
+    % give a random class number to classLabel if it wasn't present in labels we sampled from 
+    while isnan(classesStats(2,classLabel)) || isnan(classesStats(4,classLabel))
+        classLabel = randi(size(classesStats, 2));
+    end
     
     % sample from prob distribution lC
     for l=1:length(labelsBelongingToClass)
@@ -35,6 +40,7 @@ for lC=1:length(uniqueClasses)
     end
     
 end
+new_image(new_image <0) = 0;
 
 % blurring images
 disp('blurring image to prevent alliasing');
