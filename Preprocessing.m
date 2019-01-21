@@ -1,9 +1,9 @@
-% pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*nii.gz';
-% pathDirSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz'; % hippo labels
-pathDirLabels = '/home/benjamin/data/OASIS/original_labels/*nii.gz';
-pathDirSupport = '/home/benjamin/data/OASIS/original_images/*nii.gz'; % images
+pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*nii.gz';
+pathDirSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz'; % hippo labels
+% pathDirLabels = '/home/benjamin/data/OASIS/original_labels/*nii.gz';
+% pathDirSupport = '/home/benjamin/data/OASIS/original_images/*nii.gz'; % images
 
-pathPreprocessedLabelsFolder = '/home/benjamin/data/OASIS/label_fusion/test_first_labels';
+pathPreprocessedLabelsFolder = '/home/benjamin/data/OASIS/label_fusion/training_labels';
 
 numberOfSmoothing = 1;
 

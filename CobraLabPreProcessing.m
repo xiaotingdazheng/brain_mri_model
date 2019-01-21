@@ -53,6 +53,9 @@ HippoLabels(GTcropping(1):GTcropping(2),GTcropping(3):GTcropping(4),GTcropping(5
 
 mriLabels = MRIread(pathLabels);
 
+% set WM hypointensities to WM
+mriLabels = correctWMHypointensities(mriLabels);
+
 % build hippocampus-less image
 disp('building hippocampus-less temporary image')
 mriLabels = buildHippocampusLessImage(mriLabels, hippoLabels);
@@ -76,11 +79,12 @@ mriLabels = pasteHippoLabels(mriLabels, HippoLabels, CSFlabel);
 
 %%%%%%%%%%%%%%%%%%%%%%%% writting preprocessed file %%%%%%%%%%%%%%%%%%%%%%%
 
-pathPreprocessedLabelsFolder = fullfile(pathPreprocessedLabelsFolder, ['training_' brainNum '_labels.nii.gz']);
+if ~exist(pathPreprocessedLabelsFolder, 'dir'), mkdir(pathPreprocessedLabelsFolder); end
+pathPreprocessedLabels = fullfile(pathPreprocessedLabelsFolder, ['training_' brainNum '_labels.nii.gz']);
 mriLabels.fspec = pathPreprocessedLabelsFolder;
 
-disp(['writing merged labels in ',pathPreprocessedLabelsFolder])
-MRIwrite(mriLabels, pathPreprocessedLabelsFolder); %write a new nii.gz file.
+disp(['writing merged labels in ',pathPreprocessedLabels])
+MRIwrite(mriLabels, pathPreprocessedLabels); %write a new nii.gz file.
 
 end
 
@@ -164,6 +168,31 @@ GTHoles = GTHoles | dilatedHoles;
 GTcrop(GTHoles) = CSFlabel;
 previous_nonzero_labels = find(temp_GTcrop>0);
 GTcrop(previous_nonzero_labels) = temp_GTcrop(previous_nonzero_labels);
+
+end
+
+function mriLabels = correctWMHypointensities(mriLabels)
+
+labels = mriLabels.vol;
+
+% find index of righest voxel of left hemishpere
+idx = find(labels == 49);
+[~,J,~] = ind2sub(size(labels),idx);
+maxLeftIdx = max(J);
+
+%find WM hypointensities
+idx = find(labels == 77);
+[~,J,~] = ind2sub(size(labels),idx);
+
+% set left WM hypointensities to left WM
+idxLeftWM = idx(J>=maxLeftIdx);
+labels(idxLeftWM) = 2;
+% set right WM hypointensities to right WM
+idxRightWM = idx(J<maxLeftIdx);
+labels(idxRightWM) = 41;
+
+% write labels back to mriLabels
+mriLabels.vol = labels;
 
 end
 
