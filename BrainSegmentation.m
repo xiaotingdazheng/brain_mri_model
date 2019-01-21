@@ -1,4 +1,5 @@
 clear
+tic
 addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
@@ -40,5 +41,7 @@ for i=1:length(structPathsTestImages)
     
 end
 
-pathAccuracies = fileparts(fileparts(structPathsTestImages(i).folder), 'accuracy.mat');
+pathAccuracies = fullfile(fileparts(structPathsTestImages(i).folder), 'accuracy.mat');
 accuracy = saveAccuracy(accuracies, pathAccuracies);
+comparisonGraph({accuracy,'Oasis'},'label fusion on Oasos dataset')
+toc
