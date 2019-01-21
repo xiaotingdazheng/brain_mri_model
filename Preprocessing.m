@@ -1,18 +1,34 @@
-pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*nii.gz';
-pathDirHipppoLabels = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz';
+% pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*nii.gz';
+% pathDirSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz'; % hippo labels
+pathDirLabels = '/home/benjamin/data/OASIS/original_labels/*nii.gz';
+pathDirSupport = '/home/benjamin/data/OASIS/original_images/*nii.gz'; % images
 
-structPathsHipppoLabels = dir(pathDirHipppoLabels);
+pathPreprocessedLabelsFolder = '/home/benjamin/data/OASIS/label_fusion/test_first_labels';
+
+numberOfSmoothing = 1;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+structPathsSupport = dir(pathDirSupport);
 structPathsLabels = dir(pathDirLabels);
 
-pathPreprocessedLabelsFolder = '/home/benjamin/data/OASIS/label_fusion/training_labels';
+if ~isempty(regexp(pathDirLabels,'CobraLab', 'once')), dataType = 'CobraLab'; else, dataType = 'Oasis'; end
 
-numberOfSmoothing = 2;
-
-for i=1:length(structPathsHipppoLabels)
+if isequal(dataType, 'CobraLab')
+    for i=1:length(structPathsSupport)
+        disp(['%% processing ' structPathsLabels(i).name])
+        pathHipppoLabels = fullfile(structPathsSupport(i).folder, structPathsSupport(i).name);
+        pathLabels = fullfile(structPathsLabels(i).folder, structPathsLabels(i).name);
+        CobraLabPreProcessing(pathLabels, pathHipppoLabels, numberOfSmoothing, pathPreprocessedLabelsFolder);
+        disp(' ');
+    end
     
-    pathHipppoLabels = fullfile(structPathsHipppoLabels(i).folder, structPathsHipppoLabels(i).name);
-    pathLabels = fullfile(structPathsLabels(i).folder, structPathsLabels(i).name);
-
-    CobraLabPreProcessing(pathLabels, pathHipppoLabels, numberOfSmoothing, pathPreprocessedLabelsFolder);
-
+elseif isequal(dataType, 'Oasis')
+    for i=1:length(structPathsSupport)
+        disp(['%% processing ' structPathsLabels(i).name])
+        pathImage = fullfile(structPathsSupport(i).folder, structPathsSupport(i).name);
+        pathLabels = fullfile(structPathsLabels(i).folder, structPathsLabels(i).name);
+        OASISpreProcessing(pathLabels, pathImage, numberOfSmoothing, pathPreprocessedLabelsFolder);
+        disp(' ');
+    end
 end

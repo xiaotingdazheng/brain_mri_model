@@ -9,10 +9,18 @@ labels = MRIlabels.vol;
 % correcting labels mistakes
 disp('correcting labels mistakes')
 labels(labels>1000 & labels<2000) = 3; % set left cortex to unique label 3
-labels(labels > 2000) = 42; % set right cortex to unique label 42
+labels(labels > 2000) = 42;
 labels(labels==6) = 8; % set left cerebellum cortex to correct label
 labels(labels==45) = 47; % set right cerebellum cortex to correct label
-labels(labels==0 & image>0) = 2; % give label to white matter
+idx = find(labels == 49);
+[~,~,K] = ind2sub(size(labels),idx);
+maxLeftIdx = max(K);
+idx = find(labels==0 & image>0);
+[~,~,K] = ind2sub(size(labels),idx);
+idxLeftWM = idx(K>=maxLeftIdx);
+labels(idxLeftWM) = 2; % set left WM to 2
+idxRightWM = idx(K<maxLeftIdx);
+labels(idxRightWM) = 41; % set left WM to 41
 
 % smooth labels
 disp('smoothing labels')
