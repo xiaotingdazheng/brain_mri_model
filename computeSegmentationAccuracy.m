@@ -19,19 +19,19 @@ accuracy = NaN(1,length(labelsList)+1);
 
 for i=1:length(labelsList)
     
-    temp_labelMask = (segmentation == labelsList(i));
-    temp_GT_Mask = (refLabels == labelsList(i));
+    temp_segmentationMask = (segmentation == labelsList(i));
+    temp_RefMask = (refLabels == labelsList(i));
     
-    if ~isequal(unique(temp_labelMask), 0) && ~isequal(unique(temp_GT_Mask), 0)
-        accuracy(i) = dice(temp_labelMask, temp_GT_Mask);
+    if ~isequal(unique(temp_segmentationMask), 0) && ~isequal(unique(temp_RefMask), 0)
+        accuracy(i) = dice(temp_segmentationMask, temp_RefMask);
     end
     
 end
 
 % compute dice coef for all hippocampus
-temp_GT_Mask = refLabels > 20000 | refLabels == 17 | refLabels == 53;
-if ~isequal(unique(hippoSegmentation), 0) && ~isequal(unique(temp_GT_Mask), 0)
-    accuracy(end) = dice(hippoSegmentation, temp_GT_Mask);
+temp_RefMask = refLabels > 20000 | refLabels == 17 | refLabels == 53;
+if ~isequal(unique(hippoSegmentation), 0) && ~isequal(unique(temp_RefMask), 0)
+    accuracy(end) = dice(hippoSegmentation, temp_RefMask);
 end
 
 end

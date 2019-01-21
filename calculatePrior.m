@@ -6,7 +6,8 @@ switch labelPriorType
         
         if (~exist(logOddsSubfolder, 'dir') || recompute)
             
-            disp(['computing logOdds of ' pathFloatingLabels])
+            [~,filename,ext] = fileparts(pathFloatingLabels);
+            disp(['computing logOdds of ' filename ext])
             
             % create sufolder if it doesn't exist
             if ~exist(logOddsSubfolder, 'dir'), mkdir(logOddsSubfolder), end

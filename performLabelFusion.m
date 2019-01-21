@@ -40,7 +40,7 @@ for i=1:length(structPathsFloatingImages)
     pathFloatingImage = fullfile(structPathsFloatingImages(i).folder, structPathsFloatingImages(i).name);
     pathFloatingLabels = fullfile(structPathsFloatingLabels(i).folder, structPathsFloatingLabels(i).name);
     floBrainNum = structPathsFloatingLabels(i).name(regexp(structPathsFloatingLabels(i).name,'brain'):regexp(structPathsFloatingLabels(i).name,'_labels')-1);
-    disp(['%% processing floating ' floBrainNum ' %%'])
+    disp(['% processing floating ' floBrainNum ' %%'])
     
     %mask image if specified
     maskedTrainingImagesSubfolder = fullfile(maskedTrainingImagesFolder);
@@ -59,13 +59,11 @@ for i=1:length(structPathsFloatingImages)
         pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum, labelPriorType);
     
     % perform summation of posterior on the fly
-    disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
     [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
         pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType);
     
 end
 
-disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');
 [pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum); % argmax operation
 
 if deleteSubfolder, rmdir(tempImageSubfolder,'s'); end

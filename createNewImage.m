@@ -19,10 +19,10 @@ labelsMRI = MRIread(pathTrainingLabels);
 labels = labelsMRI.vol;
 
 % create new image by sampling from intensity prob distribution
+disp('generating voxel intensities');
 new_image = zeros(size(labels));
 uniqueClasses = unique(labelClasses);
 for lC=1:length(uniqueClasses)
-    disp(['generating voxel intensities for class ', num2str(lC)]);
     
     % find labels belonging to class lC
     classLabel = uniqueClasses(lC);

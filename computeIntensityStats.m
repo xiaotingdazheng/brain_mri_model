@@ -37,8 +37,6 @@ classesStats = zeros(4, classesNumber);
 
 for lC=1:classesNumber
     
-    disp(['processing class ', num2str(lC)]);
-    
     %find labels belonging to class lC
     labelsBelongingToClass = labelsList(labelClasses == lC);
     

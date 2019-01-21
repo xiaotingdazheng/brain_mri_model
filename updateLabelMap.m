@@ -13,6 +13,8 @@ function [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, cro
 % logOdds, which is more of a probability cpaturing the uncertainty of
 % segmentation around the edges of the structures.
 
+disp('cropping registered floating labels and updating sum of posteriors');
+
 % read registered floating image and crop it around hippocampus
 registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
 croppedRegisteredFloatingImage = registeredFloatingImage.vol;

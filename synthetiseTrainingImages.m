@@ -8,13 +8,14 @@ if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 pathStatsMatrix = fullfile(pathTempImageSubfolder, 'ClassesStats.mat');
 
 % compute stats from reference image
+disp(['% computing intensity stats for ' refBrainNum])
 classesStats = computeIntensityStats(pathRefImage, pathFirstLabels, pathClassesTable, pathStatsMatrix);
 
 % create images from stats using training labels
 for i=1:length(structPathsTrainingLabels)
     
+    disp(['% creating new image from ' structPathsTrainingLabels(i).name])
     pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-    
     [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder);
 
 end

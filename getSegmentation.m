@@ -6,6 +6,8 @@ function [pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, l
 % most likely segmentations as outputs. It also saves them in separete
 % files.
 
+disp('finding most likely segmentation and calculating corresponding accuracy');
+
 hippoLabelList= [0, 1];
 
 z = zeros(4); z(1:3,1:3) = eye(3); z(4,4) = 1;

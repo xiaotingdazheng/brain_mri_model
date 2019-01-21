@@ -12,12 +12,12 @@ switch labelPriorType
     
     case 'delta function'
         
+        disp(['applying ' floBrainNum '_to_' refBrainNum '.cpp.nii.gz to labels']);
         % define pathnames of used/saved files for label registration
         filename = [floBrainNum '_to_' refBrainNum];
         pathRegisteredFloatingLabels = fullfile(registrationSubfolder, [filename '.labels.nii.gz']); % path of registered segmentation map
         % apply registration to segmentation map
         if ~exist(pathRegisteredFloatingLabels, 'file') || recompute
-            disp(['applying ',pathTransformation,' to ',pathFloatingLabels]);
             cmd = ['reg_resample -ref ' pathRefMaskedImage ' -flo ' pathFloatingLabels ' -trans ' pathTransformation ' -res ' pathRegisteredFloatingLabels ' -pad 0 -inter 0 -voff'];
             [~,~] = system(cmd);
         end
@@ -26,7 +26,6 @@ switch labelPriorType
         pathRegisteredFloatingHippoLabels = fullfile(registrationSubfolder, [filename '.hippo_labels.nii.gz']); % path of registered segmentation map
         % apply registration to segmentation map
         if ~exist(pathRegisteredFloatingHippoLabels, 'file') || recompute
-            disp(['applying ' pathTransformation ' to ' pathFloatingHippoLabels]);
             cmd = ['reg_resample -ref ' pathRefMaskedImage ' -flo ' pathFloatingHippoLabels ' -trans ' pathTransformation ' -res ' pathRegisteredFloatingHippoLabels ' -pad 0 -inter 0 -voff'];
             [~,~] = system(cmd);
         end
@@ -35,6 +34,7 @@ switch labelPriorType
         
     case 'logOdds'
         
+        disp(['applying ' floBrainNum '_to_' refBrainNum '.cpp.nii.gz to logOdds']);
         % define registered logOdds Subfolder
         registeredLogOddsSubFolder = fullfile(registrationSubfolder,'registered_logOdds');
         if ~exist(registeredLogOddsSubFolder, 'dir'), mkdir(registeredLogOddsSubFolder), end
