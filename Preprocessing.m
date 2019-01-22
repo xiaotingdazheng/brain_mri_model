@@ -1,11 +1,14 @@
+clear
+
 pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*nii.gz';
 pathDirSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz'; % hippo labels
 % pathDirLabels = '/home/benjamin/data/OASIS/original_labels/*nii.gz';
 % pathDirSupport = '/home/benjamin/data/OASIS/original_images/*nii.gz'; % images
 
-pathPreprocessedLabelsFolder = '/home/benjamin/data/OASIS/label_fusion/training_labels';
+pathPreprocessedLabelsFolder = '/home/benjamin/data/CobraLab/label_fusion/training_labels';
 
 numberOfSmoothing = 1;
+targetResolution = [0.6 0.6 0.6]; % optional, to downsample the labels to target resolution directly here
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -19,7 +22,7 @@ if isequal(dataType, 'CobraLab')
         disp(['%% processing ' structPathsLabels(i).name])
         pathHipppoLabels = fullfile(structPathsSupport(i).folder, structPathsSupport(i).name);
         pathLabels = fullfile(structPathsLabels(i).folder, structPathsLabels(i).name);
-        CobraLabPreProcessing(pathLabels, pathHipppoLabels, numberOfSmoothing, pathPreprocessedLabelsFolder);
+        CobraLabPreProcessing(pathLabels, pathHipppoLabels, numberOfSmoothing, pathPreprocessedLabelsFolder, targetResolution);
         disp(' ');
     end
     

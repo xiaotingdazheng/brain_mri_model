@@ -94,7 +94,8 @@ if nargin == 5
     if ~isequal(sampleRes, targetResolution)
         voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
         disp(['changing labels resolution to ' voxsize])
-        cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabels ' -voxsize ' voxsize ' -rt nearest -odt float'];
+        pathPreprocessedLabelsDownsampled = strrep(pathPreprocessedLabels,'_labels.nii.gz', '_labels.0.6.nii.gz');
+        cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabelsDownsampled ' -voxsize ' voxsize ' -rt nearest -odt float'];
         [~,~] = system(cmd);
     end
 end
