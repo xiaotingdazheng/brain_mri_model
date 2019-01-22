@@ -63,7 +63,7 @@ mriLabels = buildHippocampusLessImage(mriLabels, hippoLabels);
 % convert image into hippo labels format
 disp('upsampling hippocampus-less image to hippocampus subfields resolution')
 setFreeSurfer();
-path_temp_file = '/tmp/.nii.gz'; %path of temp hippocampus-less segmemtation
+path_temp_file = '/tmp/test.nii.gz'; %path of temp hippocampus-less segmemtation
 MRIwrite(mriLabels, path_temp_file); %write a new mgz file.
 path_new_temp_file = '/tmp/test.0.3.nii.gz'; %path of upsampled file to be produced
 cmd = ['mri_convert ' path_temp_file ' ' path_new_temp_file ' -rl ' pathHippoLabels ' -rt nearest'];

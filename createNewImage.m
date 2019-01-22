@@ -20,27 +20,7 @@ labels = labelsMRI.vol;
 
 % create new image by sampling from intensity prob distribution
 disp('generating voxel intensities');
-new_image = zeros(size(labels));
-uniqueClasses = unique(labelClasses);
-for lC=1:length(uniqueClasses)
-    
-    % find labels belonging to class lC
-    classLabel = uniqueClasses(lC);
-    labelsBelongingToClass = labelsList(labelClasses == classLabel);
-    
-    % give a random class number to classLabel if it wasn't present in labels we sampled from 
-    while isnan(classesStats(2,classLabel)) || isnan(classesStats(4,classLabel))
-        classLabel = randi(size(classesStats, 2));
-    end
-    
-    % sample from prob distribution lC
-    for l=1:length(labelsBelongingToClass)
-        voxelIndices = find(labels == labelsBelongingToClass(l)); %find voxels with label l
-        new_image(voxelIndices) = classesStats(2,classLabel) + classesStats(4,classLabel)*sqrt(8)*randn(size(voxelIndices)); %generate new values for these voxels
-    end
-    
-end
-new_image(new_image <0) = 0;
+new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats);
 
 % blurring images
 disp('blurring image to prevent alliasing');
@@ -76,5 +56,31 @@ cmd = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rt c
 [~,~] = system(cmd);
 cmd = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rt nearest -odt float']; % same for labels
 [~,~] = system(cmd);
+
+end
+
+function new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats)
+
+new_image = zeros(size(labels));
+uniqueClasses = unique(labelClasses);
+for lC=1:length(uniqueClasses)
+    
+    % find labels belonging to class lC
+    classLabel = uniqueClasses(lC);
+    labelsBelongingToClass = labelsList(labelClasses == classLabel);
+    
+    % give a random class number to classLabel if it wasn't present in labels we sampled from 
+    while isnan(classesStats(2,classLabel)) || isnan(classesStats(4,classLabel))
+        classLabel = randi(size(classesStats, 2));
+    end
+    
+    % sample from prob distribution lC
+    for l=1:length(labelsBelongingToClass)
+        voxelIndices = find(labels == labelsBelongingToClass(l)); %find voxels with label l
+        new_image(voxelIndices) = classesStats(2,classLabel) + classesStats(4,classLabel)*sqrt(8)*randn(size(voxelIndices)); %generate new values for these voxels
+    end
+    
+end
+new_image(new_image <0) = 0;
 
 end
