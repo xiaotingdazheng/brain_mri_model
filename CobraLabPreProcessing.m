@@ -1,7 +1,7 @@
 function mriLabels = CobraLabPreProcessing(pathLabels, pathHippoLabels, numberOfSmoothing, pathPreprocessedLabelsFolder, targetResolution)
 
 % This function combines the labels from general image and more precise
-% hippocampal segmentations. 
+% hippocampal segmentations.
 % The difference between the two segm maps being located at around the
 % hippocampus, we first crop the image. We then replace the hippocampus
 % label in the general segmentation by the nearest labels. This results in
@@ -9,7 +9,7 @@ function mriLabels = CobraLabPreProcessing(pathLabels, pathHippoLabels, numberOf
 % hippocampus segm map. When the two images are aligned we can then paste
 % the labels of hippocampus subregions.
 % For the last step we might need to perform several operations to obtain
-% more realistic segmentations. First we observe that the molecular layer 
+% more realistic segmentations. First we observe that the molecular layer
 % is a bit too thick, so we need to shrink it. An then we need to fill the
 % cyst with CSF instead of white matter.
 
@@ -70,7 +70,7 @@ cmd = ['mri_convert ' path_temp_file ' ' path_new_temp_file ' -rl ' pathHippoLab
 [~,~] = system(cmd); %execute command
 
 % read upsampled file
-mriLabels = MRIread(path_new_temp_file); 
+mriLabels = MRIread(path_new_temp_file);
 
 % paste gt labels on top
 disp('merging hippocampal subfields and segmentation')
@@ -89,15 +89,9 @@ MRIwrite(mriLabels, pathPreprocessedLabels); %write a new nii.gz file.
 
 %%%%%%%%%%%%%%%%%%%%%%%% modifying file resolution %%%%%%%%%%%%%%%%%%%%%%%%
 
-sampleRes = [mriLabels.xsize mriLabels.ysize mriLabels.zsize];
+sampleResolution = [mriLabels.xsize mriLabels.ysize mriLabels.zsize];
 if nargin == 5
-    if ~isequal(sampleRes, targetResolution)
-        voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
-        disp(['changing labels resolution to ' voxsize])
-        pathPreprocessedLabelsDownsampled = strrep(pathPreprocessedLabels,'_labels.nii.gz', '_labels.0.6.nii.gz');
-        cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabelsDownsampled ' -voxsize ' voxsize ' -rt nearest -odt float'];
-        [~,~] = system(cmd);
-    end
+    modifyResolution(sampleResolution, targetResolution, pathPreprocessedLabels);
 end
 
 end
@@ -108,7 +102,7 @@ labels = mriHippoLabels.vol;
 
 %find left hippocampus
 maskmri = mriHippoLabels; %copies mri
-maskmri.vol(:) = labels>0 & labels<100; 
+maskmri.vol(:) = labels>0 & labels<100;
 [~,cropping] = cropLabelVol(maskmri, 4); % crop hippocampus
 labelsCrop = labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)); % crop the labels
 
@@ -171,14 +165,14 @@ GTcrop = zeros(size(GTcrop));
 %dilate hippocampus
 maskGTcrop = temp_GTcrop>0;
 GTHoles = imfill(maskGTcrop,'holes')  & ~maskGTcrop; %find holes(=1)
-dilated = imdilate(maskGTcrop, ones(3)); 
+dilated = imdilate(maskGTcrop, ones(3));
 
 %find holes in dilated hippocampus and dilate them
-dilatedHoles = imfill(dilated,'holes') & ~dilated; 
+dilatedHoles = imfill(dilated,'holes') & ~dilated;
 dilatedHoles = imdilate(dilatedHoles, ones(7)); %dilate these holes
 
 %keep only hole voxels corresponding to original holes
-GTHoles = GTHoles | dilatedHoles; 
+GTHoles = GTHoles | dilatedHoles;
 GTcrop(GTHoles) = CSFlabel;
 previous_nonzero_labels = find(temp_GTcrop>0);
 GTcrop(previous_nonzero_labels) = temp_GTcrop(previous_nonzero_labels);
@@ -228,7 +222,7 @@ labelsCrop = labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):
 % remove hippocampus labels from list of labels used to calculate distance maps
 labelList = unique(labelsCrop);
 for h=1:length(hippoLabels)
-    labelList = labelList(labelList~=hippoLabels(h)); 
+    labelList = labelList(labelList~=hippoLabels(h));
 end
 
 % build distance maps
@@ -257,4 +251,21 @@ labels(labels==CSFlabel + 20000) = CSFlabel; %puts back CSF in hippocampus to 24
 
 mriLabels.vol = labels; %write new matrix in header
 
+end
+
+function modifyResolution(sampleResolution, targetResolution, pathPreprocessedLabels)
+
+if ~isequal(sampleResolution, targetResolution)
+    if targetResolution(1) == targetResolution(2) && targetResolution(1) == targetResolution(3)
+        resolution = num2str(targetResolution(1),'%.1f');
+    else
+        resolution = [num2str(targetResolution(1),'%.1f'), 'x',num2str(targetResolution(2),'%.1f'), 'x',num2str(targetResolution(3),'%.1f')];
+    end
+    voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
+    disp(['changing labels resolution to ' voxsize])
+    pathPreprocessedLabelsDownsampled = strrep(pathPreprocessedLabels,'_labels.nii.gz', ['_labels.' resolution '.nii.gz']);
+    cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabelsDownsampled ' -voxsize ' voxsize ' -rt nearest -odt float'];
+    [~,~] = system(cmd);
+end
+    
 end
