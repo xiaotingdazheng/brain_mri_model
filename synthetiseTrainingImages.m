@@ -16,7 +16,7 @@ for i=1:length(structPathsTrainingLabels)
     
     disp(['% creating new image from ' structPathsTrainingLabels(i).name])
     pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-    [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder);
+    [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder, pathRefImage);
 
 end
 
