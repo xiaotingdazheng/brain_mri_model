@@ -24,7 +24,7 @@ pathDirRefImages = '~/data/CobraLab/original_images/*.nii.gz';
 recompute = 1;
 
 % apply masking to images
-cropAll = 1;                     % apply cropping to all images and labels (0 or 1)
+cropImage = 1;                     % apply cropping to all images and labels (0 or 1)
 
 % label fusion parameter
 sigma = 15;                    % std dev of gaussian similarity meaure
@@ -55,7 +55,7 @@ end
 registrationFolder = fullfile(pathDataFolder,'registrations',['registrations_', realOrSynthetic, smoothingName]);
 maskedImageFolder = fullfile(pathDataFolder, 'masked_images');
 croppedFolder = fullfile(pathDataFolder,'cropped_images_and_labels',['croppings_', realOrSynthetic, smoothingName]);
-if ~exist(croppedFolder, 'dir') && cropAll, mkdir(croppedFolder), end
+if ~exist(croppedFolder, 'dir') && cropImage, mkdir(croppedFolder), end
 
 % listing images and labels
 structPathsFloatingImages = dir(pathDirFloatingImages);
@@ -82,7 +82,7 @@ leaveOneOutIndices = nchoosek(1:n_training_data,n_training_data-1);
 refIndex = n_training_data:-1:1;
 
 % result matrix
-accuracies = NaN(n_training_data, length(labelsList) + 1);
+accuracies = cell(length(structPathsTestImages),1);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% procedure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,7 +97,7 @@ for i=1:size(leaveOneOutIndices,1)
     disp(['%%%%% testing label fusion on ',refBrainNum, ' %%%%%']); disp(' ');
     
     % preparing the reference image for label fusion (masking and cropping)
-    [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, margin, croppedFolder);
+    [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, cropImage, margin, croppedFolder);
     
     % initialise matrix on which label fusion will be performed
     % initialising with zeros to start image with background label
@@ -120,15 +120,14 @@ for i=1:size(leaveOneOutIndices,1)
         % compute logOdds or create hippocampus segmentation map (for delta function)
         logOddsSubfolder = fullfile(logOddsFolder, floBrainNum);
         pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, resultsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute);
-        
+
         % registration of synthetic image to real image
         registrationSubFolder = fullfile(registrationFolder, [floBrainNum, 'registered_to_', refBrainNum]);
-        [pathRegisteredFloatingImage, pathTransformation] = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder,...
-            recompute, refBrainNum, floBrainNum);
+        pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, recompute, refBrainNum, floBrainNum);
         
         % registration of loggOdds
         [registeredLogOddsSubFolder, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels] = registerLabels(pathFloatingLabels, pathFloatingHippoLabels,...
-            pathTransformation, pathRefMaskedImage, labelsList, pathlogOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum);
+            pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum, labelPriorType);
         
         % perform summation of posterior on the fly
         disp('cropping registered floating labels and updating sum of posteriors'); disp(' ');
@@ -138,8 +137,8 @@ for i=1:size(leaveOneOutIndices,1)
     end
     
     disp('finding most likely segmentation and calculating corresponding accuracy'); disp(' '); disp(' ');
-    [labelMap, labelMapHippo] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum); % argmax operation
-    accuracies(i,:) = computeSegmentationAccuracy(labelMap, labelMapHippo, croppedRefLabels); % compute Dice coef for all structures
+    [pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum); % argmax operation
+    accuracies{i} = computeSegmentationAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, cropping); % compute Dice coef for all structures
     
 end
 
