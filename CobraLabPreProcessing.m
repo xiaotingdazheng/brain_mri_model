@@ -1,4 +1,4 @@
-function mriLabels = CobraLabPreProcessing(pathLabels, pathHippoLabels, numberOfSmoothing, pathPreprocessedLabelsFolder)
+function mriLabels = CobraLabPreProcessing(pathLabels, pathHippoLabels, numberOfSmoothing, pathPreprocessedLabelsFolder, targetResolution)
 
 % This function combines the labels from general image and more precise
 % hippocampal segmentations. 
@@ -83,8 +83,21 @@ if ~exist(pathPreprocessedLabelsFolder, 'dir'), mkdir(pathPreprocessedLabelsFold
 pathPreprocessedLabels = fullfile(pathPreprocessedLabelsFolder, ['training_' brainNum '_labels.nii.gz']);
 mriLabels.fspec = pathPreprocessedLabelsFolder;
 
-disp(['writing merged labels in ',pathPreprocessedLabels])
+disp(['writing merged labels in ' pathPreprocessedLabels])
 MRIwrite(mriLabels, pathPreprocessedLabels); %write a new nii.gz file.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%% modifying file resolution %%%%%%%%%%%%%%%%%%%%%%%%
+
+sampleRes = [mriLabels.xsize mriLabels.ysize mriLabels.zsize];
+if nargin == 5
+    if ~isequal(sampleRes, targetResolution)
+        voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
+        disp(['changing labels resolution to ' voxsize])
+        cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabels ' -voxsize ' voxsize ' -rt nearest -odt float'];
+        [~,~] = system(cmd);
+    end
+end
 
 end
 
