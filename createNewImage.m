@@ -51,7 +51,6 @@ voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'
 % save temporary image (at sampling resolution)
 disp('writting created image');
 labelsMRI.vol = new_image;
-labelsMRI.fspec = pathNewSegmMap;
 MRIwrite(labelsMRI, pathNewImage); %write a new nifti file.
 
 % save image and labels at target resolution
@@ -109,13 +108,13 @@ pathTrainingLabels = strrep(pathTrainingLabels, '.nii.gz','.mgz');
 [~,filename,~] = fileparts(pathTrainingLabels);
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
 pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [filename '.reg_to_' refBrainNum '.nii.gz']);
-labelsMRI.fspec = pathRegisteredTrainingLabels;
 cmd = ['reg_resample -ref ' pathTrainingLabels ' -flo ' pathNewImage ' -trans ' aff ' -res ' pathRegisteredTrainingLabels ' -pad 0 -inter 0 -voff'];
 [~,~] = system(cmd);
 
 % resample new intensities according to newly registered labels
 labelsMRI = MRIread(pathRegisteredTrainingLabels);
 labels = labelsMRI.vol;
+labelsMRI.fspec = pathRegisteredTrainingLabels;
 new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats);
 
 end
