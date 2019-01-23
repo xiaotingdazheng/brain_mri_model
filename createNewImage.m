@@ -1,4 +1,5 @@
-function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution, pathTempImageSubfolder, pathRefImage)
+function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution,...
+    pathTempImageSubfolder, pathRefImage, pathFirstLabels)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -56,10 +57,17 @@ MRIwrite(labelsMRI, pathNewImage); %write a new nifti file.
 % save image and labels at target resolution
 disp('dowmsampling to target resolution');
 setFreeSurfer();
-cmd = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rt cubic -odt float']; % downsample like template image
-[~,~] = system(cmd);
-cmd = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rt nearest -odt float']; % same for labels
-[~,~] = system(cmd);
+refImageMRI = MRIread(pathRefImage);
+refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
+if isequal(refImageRes, targetResolution) 
+    cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rl ' pathRefImage ' -rt cubic -odt float']; % downsample like template image
+    cmd2 = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rl ' pathFirstLabels ' -rt nearest -odt float']; % same for labels
+else
+    cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rt cubic -odt float']; % downsample like template image
+    cmd2 = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rt nearest -odt float']; % same for labels
+end   
+[~,~] = system(cmd1);
+[~,~] = system(cmd2);
 
 end
 

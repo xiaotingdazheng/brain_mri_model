@@ -7,7 +7,7 @@ pathDirSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz'; % hi
 
 pathPreprocessedLabelsFolder = '/home/benjamin/data/CobraLab/label_fusion/training_labels';
 
-numberOfSmoothing = 1;
+numberOfSmoothing = 2;
 targetResolution = [0.6 0.6 0.6]; % optional, to downsample the labels to target resolution directly here
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
