@@ -7,11 +7,11 @@ addpath /home/benjamin/matlab/toolbox
 pathDirTestImages = '/home/benjamin/data/CobraLab/label_fusion/test_images/*nii.gz';         % original images
 pathTestFirstLabels = '/home/benjamin/data/CobraLab/label_fusion/test_first_labels/*nii.gz'; % FS labels at test image resolution, for intensity sampling
 pathDirTrainingLabels = '/home/benjamin/data/CobraLab/label_fusion/training_labels/*nii.gz'; % labels at 0.3 resolution, for image generation
-pathDirTestLabels = '/home/benjamin/data/CobraLab/label_fusion/test_first_labels/*nii.gz';   % same labels as training at test image resolution, for evaluation
+pathDirTestLabels = '/home/benjamin/data/CobraLab/label_fusion/test_gt_labels/*nii.gz';      % same labels as training at test image resolution, for evaluation
 pathClassesTable = '/home/benjamin/data/CobraLab/label_fusion/classesTable.txt';             % correspondance between labels and classes
 
 % parameters
-targetResolution = [1 1 1];
+targetResolution = [0.6 0.6 0.6];
 cropImage = 1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -21,10 +21,6 @@ structPathsFirstRefLabels = dir(pathTestFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
 accuracies = cell(length(structPathsTestImages),1);
-
-% leave one out indices
-n_training_data = length(structPathsLabels);
-leaveOneOutIndices = flipud(nchoosek(1:n_training_data,n_training_data-1));
 
 for i=1:length(structPathsTestImages)
     

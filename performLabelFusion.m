@@ -6,10 +6,10 @@ labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,4
 margin = 30;
 rho = 0.5;
 threshold = 0.3;
-sigma = 150;
+sigma = 15;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
-recompute = 0;
+recompute = 1;
 
 % define paths of real image and corresponding labels
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
@@ -40,7 +40,7 @@ for i=1:length(structPathsFloatingImages)
     pathFloatingImage = fullfile(structPathsFloatingImages(i).folder, structPathsFloatingImages(i).name);
     pathFloatingLabels = fullfile(structPathsFloatingLabels(i).folder, structPathsFloatingLabels(i).name);
     floBrainNum = structPathsFloatingLabels(i).name(regexp(structPathsFloatingLabels(i).name,'brain'):regexp(structPathsFloatingLabels(i).name,'_labels')-1);
-    disp(['% processing floating ' floBrainNum ' %%'])
+    disp(['% processing floating ' floBrainNum])
     
     %mask image if specified
     maskedTrainingImagesSubfolder = fullfile(maskedTrainingImagesFolder);
