@@ -13,6 +13,13 @@ pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion/test_first_labels/*n
 % parameters
 targetResolution = [1 1 1];
 cropImage = 1;
+margin = 30;
+rho = 0.5;
+threshold = 0.3;
+sigma = 150;
+labelPriorType = 'logOdds';
+deleteSubfolder = 0;
+recompute = 1;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -20,6 +27,7 @@ structPathsTestImages = dir(pathDirTestImages);
 structPathsFirstRefLabels = dir(pathTestFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
 accuracies = cell(length(structPathsTestImages),1);
+labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute};
 
 for i=1:length(structPathsTestImages)
     
@@ -32,13 +40,15 @@ for i=1:length(structPathsTestImages)
     
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
-    [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
+    [pathDirSyntheticImages, pathDirSyntheticLabels] = ...
+        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
-    [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion(pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, cropImage);
+    [pathSegmentation, pathHippoSegmentation, cropping] = ...
+        performLabelFusion(pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');

@@ -1,15 +1,16 @@
-function [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, cropImage)
+function [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters)
 
 % hardcoded parameters
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
     58,60,62,63,85,251,252,253,254,255,20001,20002,20004,20005,20006,20101,20102,20104,20105,20106];
-margin = 30;
-rho = 0.5;
-threshold = 0.3;
-sigma = 15;
-labelPriorType = 'logOdds';
-deleteSubfolder = 0;
-recompute = 1;
+cropImage = labelFusionParameters{1};
+margin = labelFusionParameters{2};
+rho = labelFusionParameters{3};
+threshold = labelFusionParameters{4};
+sigma = labelFusionParameters{5};
+labelPriorType = labelFusionParameters{6};
+deleteSubfolder = labelFusionParameters{7};
+recompute = labelFusionParameters{8};
 
 % define paths of real image and corresponding labels
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
