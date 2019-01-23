@@ -1,4 +1,4 @@
-function pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder,...
+function pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, registrationOptions,...
     recompute, refBrainNum, floBrainNum)
 
 % names of files that will be used/saved during registration
@@ -17,7 +17,7 @@ end
 % compute registration synthetic image to real images
 if ~exist(pathRegisteredFloatingImage, 'file') || recompute
     disp(['registering with reg_f3d ',floBrainNum,' to ',refBrainNum]);
-    cmd = ['reg_f3d -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -res ' pathRegisteredFloatingImage ' -aff ' aff ' -cpp ' pathTransformation ' -pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff'];
+    cmd = ['reg_f3d -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -res ' pathRegisteredFloatingImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];
     [~,~] = system(cmd);    
 end
 

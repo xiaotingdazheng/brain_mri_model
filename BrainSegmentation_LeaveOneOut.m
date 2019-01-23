@@ -20,6 +20,7 @@ sigma = 15;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
 recompute = 1;
+registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -28,7 +29,7 @@ structPathsFirstRefLabels = dir(pathTestFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
 accuracies = cell(length(structPathsTestImages),1);
-labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute};
+labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
 
 for i=1:length(structPathsTestImages)
     

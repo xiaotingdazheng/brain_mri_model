@@ -11,6 +11,7 @@ sigma = labelFusionParameters{5};
 labelPriorType = labelFusionParameters{6};
 deleteSubfolder = labelFusionParameters{7};
 recompute = labelFusionParameters{8};
+registrationOptions = labelFusionParameters{9};
 
 % define paths of real image and corresponding labels
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
@@ -53,7 +54,7 @@ for i=1:length(structPathsFloatingImages)
     
     % registration of synthetic image to real image
     registrationSubFolder = fullfile(registrationFolder, ['training_' floBrainNum '_reg_to_test_' refBrainNum]);
-    pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, recompute, refBrainNum, floBrainNum);
+    pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, registrationOptions, recompute, refBrainNum, floBrainNum);
     
     % registration of loggOdds
     [registeredLogOddsSubFolder, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels] = registerLabels(pathFloatingLabels, pathFloatingHippoLabels,...
