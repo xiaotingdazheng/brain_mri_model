@@ -1,7 +1,7 @@
-function [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathFirstLabels, pathDirLabels, pathClassesTable, targetResolution)
+function [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution)
 
 % files handling
-structPathsTrainingLabels = dir(pathDirLabels);
+structPathsTrainingLabels = dir(pathDirTrainingLabels);
 refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
 pathTempImageSubfolder = fullfile(fileparts(structPathsTrainingLabels(1).folder), ['temp_' refBrainNum]);
 if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end

@@ -58,8 +58,8 @@ MRIwrite(labelsMRI, pathNewImage); %write a new nifti file.
 disp('dowmsampling to target resolution');
 setFreeSurfer();
 refImageMRI = MRIread(pathRefImage);
-refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
-if isequal(refImageRes, targetResolution) 
+refImageRes = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
+if isequal(refImageRes, voxsize) 
     cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rl ' pathRefImage ' -rt cubic -odt float']; % downsample like template image
     cmd2 = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rl ' pathFirstLabels ' -rt nearest -odt float']; % same for labels
 else
