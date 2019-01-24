@@ -52,6 +52,7 @@ HippoLabels(GTcropping(1):GTcropping(2),GTcropping(3):GTcropping(4),GTcropping(5
 %%%%%%%%%%%%%%%%%%%%%%%%% preprocess labels image %%%%%%%%%%%%%%%%%%%%%%%%%
 
 mriLabels = MRIread(pathLabels);
+firstLabelsResolution = [mriLabels.xsize mriLabels.ysize mriLabels.zsize];
 
 % set WM hypointensities to WM
 mriLabels = correctWMHypointensities(mriLabels);
@@ -91,7 +92,7 @@ MRIwrite(mriLabels, pathPreprocessedLabels); %write a new nii.gz file.
 
 sampleResolution = [mriLabels.xsize mriLabels.ysize mriLabels.zsize];
 if nargin == 5
-    modifyResolution(sampleResolution, targetResolution, pathPreprocessedLabels);
+    modifyResolution(sampleResolution, targetResolution, firstLabelsResolution, pathPreprocessedLabels, pathLabels);
 end
 
 end
@@ -253,18 +254,31 @@ mriLabels.vol = labels; %write new matrix in header
 
 end
 
-function modifyResolution(sampleResolution, targetResolution, pathPreprocessedLabels)
+function modifyResolution(sampleResolution, targetResolution, firstLabelsResolution, pathPreprocessedLabels, pathLabels)
 
-if ~isequal(sampleResolution, targetResolution)
+% change resolution if sampling and target resolutions are not the same
+targetResName = [num2str(targetResolution(1),'%.2f') ' ' num2str(targetResolution(2),'%.2f') ' ' num2str(targetResolution(3),'%.2f')];
+sampleResName = [num2str(sampleResolution(1),'%.2f') ' ' num2str(sampleResolution(2),'%.2f') ' ' num2str(sampleResolution(3),'%.2f')];
+if ~isequal(sampleResName, targetResName)
+    
+    % build name of saved downsampled file
     if targetResolution(1) == targetResolution(2) && targetResolution(1) == targetResolution(3)
         resolution = num2str(targetResolution(1),'%.1f');
     else
         resolution = [num2str(targetResolution(1),'%.1f'), 'x',num2str(targetResolution(2),'%.1f'), 'x',num2str(targetResolution(3),'%.1f')];
     end
     voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
-    disp(['changing labels resolution to ' voxsize])
     pathPreprocessedLabelsDownsampled = strrep(pathPreprocessedLabels,'_labels.nii.gz', ['_labels.' resolution '.nii.gz']);
-    cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabelsDownsampled ' -voxsize ' voxsize ' -rt nearest -odt float'];
+    
+    disp(['changing labels resolution to ' voxsize])
+    
+    % build command to be executed. Reslice like original labels if they have same resolution as target
+    firstLabelsResName = [num2str(firstLabelsResolution(1),'%.2f') ' ' num2str(firstLabelsResolution(2),'%.2f') ' ' num2str(firstLabelsResolution(3),'%.2f')];
+    if isequal(firstLabelsResName, targetResName)
+        cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabelsDownsampled ' -rl ' pathLabels ' -rt nearest -odt float'];
+    else
+        cmd = ['mri_convert ' pathPreprocessedLabels ' ' pathPreprocessedLabelsDownsampled ' -voxsize ' voxsize ' -rt nearest -odt float'];
+    end
     [~,~] = system(cmd);
 end
     
