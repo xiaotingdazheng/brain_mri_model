@@ -9,10 +9,8 @@ if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 pathStatsMatrix = fullfile(pathTempImageSubfolder, 'ClassesStats.mat');
 
 % compute stats from reference image
-if recompute || ~exist(pathStatsMatrix, 'file')
-    disp(['% computing intensity stats for ' refBrainNum])
-    classesStats = computeIntensityStats(pathRefImage, pathFirstLabels, pathClassesTable, pathStatsMatrix);
-end
+disp(['% computing intensity stats for ' refBrainNum])
+classesStats = computeIntensityStats(pathRefImage, pathFirstLabels, pathClassesTable, pathStatsMatrix, recompute);
 
 % create images from stats using training labels
 for i=1:length(structPathsTrainingLabels)
