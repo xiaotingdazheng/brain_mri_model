@@ -50,7 +50,7 @@ for i=1:length(structPathsTestImages)
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
     [pathDirSyntheticImages, pathDirSyntheticLabels] = ...
-        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
+        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])

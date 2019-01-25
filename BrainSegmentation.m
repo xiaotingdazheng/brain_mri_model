@@ -14,13 +14,13 @@ pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion/test_first_labels/*n
 targetResolution = [1 1 1];
 cropImage = 1;
 margin = 30;
-rho = 0.5;
-threshold = 0.3;
+rho = 1;
+threshold = 0.1;
 sigma = 150;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
-recompute = 1;
-registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff';
+recompute = 0;
+registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -42,7 +42,7 @@ for i=1:length(structPathsTestImages)
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
     [pathDirSyntheticImages, pathDirSyntheticLabels] = ...
-        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution);
+        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
