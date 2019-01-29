@@ -1,4 +1,5 @@
 clear
+tic
 addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
@@ -59,3 +60,4 @@ end
 pathAccuracies = fullfile(fileparts(structPathsTestImages(i).folder), 'accuracy.mat');
 accuracy = saveAccuracy(accuracies, pathAccuracies);
 disp(accuracy{end,end});
+toc
