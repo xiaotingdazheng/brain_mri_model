@@ -4,11 +4,11 @@ addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_reg3/test_images/*nii.gz';
-pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion_reg3/test_first_labels/*nii.gz';
-pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_reg3/training_labels/*nii.gz';
-pathClassesTable = '/home/benjamin/data/OASIS/label_fusion_reg3/classesTable.txt';
-pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_reg3/test_first_labels/*nii.gz'; % for evaluation
+pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_reg4/test_images/*nii.gz';
+pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion_reg4/test_first_labels/*nii.gz';
+pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_reg4/training_labels/*nii.gz';
+pathClassesTable = '/home/benjamin/data/OASIS/label_fusion_reg4/classesTable.txt';
+pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_reg4/test_first_labels/*nii.gz'; % for evaluation
 
 % parameters
 targetResolution = [1 1 1];
@@ -20,7 +20,7 @@ sigma = 150;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
 recompute = 1;
-registrationOptions = '-pad 0 -vel -voff';
+registrationOptions = '-pad 0 -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
