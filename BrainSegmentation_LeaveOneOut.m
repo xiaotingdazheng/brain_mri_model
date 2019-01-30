@@ -1,4 +1,5 @@
-clear
+clearnow = clock;
+fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
 addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
