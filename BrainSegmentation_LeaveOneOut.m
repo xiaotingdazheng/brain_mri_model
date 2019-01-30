@@ -73,4 +73,4 @@ end
 pathAccuracies = fullfile(fileparts(structPathsTestImages(i).folder), 'accuracy.mat');
 accuracy = saveAccuracy(accuracies, pathAccuracies);
 comparisonGraph({accuracy,'Oasis'},'label fusion on Oasis dataset')
-toc
+tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));
