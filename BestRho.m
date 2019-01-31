@@ -6,11 +6,11 @@ addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_reg6/test_images/*nii.gz';
-pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion_reg6/test_first_labels/*nii.gz';
-pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_reg6/training_labels/*nii.gz';
-pathClassesTable = '/home/benjamin/data/OASIS/label_fusion_reg6/classesTable.txt';
-pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_reg6/test_first_labels/*nii.gz'; % for evaluation
+pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_reg8/test_images/*nii.gz';
+pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion_reg8/test_first_labels/*nii.gz';
+pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_reg8/training_labels/*nii.gz';
+pathClassesTable = '/home/benjamin/data/OASIS/label_fusion_reg8/classesTable.txt';
+pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_reg8/test_first_labels/*nii.gz'; % for evaluation
 
 % parameters
 targetResolution = [1 1 1];
@@ -22,7 +22,7 @@ sigma = 150;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
 recompute = 1;
-registrationOptions = '-pad 0 -ln 3 -sx 2.5 --lncc 5.0 -voff';
+registrationOptions = '-pad 0 -ln 4 -sx 5 --lncc 5.0 -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
