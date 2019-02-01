@@ -26,7 +26,7 @@ registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 structPathsTestImages = dir(pathDirTestImages);
-structPathsFirstRefLabels = dir(pathTestFirstLabpathAccuracies = fullfile(fileparts(structPathsTestImages(i).folder), 'accuracy.mat');els);
+structPathsFirstRefLabels = dir(pathTestFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
 accuracies = cell(length(structPathsTestImages),1);
 labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
