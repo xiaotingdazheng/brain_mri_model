@@ -11,7 +11,7 @@ if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 % create images from stats using training labels
 for i=1:length(structPathsTrainingLabels)
     
-    disp(['% creating new image from ' structPathsTrainingLabels(i).name])
+    disp(['% preprocessing ' structPathsTrainingLabels(i).name])
     pathTrainingImage = fullfile(structPathsTrainingImages(i).folder, structPathsTrainingImages(i).name);
     pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
     [pathDirFloatingImages, pathDirFloatingLabels] = ...
@@ -43,7 +43,7 @@ voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'
 if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
     
     % downsample image and labels at target resolution
-    disp('dowmsampling to target resolution');
+    disp('downsampling to target resolution ')
     setFreeSurfer();
     refImageMRI = MRIread(pathRefImage);
     refImageRes = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
