@@ -1,15 +1,16 @@
-clearnow = clock;
+clear
+now = clock;
 fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
 addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_lp3/test_images/*nii.gz';
-pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion_lp3/test_first_labels/*nii.gz';
-pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_lp3/training_labels/*nii.gz';
-pathClassesTable = '/home/benjamin/data/OASIS/label_fusion_lp3/classesTable.txt';
-pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_lp3/test_first_labels/*nii.gz'; % for evaluation
+pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_FS/test_images/*nii.gz';
+pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion_FS/test_first_labels/*nii.gz';
+pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_FS/test_first_labels/*nii.gz'; % for evaluation
+pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_FS/training_labels/*nii.gz';
+pathClassesTable = '/home/benjamin/data/OASIS/label_fusion_FS/classesTable.txt';
 
 % parameters
 targetResolution = [1 1 1];
@@ -17,11 +18,11 @@ cropImage = 1;
 margin = 30;
 rho = 0.5;
 threshold = 0.1;
-sigma = 150;
+sigma = 15;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
 recompute = 1;
-registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff';
+registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
