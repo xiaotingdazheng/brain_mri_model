@@ -5,11 +5,11 @@ addpath /usr/local/freesurfer/matlab
 addpath /home/benjamin/matlab/toolbox
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_lp3/test_images/*nii.gz';
-pathFirstTestLabels = '/home/benjamin/data/OASIS/label_fusion_lp3/test_first_labels/*nii.gz';
-pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_lp3/test_first_labels/*nii.gz'; % for evaluation
-pathDirTrainingImages = '/home/benjamin/data/OASIS/label_fusion_lp3/training_labels/*nii.gz';
-pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_lp3/training_images/*nii.gz';
+pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_real/test_images/*nii.gz';
+pathFirstTestLabels = '/home/benjamin/data/OASIS/label_fusion_real/test_first_labels/*nii.gz';
+pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_real/test_first_labels/*nii.gz';
+pathDirTrainingImages = '/home/benjamin/data/OASIS/label_fusion_real/training_images/*nii.gz';
+pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_real/training_labels/*nii.gz';
 
 % parameters
 targetResolution = [1 1 1];
@@ -21,7 +21,7 @@ sigma = 150;
 labelPriorType = 'logOdds';
 deleteSubfolder = 0;
 recompute = 1;
-registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff';
+registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -43,7 +43,7 @@ for i=1:length(structPathsTestImages)
     % floating images generation
     disp(['%% preprocessing images for ' structPathsTestImages(i).name])
     [pathDirFloatingImages, pathDirFloatingLabels] = ...
-        preprocessTrainingImages(pathRefImage, pathFirstLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute);
+        preprocessTrainingImages(pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
