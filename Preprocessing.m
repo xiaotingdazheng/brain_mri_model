@@ -1,14 +1,14 @@
 clear
 
-pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*nii.gz';
-pathDirSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz'; % hippo labels
-% pathDirLabels = '/home/benjamin/data/OASIS/original_labels/*nii.gz';
-% pathDirSupport = '/home/benjamin/data/OASIS/original_images/*nii.gz'; % images
+% pathDirLabels = '/home/benjamin/data/CobraLab/original_labels/*nii.gz';
+% pathDirSupport = '/home/benjamin/data/CobraLab/hippocampus_labels/*nii.gz'; % hippo labels
+pathDirLabels = '/home/benjamin/data/OASIS/labels/original_labels/*nii.gz';
+pathDirSupport = '/home/benjamin/data/OASIS/images/original_images/*nii.gz'; % images
 
-pathPreprocessedLabelsFolder = '/home/benjamin/data/CobraLab/label_fusion/training_labels';
+pathPreprocessedLabelsFolder = '/home/benjamin/data/OASIS/test';
 
 numberOfSmoothing = 2;
-targetResolution = [0.6 0.6 0.6]; % optional, to downsample the labels to target resolution directly here
+targetResolution = [1 1 1]; % optional, to downsample the labels to target resolution directly here
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
