@@ -8,11 +8,11 @@ addpath /usr/local/freesurfer/matlab % path of freesurfer's matlab functions
 addpath(genpath(pwd))                % includes toolbox folder
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_real/test_images/*nii.gz';         % test images
-pathFirstTestLabels = '/home/benjamin/data/OASIS/label_fusion_real/test_first_labels/*nii.gz'; % FS labels
-pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_real/test_first_labels/*nii.gz';   % test labels for evaluation
-pathDirTrainingImages = '/home/benjamin/data/OASIS/label_fusion_real/training_images/*nii.gz'; % training images
-pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_real/training_labels/*nii.gz'; % training labels
+pathDirTestImages = '~/data/OASIS/label_fusion_real/test_images/*nii.gz';         % test images
+pathFirstTestLabels = '~/data/OASIS/label_fusion_real/test_first_labels/*nii.gz'; % FS labels
+pathDirTestLabels = '~/data/OASIS/label_fusion_real/test_first_labels/*nii.gz';   % test labels for evaluation
+pathDirTrainingImages = '~/data/OASIS/label_fusion_real/training_images/*nii.gz'; % training images
+pathDirTrainingLabels = '~/data/OASIS/label_fusion_real/training_labels/*nii.gz'; % training labels
 
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images

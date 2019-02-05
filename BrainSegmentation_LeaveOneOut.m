@@ -8,11 +8,11 @@ addpath /usr/local/freesurfer/matlab % path of freesurfer's matlab functions
 addpath(genpath(pwd))                % includes toolbox folder
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/CobraLab/label_fusion/test_images/*nii.gz';         % test images
-pathTestFirstLabels = '/home/benjamin/data/CobraLab/label_fusion/test_first_labels/*nii.gz'; % FS labels
-pathDirTestLabels = '/home/benjamin/data/CobraLab/label_fusion/test_gt_labels/*nii.gz';      % test labels for evaluation
-pathDirTrainingLabels = '/home/benjamin/data/CobraLab/label_fusion/training_labels/*nii.gz'; % training labels
-pathClassesTable = '/home/benjamin/data/CobraLab/label_fusion/classesTable.txt';             % table between labels and intensity classes
+pathDirTestImages = '~/data/CobraLab/label_fusion/test_images/*nii.gz';         % test images
+pathTestFirstLabels = '~/data/CobraLab/label_fusion/test_first_labels/*nii.gz'; % FS labels
+pathDirTestLabels = '~/data/CobraLab/label_fusion/test_gt_labels/*nii.gz';      % test labels for evaluation
+pathDirTrainingLabels = '~/data/CobraLab/label_fusion/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/CobraLab/label_fusion/classesTable.txt';             % table between labels and intensity classes
 
 % parameters
 targetResolution = [0.6 0.6 0.6]; % resolution of synthetic images

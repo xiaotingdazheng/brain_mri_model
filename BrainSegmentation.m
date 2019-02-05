@@ -8,11 +8,11 @@ addpath /usr/local/freesurfer/matlab % path of freesurfer's matlab functions
 addpath(genpath(pwd))                % includes toolbox folder
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/test_images/*nii.gz';         % test images
-pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/test_first_labels/*nii.gz'; % FS labels
-pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/test_first_labels/*nii.gz';   % test labels for evaluation
-pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/training_labels/*nii.gz'; % training labels
-pathClassesTable = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/classesTable.txt';             % table between labels and intensity classes
+pathDirTestImages = '~/data/OASIS/label_fusions/label_fusion_FS/test_images/*nii.gz';         % test images
+pathTestFirstLabels = '~/data/OASIS/label_fusions/label_fusion_FS/test_first_labels/*nii.gz'; % FS labels
+pathDirTestLabels = '~/data/OASIS/label_fusions/label_fusion_FS/test_first_labels/*nii.gz';   % test labels for evaluation
+pathDirTrainingLabels = '~/data/OASIS/label_fusions/label_fusion_FS/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/OASIS/label_fusions/label_fusion_FS/classesTable.txt';             % table between labels and intensity classes
 
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images
