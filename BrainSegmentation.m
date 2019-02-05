@@ -2,27 +2,29 @@ clear
 now = clock;
 fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
-addpath /usr/local/freesurfer/matlab
-addpath /home/benjamin/matlab/toolbox
+
+% add paths for additionnal functions
+addpath /usr/local/freesurfer/matlab % path of freesurfer's matlab functions
+addpath(genpath(pwd))                % includes toolbox folder
 
 % define paths
-pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_FS/test_images/*nii.gz';
-pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusion_FS/test_first_labels/*nii.gz';
-pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_FS/test_first_labels/*nii.gz'; % for evaluation
-pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusion_FS/training_labels/*nii.gz';
-pathClassesTable = '/home/benjamin/data/OASIS/label_fusion_FS/classesTable.txt';
+pathDirTestImages = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/test_images/*nii.gz';         % test images
+pathTestFirstLabels = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/test_first_labels/*nii.gz'; % FS labels
+pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/test_first_labels/*nii.gz';   % test labels for evaluation
+pathDirTrainingLabels = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/training_labels/*nii.gz'; % training labels
+pathClassesTable = '/home/benjamin/data/OASIS/label_fusions/label_fusion_FS/classesTable.txt';             % table between labels and intensity classes
 
 % parameters
-targetResolution = [1 1 1];
-cropImage = 1;
-margin = 30;
-rho = 0.5;
-threshold = 0.1;
-sigma = 15;
-labelPriorType = 'logOdds';
-deleteSubfolder = 0;
-recompute = 1;
-registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -voff';
+targetResolution = [1 1 1]; % resolution of synthetic images
+cropImage = 1;              % perform cropping around hippocampus (0-1)
+margin = 30;                % cropping margin
+rho = 0.5;                  % exponential decay for logOdds maps
+threshold = 0.1;            % lower bound for logOdds maps
+sigma = 15;                 % var for Gaussian likelihhod
+labelPriorType = 'logOdds'; % type of prior ('logOdds' or 'delta function')
+deleteSubfolder = 0;        % delete subfolder after having segmented an image
+recompute = 1;              % recompute files, even if they exist (0-1)
+registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
