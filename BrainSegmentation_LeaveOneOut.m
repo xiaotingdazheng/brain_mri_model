@@ -2,8 +2,10 @@ clear
 now = clock;
 fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
-addpath /usr/local/freesurfer/matlab
-addpath(genpath(pwd))
+
+% add paths for additionnal functions
+addpath /usr/local/freesurfer/matlab % path of freesurfer's matlab functions
+addpath(genpath(pwd))                % includes toolbox folder
 
 % define paths
 pathDirTestImages = '/home/benjamin/data/CobraLab/label_fusion/test_images/*nii.gz';         % test images
