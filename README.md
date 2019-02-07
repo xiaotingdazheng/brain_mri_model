@@ -1,5 +1,6 @@
 # brain_mri_model
 
+This repository aims to perform Brain MRI segmentation, independently of image resolution or modality.
 
 ## requirements
 
@@ -19,13 +20,13 @@ Nevertheless there are some naming conventions that you need to respect. Indeed 
 
 main folder/test_images/test_brain##.nii.gz
 
-           /test_first_labels/test_brain##_labels.nii.gz
+main folder/test_first_labels/test_brain##_labels.nii.gz
            
-           /test_labels/test_brain##_labels.nii.gz
+main folder/test_labels/test_brain##_labels.nii.gz
            
-           /training_labels/training_brain#_labels.nii.gz
+main folder/training_labels/training_brain#_labels.nii.gz
            
-           /classesTable.txt
+main folder/classesTable.txt
 
  
 
