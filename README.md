@@ -4,6 +4,7 @@
 ## requirements
 
 -recent version of matlab (>2016)
+
 -freesurfer package: https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
 
 ## scripts
@@ -17,9 +18,13 @@ Nevertheless there are some naming conventions that you need to respect. Indeed 
 -  BrainSegmentation.m : performs data synthesis and label fusion on two different datasets (training and test)
 
 main folder/test_images/test_brain##.nii.gz
+
            /test_first_labels/test_brain##_labels.nii.gz
+           
            /test_labels/test_brain##_labels.nii.gz
+           
            /training_labels/training_brain#_labels.nii.gz
+           
            /classesTable.txt
 
  
