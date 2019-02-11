@@ -1,9 +1,9 @@
-function setFreeSurfer(freesurferHome)
+function setFreeSurfer(freeSurferHome)
 
-setenv('FREESURFER_HOME',fullfile(freesurferHome,'')); %setup of freesurfer environment
+setenv('FREESURFER_HOME',fullfile(freeSurferHome,'')); %setup of freesurfer environment
 PATH = getenv('PATH');
-if ~contains(PATH,fullfile(freesurferHome,'bin/'))
-    setenv('PATH',[PATH ':' fullfile(freesurferHome,'bin')]);
+if ~contains(PATH,fullfile(freeSurferHome,'bin/'))
+    setenv('PATH',[PATH ':' fullfile(freeSurferHome,'bin')]);
 end
 
 end

@@ -1,4 +1,4 @@
-function pathMaskedImage = maskImage(pathImage, pathLabels, maskedImageFolder, freesurferHome)
+function pathMaskedImage = maskImage(pathImage, pathLabels, maskedImageFolder, freeSurferHome)
 
 % create name of masked file
 temp_path = strrep(pathImage,'.nii.gz','.mgz');
@@ -7,7 +7,7 @@ pathMaskedImage = fullfile(maskedImageFolder, [name '.masked.nii.gz']); %path of
 if ~exist(maskedImageFolder, 'dir'), mkdir(maskedImageFolder); end
 
 % mask image
-setFreeSurfer(freesurferHome);
+setFreeSurfer(freeSurferHome);
 cmd = ['mri_mask ' pathImage ' ' pathLabels ' ' pathMaskedImage];
 [~,~] = system(cmd);
 

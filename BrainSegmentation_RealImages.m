@@ -4,7 +4,7 @@ fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' '
 tic
 
 % add paths for additionnal functions
-freesurferHome = '/usr/local/freesurfer/';
+freeSurferHome = '/usr/local/freesurfer/';
 
 % define paths
 pathDirTestImages = '~/data/OASIS/label_fusions/label_fusion_FS_real/test_images/*nii.gz';         % test images
@@ -28,7 +28,7 @@ registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -voff'; % registration para
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % add paths of freesurfer functions and toolobox
-addpath(fullfile(freesurferHome, 'matlab/'));
+addpath(fullfile(freeSurferHome, 'matlab/'));
 addpath(genpath(pwd));
 
 % initialisation
@@ -50,14 +50,14 @@ for i=1:length(structPathsTestImages)
     % floating images generation
     disp(['%% preprocessing images for ' structPathsTestImages(i).name])
     [pathDirFloatingImages, pathDirFloatingLabels] = ...
-        preprocessTrainingImages(pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute, freesurferHome);
+        preprocessTrainingImages(pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute, freeSurferHome);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirFloatingImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirFloatingLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, cropping] = ...
-        performLabelFusion(pathRefImage, pathFirstTestLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freesurferHome);
+        performLabelFusion(pathRefImage, pathFirstTestLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');

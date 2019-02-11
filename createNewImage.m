@@ -1,5 +1,5 @@
 function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution,...
-    pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freesurferHome)
+    pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freeSurferHome)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -60,7 +60,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
 
     % save image and labels at target resolution
     disp('dowmsampling to target resolution');
-    setFreeSurfer(freesurferHome);
+    setFreeSurfer(freeSurferHome);
     refImageMRI = MRIread(pathRefImage);
     refImageRes = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
     if isequal(refImageRes, voxsize) 
