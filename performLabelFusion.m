@@ -35,8 +35,8 @@ segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNu
 
 % initialise matrix on which label fusion will be performed
 % initialising with zeros to start image with background label
-labelMap = zeros([size(croppedRefMaskedImage), length(labelsList)]);
-labelMapHippo = zeros([size(croppedRefMaskedImage), 2]);
+labelMap = zeros([size(croppedRefMaskedImage), length(labelsList)], 'single');
+labelMapHippo = zeros([size(croppedRefMaskedImage), 2], 'single');
 
 for i=1:length(structPathsFloatingImages)
     

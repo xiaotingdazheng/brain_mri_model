@@ -17,7 +17,7 @@ disp('cropping registered floating labels and updating sum of posteriors');
 
 % read registered floating image and crop it around hippocampus
 registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
-croppedRegisteredFloatingImage = registeredFloatingImage.vol;
+croppedRegisteredFloatingImage = single(registeredFloatingImage.vol);
 if cropping
     croppedRegisteredFloatingImage = croppedRegisteredFloatingImage(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
 end
@@ -33,7 +33,7 @@ switch labelPriorType
         registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         croppedRegisteredFloatingLabels = registeredFloatingLabels.vol;
         if cropping
-            croppedRegisteredFloatingLabels = croppedRegisteredFloatingLabels(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
+            croppedRegisteredFloatingLabels = single(croppedRegisteredFloatingLabels(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6)));
         end
         for k=1:length(labelsList)
             labelPrior = (croppedRegisteredFloatingLabels == labelsList(k)); % binary map of label k
@@ -42,7 +42,7 @@ switch labelPriorType
         
         % same mechanism for hippocampus map
         registeredFloatingHippoLabels = MRIread(pathRegisteredFloatingHippoLabels);
-        croppedRegisteredFloatingHippoLabels = registeredFloatingHippoLabels.vol;
+        croppedRegisteredFloatingHippoLabels = sinlge(registeredFloatingHippoLabels.vol);
         if cropping
             croppedRegisteredFloatingHippoLabels = croppedRegisteredFloatingHippoLabels(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
         end
@@ -55,8 +55,8 @@ switch labelPriorType
     case 'logOdds'
         
         % calculate unmargenalisedPosterior and partitionFunction
-        unmargenalisedPosterior = zeros(size(labelMap));
-        partitionFunction = zeros(size(croppedRefMaskedImage));
+        unmargenalisedPosterior = zeros(size(labelMap), 'single');
+        partitionFunction = zeros(size(croppedRefMaskedImage), 'single');
         for k=1:length(labelsList)
             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
             [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, k);
@@ -65,8 +65,8 @@ switch labelPriorType
         labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
         % same mechanism for hipocampus logOdds
-        unmargenalisedPosterior = zeros(size(labelMapHippo));
-        partitionFunction = zeros(size(croppedRefMaskedImage));
+        unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
+        partitionFunction = zeros(size(croppedRefMaskedImage), 'single');
         temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, 1);
         temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_hippo.nii.gz');
@@ -81,7 +81,7 @@ function [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargena
 
 % load logOdds and crop it around ROI
 MRILogOdds = MRIread(temp_pathLogOdds);
-labelPrior = MRILogOdds.vol;
+labelPrior = single(MRILogOdds.vol);
 if cropping
     labelPrior = labelPrior(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
 end

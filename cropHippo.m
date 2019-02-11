@@ -18,8 +18,8 @@ LabelsMaskMRI.vox2ras0 = z;
 [~, cropping] = cropLabelVol(LabelsMaskMRI, margin); % finds cropping around hippocampus
 
 % crop both image and corresponding segmentation
-croppedRefLabels = Labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
-croppedImage = Image(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6));
+croppedRefLabels = single(Labels(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)));
+croppedImage = single(Image(cropping(1):cropping(2),cropping(3):cropping(4),cropping(5):cropping(6)));
 
 % save cropped segmentation
 LabelsMaskMRI.vol = croppedRefLabels;

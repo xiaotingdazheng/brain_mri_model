@@ -17,20 +17,19 @@ labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,4
 
 accuracy = cell(size(accuracies,1)+3,size(accuracies,2)+2); % initialisation
 
-% row names
-accuracy{1,1} = 'brain regions'; 
+% rows and columns names
+accuracy{1,1} = 'brain regions';
 accuracy{2,1} = 'associated label';
-accuracy{3,1} = 'leave one out accuracies'; 
 accuracy{end,1} = 'region mean accuracy';
+accuracy{3,1} = 'structure accuracies';
+accuracy{1,end} = 'test brain mean accuracy';
 
 accuracy(1,2:end-1) = namesList'; % insert brain regions' names
 accuracy(2,2:end-1) = num2cell(labelsList); % insert corresponding labels
-accuracy{1,end} = 'test brain mean accuracy';
-
 accuracy(3:end-1,2:end-1) = num2cell(accuracies); % results of label fusion
 
-accuracy(end,2:end-1) = num2cell(mean(accuracies,'omitnan')); % mean Dice coef for each structure
-accuracy(3:end,end) = num2cell(mean(cell2mat(accuracy(3:end,2:end-1)),2,'omitnan')); % mean Dice coef for each brain
+accuracy(3:end-1,end) = num2cell(mean(accuracies,2,'omitnan')); % mean Dice coef for each brain
+accuracy(end,2:end) = num2cell(mean(cell2mat(accuracy(3:end-1,2:end)),'omitnan')); % mean Dice coef for each structure
 
 % save created file, bottom right cell being the mean dice coefficient for
 % the whole label fusion

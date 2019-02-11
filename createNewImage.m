@@ -79,7 +79,7 @@ end
 
 function new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats)
 
-new_image = zeros(size(labels));
+new_image = zeros(size(labels), 'single');
 uniqueClasses = unique(labelClasses);
 for lC=1:length(uniqueClasses)
     

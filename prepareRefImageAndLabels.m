@@ -10,8 +10,8 @@ if cropAll
 else
     refLabels = MRIread(pathRefLabels);
     refMaskedImage = MRIread(pathRefMaskedImage);
-    croppedRefLabels = refLabels.vol;
-    croppedRefMaskedImage = refMaskedImage.vol;
+    croppedRefLabels = single(refLabels.vol);
+    croppedRefMaskedImage = single(refMaskedImage.vol);
     cropping = 0;
 end
 
