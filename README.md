@@ -8,6 +8,8 @@ This repository aims to perform Brain MRI segmentation, independently of image r
 
 -freesurfer package: https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
 
+-nifty reg package: http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg
+
 ## scripts
 
 There are several scripts that you can use. All the things you need to change are at the top of these scripts.
