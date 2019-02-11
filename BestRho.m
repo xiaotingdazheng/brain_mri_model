@@ -25,7 +25,7 @@ labelPriorType = 'logOdds';
 deleteSubfolder = 0;
 recompute = 1;
 debug = 0;
-registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 5 --lncc 5.0 -voff';
+registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 5 --lncc 5.0 -omp 3 -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

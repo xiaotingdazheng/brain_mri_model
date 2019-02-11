@@ -25,7 +25,7 @@ labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function'
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
 recompute = 1;                    % recompute files, even if they exist (0-1)
 debug = 0;                        % display debug information from registrations
-registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
+registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
