@@ -5,6 +5,7 @@ tic
 
 % add paths for additionnal functions
 freeSurferHome = '/usr/local/freesurfer/';
+niftyRegHome = '/usr/local/nifty_reg/';
 
 % define paths
 pathDirTestImages = '~/data/OASIS/label_fusions/label_fusion_FS_real/test_images/*nii.gz';         % test images
@@ -49,15 +50,15 @@ for i=1:length(structPathsTestImages)
     
     % floating images generation
     disp(['%% preprocessing images for ' structPathsTestImages(i).name])
-    [pathDirFloatingImages, pathDirFloatingLabels] = ...
-        preprocessTrainingImages(pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute, freeSurferHome);
+    [pathDirFloatingImages, pathDirFloatingLabels] = preprocessTrainingImages...
+        (pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute, freeSurferHome);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirFloatingImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirFloatingLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, cropping] = ...
-        performLabelFusion(pathRefImage, pathFirstTestLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome);
+        performLabelFusion(pathRefImage, pathFirstTestLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');

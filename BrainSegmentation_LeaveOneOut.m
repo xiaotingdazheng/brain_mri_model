@@ -5,6 +5,7 @@ tic
 
 % add paths for additionnal functions
 freeSurferHome = '/usr/local/freesurfer/';
+niftyRegHome = '/usr/local/nifty_reg/';
 
 % define paths
 pathDirTestImages = '~/data/CobraLab/label_fusion/test_images/*nii.gz';         % test images
@@ -57,15 +58,15 @@ for i=1:length(structPathsTestImages)
     
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
-    [pathDirSyntheticImages, pathDirSyntheticLabels] = ...
-        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome);
+    [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages...
+        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, cropping] = ...
-        performLabelFusion(pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome);
+        performLabelFusion(pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');

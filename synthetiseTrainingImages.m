@@ -1,5 +1,5 @@
 function [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathFirstLabels, pathDirTrainingLabels,...
-    pathClassesTable, targetResolution, recompute, freeSurferHome)
+    pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome)
 
 % files handling
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
@@ -18,7 +18,7 @@ for i=1:length(structPathsTrainingLabels)
     disp(['% creating new image from ' structPathsTrainingLabels(i).name])
     pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
     [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution, ...
-        pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freeSurferHome);
+        pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freeSurferHome, niftyRegHome);
 
 end
 

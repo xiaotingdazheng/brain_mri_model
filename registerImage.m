@@ -1,5 +1,5 @@
 function pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, registrationOptions,...
-    recompute, refBrainNum, floBrainNum)
+    recompute, refBrainNum, floBrainNum, niftyRegHome)
 
 % names of files that will be used/saved during registration
 if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % logOdds folder
@@ -11,13 +11,15 @@ pathTransformation = fullfile(registrationSubFolder, [filename '.cpp.nii.gz']); 
 % compute first rigid registration
 if ~exist(aff, 'file') || recompute
     disp(['registering with reg_aladin ',floBrainNum,' to ',refBrainNum]);
-    cmd = ['reg_aladin -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -aff ' aff ' -pad 0 -voff'];
+    pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
+    cmd = [pathRegAladin ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -aff ' aff ' -pad 0 -voff'];
     [~,~] = system(cmd);
 end
 % compute registration synthetic image to real images
 if ~exist(pathRegisteredFloatingImage, 'file') || recompute
     disp(['registering with reg_f3d ',floBrainNum,' to ',refBrainNum]);
-    cmd = ['reg_f3d -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -res ' pathRegisteredFloatingImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];
+    pathRegF3d = fullfile(niftyRegHome, 'reg_f3d');
+    cmd = [pathRegF3d ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -res ' pathRegisteredFloatingImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];
     [~,~] = system(cmd);    
 end
 

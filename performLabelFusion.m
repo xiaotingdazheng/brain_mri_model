@@ -1,5 +1,5 @@
 function [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion...
-    (pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome)
+    (pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome)
 
 % hardcoded parameters
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
@@ -57,11 +57,12 @@ for i=1:length(structPathsFloatingImages)
     
     % registration of synthetic image to real image
     registrationSubFolder = fullfile(registrationFolder, ['training_' floBrainNum '_reg_to_test_' refBrainNum]);
-    pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, registrationOptions, recompute, refBrainNum, floBrainNum);
+    pathRegisteredFloatingImage = registerImage...
+        (pathRefMaskedImage, pathFloatingImage, registrationSubFolder, registrationOptions, recompute, refBrainNum, floBrainNum, niftyRegHome);
     
     % registration of loggOdds
     [registeredLogOddsSubFolder, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels] = registerLabels(pathFloatingLabels, pathFloatingHippoLabels,...
-        pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum, labelPriorType);
+        pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubFolder, recompute, refBrainNum, floBrainNum, labelPriorType, niftyRegHome);
     
     % perform summation of posterior on the fly
     [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
