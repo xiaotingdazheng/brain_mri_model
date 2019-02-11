@@ -2,8 +2,9 @@ clear
 now = clock;
 fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
-addpath /usr/local/freesurfer/matlab
-addpath /home/benjamin/matlab/toolbox
+
+% add paths for additionnal functions
+freesurferHome = '/usr/local/freesurfer/';
 
 % define paths
 pathDirTestImages = '/home/benjamin/data/OASIS/label_fusion_reg9/test_images/*nii.gz';
@@ -26,6 +27,11 @@ registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 5 --lncc 5.0 -voff';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% add paths of freesurfer functions and toolobox
+addpath(fullfile(freesurferHome, 'matlab/'));
+addpath(genpath(pwd));
+
+% initialisation
 structPathsTestImages = dir(pathDirTestImages);
 structPathsFirstRefLabels = dir(pathTestFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
@@ -44,14 +50,14 @@ for i=1:5
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
     [pathDirSyntheticImages, pathDirSyntheticLabels] = ...
-        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute);
+        synthetiseTrainingImages(pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freesurferHome);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, cropping] = ...
-        performLabelFusion(pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters);
+        performLabelFusion(pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freesurferHome);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');

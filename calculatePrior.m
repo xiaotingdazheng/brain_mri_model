@@ -1,4 +1,5 @@
-function pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute)
+function pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, ...
+    rho, threshold, recompute, freesurferHome)
 
 switch labelPriorType
     
@@ -51,7 +52,7 @@ switch labelPriorType
         % if file doesn't exist or must be recomputed
         if ~exist(pathFloatingHippoLabels, 'file') || recompute
             
-            setFreeSurfer();
+            setFreeSurfer(freesurferHome);
             
             FloatingLabels = MRIread(pathFloatingLabels); % read labels
             hippoMap = FloatingLabels.vol > 20000 | FloatingLabels.vol == 17 | FloatingLabels.vol == 53; % hippo mask

@@ -50,14 +50,14 @@ for i=1:length(structPathsTestImages)
     % floating images generation
     disp(['%% preprocessing images for ' structPathsTestImages(i).name])
     [pathDirFloatingImages, pathDirFloatingLabels] = ...
-        preprocessTrainingImages(pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute);
+        preprocessTrainingImages(pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute, freesurferHome);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirFloatingImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirFloatingLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, cropping] = ...
-        performLabelFusion(pathRefImage, pathFirstTestLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters);
+        performLabelFusion(pathRefImage, pathFirstTestLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freesurferHome);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');

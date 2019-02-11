@@ -1,4 +1,5 @@
-function [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion(pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters)
+function [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion...
+    (pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freesurferHome)
 
 % hardcoded parameters
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
@@ -29,7 +30,8 @@ maskedTrainingImagesFolder = fullfile(tempImageSubfolder, 'training_images_maske
 segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNum]);
 
 % preparing the reference image for label fusion (masking and cropping)
-[pathRefMaskedImage, ~, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathFirstRefLabels, cropImage, margin, preprocessedRefBrainFolder);
+[pathRefMaskedImage, ~, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathFirstRefLabels, cropImage, margin, ...
+    preprocessedRefBrainFolder, freesurferHome);
 
 % initialise matrix on which label fusion will be performed
 % initialising with zeros to start image with background label
@@ -46,11 +48,12 @@ for i=1:length(structPathsFloatingImages)
     
     %mask image if specified
     maskedTrainingImagesSubfolder = fullfile(maskedTrainingImagesFolder);
-    pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedTrainingImagesSubfolder);
+    pathFloatingImage = maskImage(pathFloatingImage, pathFloatingLabels, maskedTrainingImagesSubfolder, freesurferHome);
     
     % compute logOdds or create hippocampus segmentation map (for delta function)
     logOddsSubfolder = fullfile(logOddsFolder, ['training_' floBrainNum]);
-    pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute);
+    pathFloatingHippoLabels = calculatePrior...
+        (pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, rho, threshold, recompute, freesurferHome);
     
     % registration of synthetic image to real image
     registrationSubFolder = fullfile(registrationFolder, ['training_' floBrainNum '_reg_to_test_' refBrainNum]);

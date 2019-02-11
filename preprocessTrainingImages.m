@@ -1,5 +1,5 @@
 function [pathDirFloatingImages, pathDirFloatingLabels] = preprocessTrainingImages(pathRefImage, pathFirstLabels, pathDirTrainingImages, pathDirTrainingLabels,...
-    targetResolution, recompute)
+    targetResolution, recompute, freesurferHome)
 
 % files handling
 structPathsTrainingImages = dir(pathDirTrainingImages);
@@ -14,15 +14,15 @@ for i=1:length(structPathsTrainingLabels)
     disp(['% preprocessing ' structPathsTrainingLabels(i).name])
     pathTrainingImage = fullfile(structPathsTrainingImages(i).folder, structPathsTrainingImages(i).name);
     pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-    [pathDirFloatingImages, pathDirFloatingLabels] = ...
-        downsampleTrainingImage(pathTrainingImage, pathTrainingLabels, pathRefImage, pathFirstLabels, targetResolution, pathTempImageSubfolder, recompute);
+    [pathDirFloatingImages, pathDirFloatingLabels] = downsampleTrainingImage(pathTrainingImage, pathTrainingLabels, pathRefImage, pathFirstLabels, ...
+        targetResolution, pathTempImageSubfolder, recompute, freesurferHome);
     
 end
 
 end
 
-function [pathDirFloatingImages, pathDirFloatingLabels] = ...
-    downsampleTrainingImage(pathTrainingImage, pathTrainingLabels, pathRefImage, pathFirstLabels, targetResolution, pathTempImageSubfolder, recompute)
+function [pathDirFloatingImages, pathDirFloatingLabels] = downsampleTrainingImage(pathTrainingImage, pathTrainingLabels, pathRefImage, pathFirstLabels, ...
+    targetResolution, pathTempImageSubfolder, recompute, freesurferHome)
 
 
 % name of handled files
@@ -44,7 +44,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
     
     % downsample image and labels at target resolution
     disp('downsampling to target resolution ')
-    setFreeSurfer();
+    setFreeSurfer(freesurferHome);
     refImageMRI = MRIread(pathRefImage);
     refImageRes = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
     if isequal(refImageRes, voxsize)
