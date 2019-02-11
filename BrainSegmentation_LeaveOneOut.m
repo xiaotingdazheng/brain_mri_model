@@ -4,8 +4,7 @@ fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' '
 tic
 
 % add paths for additionnal functions
-addpath /usr/local/freesurfer/matlab % path of freesurfer's matlab functions
-addpath(genpath(pwd))                % includes toolbox folder
+freesurferHome = '/usr/local/freesurfer/';
 
 % define paths
 pathDirTestImages = '~/data/CobraLab/label_fusion/test_images/*nii.gz';         % test images
@@ -28,6 +27,11 @@ registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -be 0.0005 -le 0.00
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% add paths of freesurfer functions and toolobox
+addpath(fullfile(freesurferHome, 'matlab/'));
+addpath(genpath(pwd));
+
+% initialisation
 structPathsTestImages = dir(pathDirTestImages);
 structPathsFirstRefLabels = dir(pathTestFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
