@@ -34,7 +34,6 @@ if ~isequal(unique(hippoSegmentation), 0) && ~isequal(unique(temp_RefMask), 0)
     accuracy(end) = dice(hippoSegmentation, temp_RefMask);
 end
 
-% 
 
 end
 
