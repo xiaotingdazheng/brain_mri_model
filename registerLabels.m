@@ -1,5 +1,5 @@
 function [registeredLogOddsSubFolder, pathRegisteredFloatingLabels, pathRegisteredFloatingHippoLabels] = registerLabels(pathFloatingLabels, pathFloatingHippoLabels,...
-    pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubfolder, recompute, refBrainNum, floBrainNum, labelPriorType, niftyRegHome)
+    pathRefMaskedImage, labelsList, logOddsSubfolder, registrationSubfolder, recompute, refBrainNum, floBrainNum, labelPriorType, niftyRegHome, debug)
 
 % This function is called only if labelPriorType was set to 'logOdds'. It
 % applies to the logOdds files the warping computed during the registration
@@ -20,7 +20,11 @@ switch labelPriorType
         % apply registration to segmentation map
         if ~exist(pathRegisteredFloatingLabels, 'file') || recompute
             cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingLabels ' -trans ' pathTransformation ' -res ' pathRegisteredFloatingLabels ' -pad 0 -inter 0 -voff'];
-            [~,~] = system(cmd);
+            if debug
+                system(cmd);
+            else
+                [~,~] = system(cmd);
+            end
         end
         
         % same mechanism for hippocampus segmentation map
@@ -28,7 +32,11 @@ switch labelPriorType
         % apply registration to segmentation map
         if ~exist(pathRegisteredFloatingHippoLabels, 'file') || recompute
             cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingHippoLabels ' -trans ' pathTransformation ' -res ' pathRegisteredFloatingHippoLabels ' -pad 0 -inter 0 -voff'];
-            [~,~] = system(cmd);
+            if debug
+                system(cmd);
+            else
+                [~,~] = system(cmd);
+            end
         end
         
         registeredLogOddsSubFolder = '';
@@ -46,7 +54,11 @@ switch labelPriorType
             if ~exist(pathRegisteredLogOdds, 'file') || recompute
                 temp_pathLogOdds = fullfile(logOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']); % path of file to register
                 cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
-                [~,~] = system(cmd);
+                if debug
+                    system(cmd);
+                else
+                    [~,~] = system(cmd);
+                end
             end
         end
         
@@ -55,13 +67,21 @@ switch labelPriorType
         if ~exist(pathRegisteredLogOdds, 'file') || recompute
             temp_pathLogOdds = fullfile(logOddsSubfolder, 'logOdds_hippo.nii.gz');
             cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
-            [~,~] = system(cmd);
+            if debug
+                system(cmd);
+            else
+                [~,~] = system(cmd);
+            end
         end
         pathRegisteredLogOdds = fullfile(registeredLogOddsSubFolder, 'logOdds_non_hippo.nii.gz');
         if ~exist(pathRegisteredLogOdds, 'file') || recompute
             temp_pathLogOdds = fullfile(logOddsSubfolder, 'logOdds_non_hippo.nii.gz');
             cmd = [pathRegResample ' -ref ',pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
-            [~,~] = system(cmd);
+            if debug
+                system(cmd);
+            else
+                [~,~] = system(cmd);
+            end
         end
         
         pathRegisteredFloatingLabels = '';

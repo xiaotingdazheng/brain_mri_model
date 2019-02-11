@@ -1,9 +1,9 @@
 function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetResolution,...
-    pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freeSurferHome, niftyRegHome)
+    pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freeSurferHome, niftyRegHome, debug)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
-% For each voxel, we sample a value drawn from the model of the class it 
+% For each voxel, we sample a value drawn from the model of the class it
 % belongs to (identified thanks to the segmentation map).
 % This results in an image of the same resolution as the provided segm map.
 % We still need to blur the obtained image before downsample it to the
@@ -35,44 +35,44 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     % read training labels
     labelsMRI = MRIread(pathTrainingLabels);
     labels = labelsMRI.vol;
-
+    
     % create new image by sampling from intensity prob distribution
     disp('generating voxel intensities');
     new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats);
-
+    
     % reformate labels if they are anisotropic
     if ~(targetResolution(1) == targetResolution(2) && targetResolution(1) == targetResolution(3))
         [new_image, labelsMRI] = formateAnisotropicImage(new_image, labelsMRI, pathRefImage, pathTrainingLabels, pathTempImageSubfolder, ...
-            labelsList, labelClasses, classesStats, niftyRegHome);
+            labelsList, labelClasses, classesStats, niftyRegHome, debug);
     end
-
+    
     % blurring images
     disp('blurring image to prevent alliasing');
     sampleRes = [labelsMRI.xsize, labelsMRI.ysize, labelsMRI.zsize]; % should be 0.3
     f=targetResolution./sampleRes;
     sigmaFilt=0.9*f;
     new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
-
+    
     % save temporary image (at sampling resolution)
     disp('writting created image');
     labelsMRI.vol = new_image;
     MRIwrite(labelsMRI, pathNewImage); %write a new nifti file.
-
+    
     % save image and labels at target resolution
     disp('dowmsampling to target resolution');
     setFreeSurfer(freeSurferHome);
     refImageMRI = MRIread(pathRefImage);
     refImageRes = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
-    if isequal(refImageRes, voxsize) 
+    if isequal(refImageRes, voxsize)
         cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rl ' pathRefImage ' -rt cubic -odt float']; % downsample like template image
         cmd2 = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rl ' pathFirstLabels ' -rt nearest -odt float']; % same for labels
     else
         cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rt cubic -odt float']; % downsample like template image
         cmd2 = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rt nearest -odt float']; % same for labels
-    end   
+    end
     [~,~] = system(cmd1);
     [~,~] = system(cmd2);
-
+    
 end
 
 end
@@ -87,7 +87,7 @@ for lC=1:length(uniqueClasses)
     classLabel = uniqueClasses(lC);
     labelsBelongingToClass = labelsList(labelClasses == classLabel);
     
-    % give a random class number to classLabel if it wasn't present in labels we sampled from 
+    % give a random class number to classLabel if it wasn't present in labels we sampled from
     while isnan(classesStats(2,classLabel)) || isnan(classesStats(4,classLabel))
         classLabel = randi(size(classesStats, 2));
     end
@@ -104,18 +104,22 @@ new_image(new_image <0) = 0;
 end
 
 function [new_image, labelsMRI] = formateAnisotropicImage...
-    (new_image, labelsMRI, pathRefImage, pathTrainingLabels, pathTempImageSubfolder, labelsList, labelClasses, classesStats, niftyRegHome)
+    (new_image, labelsMRI, pathRefImage, pathTrainingLabels, pathTempImageSubfolder, labelsList, labelClasses, classesStats, niftyRegHome, debug)
 
 %write new image in nifti file.
 pathNewImage = '/tmp/temp_anisotropic.nii.gz';
 labelsMRI.vol = new_image;
-MRIwrite(labelsMRI, pathNewImage); 
+MRIwrite(labelsMRI, pathNewImage);
 
 % linear registration
 aff = '/tmp/temp_aff.nii.gz';
 pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -pad 0 -voff'];
-[~,~] = system(cmd);
+if debug
+    system(cmd);
+else
+    [~,~] = system(cmd);
+end
 
 % apply linear transformation
 pathRegisteredTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
@@ -126,7 +130,11 @@ refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.ni
 pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [filename '.reg_to_' refBrainNum '.nii.gz']);
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
 cmd = [pathRegResample ' -ref ' pathTrainingLabels ' -flo ' pathNewImage ' -trans ' aff ' -res ' pathRegisteredTrainingLabels ' -pad 0 -inter 0 -voff'];
-[~,~] = system(cmd);
+if debug
+    system(cmd);
+else
+    [~,~] = system(cmd);
+end
 
 % resample new intensities according to newly registered labels
 labelsMRI = MRIread(pathRegisteredTrainingLabels);
