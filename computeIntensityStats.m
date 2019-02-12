@@ -10,7 +10,12 @@ function classesStats = computeIntensityStats(pathImage, pathFirstLabels, pathCl
 % ususal mean and std deviation, or ths median and a std deviation based on
 % the MAD, which allows us to be more robust to outliers.
 
+idx = regexp(pathImage,'brain');
+refBrainNum = pathImage(idx(end):regexp(pathImage,'.nii.gz')-1);
+
 if recompute || ~exist(pathStatsMatrix, 'file')
+    
+    disp(['% computing intensity stats for test ' refBrainNum])
 
     %read image
     imageMRI = MRIread(pathImage);
@@ -59,6 +64,7 @@ if recompute || ~exist(pathStatsMatrix, 'file')
 
 else 
     
+   disp(['% loading intensity stats for test ' refBrainNum])
    load(pathStatsMatrix, 'classesStats');
     
 end

@@ -33,6 +33,8 @@ voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'
 
 if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     
+    disp(['% creating new image from training ' TrainingBrainNum ' labels'])
+    
     % read training labels
     labelsMRI = MRIread(pathTrainingLabels);
     labels = labelsMRI.vol;
@@ -73,6 +75,10 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     end
     [~,~] = system(cmd1);
     [~,~] = system(cmd2);
+    
+else
+    
+    disp(['% loading image generated from training ' TrainingBrainNum ' labels'])
     
 end
 
