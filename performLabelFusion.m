@@ -15,7 +15,8 @@ recompute = labelFusionParameters{8};
 registrationOptions = labelFusionParameters{9};
 
 % define paths of real image and corresponding labels
-refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
+idx = regexp(pathRefImage,'brain');
+refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
 
 % handling paths
 structPathsFloatingImages = dir(pathDirFloatingImages);

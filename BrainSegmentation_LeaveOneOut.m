@@ -20,10 +20,10 @@ cropImage = 1;                    % perform cropping around hippocampus (0-1)
 margin = 30;                      % cropping margin
 rho = 0.5;                        % exponential decay for logOdds maps
 threshold = 0.1;                  % lower bound for logOdds maps
-sigma = 15;                       % var for Gaussian likelihhod
+sigma = 300;                       % var for Gaussian likelihhod
 labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
-recompute = 1;                    % recompute files, even if they exist (0-1)
+recompute = 0;                    % recompute files, even if they exist (0-1)
 debug = 1;                        % display debug information from registrations
 registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
 

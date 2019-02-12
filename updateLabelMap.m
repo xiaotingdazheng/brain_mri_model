@@ -42,7 +42,7 @@ switch labelPriorType
         
         % same mechanism for hippocampus map
         registeredFloatingHippoLabels = MRIread(pathRegisteredFloatingHippoLabels);
-        croppedRegisteredFloatingHippoLabels = sinlge(registeredFloatingHippoLabels.vol);
+        croppedRegisteredFloatingHippoLabels = single(registeredFloatingHippoLabels.vol);
         if cropping
             croppedRegisteredFloatingHippoLabels = croppedRegisteredFloatingHippoLabels(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
         end

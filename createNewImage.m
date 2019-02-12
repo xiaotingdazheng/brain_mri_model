@@ -21,7 +21,8 @@ if targetResolution(1) == targetResolution(2) && targetResolution(1) == targetRe
 else
     resolution = [num2str(targetResolution(1),'%.1f'), 'x',num2str(targetResolution(2),'%.1f'), 'x',num2str(targetResolution(3),'%.1f')];
 end
-TrainingBrainNum = pathTrainingLabels(regexp(pathTrainingLabels,'brain'):regexp(pathTrainingLabels,'_labels.nii.gz')-1);
+idx = regexp(pathTrainingLabels,'brain');
+TrainingBrainNum = pathTrainingLabels(idx(end):regexp(pathTrainingLabels,'_labels.nii.gz')-1);
 pathDirSyntheticImages = fullfile(pathTempImageSubfolder, 'synthetic_images');
 if ~exist(pathDirSyntheticImages, 'dir'), mkdir(pathDirSyntheticImages); end
 pathNewImage = fullfile(pathDirSyntheticImages, ['training_' TrainingBrainNum '.synthetic.' resolution '.nii.gz']);
