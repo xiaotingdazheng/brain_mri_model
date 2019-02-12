@@ -3,6 +3,9 @@ now = clock;
 fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
 
+% experiment title
+title = 'label fusion on CobraLab isotropic T2';
+
 % add paths for additionnal functions
 freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/usr/local/nifty_reg/';
@@ -69,5 +72,5 @@ end
 
 pathAccuracies = fullfile(fileparts(structPathsTestImages(i).folder), 'accuracy.mat');
 accuracy = saveAccuracy(accuracies, pathAccuracies);
-comparisonGraph({accuracy,'Oasis'},'label fusion on Oasis dataset')
+comparisonGraph({accuracy,'regions'}, title)
 tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));
