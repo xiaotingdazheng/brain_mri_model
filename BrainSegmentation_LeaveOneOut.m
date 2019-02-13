@@ -1,6 +1,6 @@
 clear
 now = clock;
-fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
+fprintf('Started on %d/%d at %dh%02d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
 
 % experiment title
