@@ -15,21 +15,26 @@ labelsList = [  2,3, 4, 5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43
 labelClasses = [2,1,12,12,4,3, 7, 8,10,11,12,12, 5,14,15,16, 9, 6,18,13, 2, 1,12,12, 4, 3, 7, 8,10,11,...
     14,15, 9, 6,18,13,17,  2,  2,  2,  2,  2,   14,   14,   14,   14,    2,   14,   14,   14,   14,    2];
 
-% names of created files (image and segmentation)
+% names of naming variables
+idx = regexp(pathTrainingLabels,'brain');
+TrainingBrainNum = pathTrainingLabels(idx(end):regexp(pathTrainingLabels,'_labels.nii.gz')-1);
+voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
 if targetResolution(1) == targetResolution(2) && targetResolution(1) == targetResolution(3)
     resolution = num2str(targetResolution(1),'%.1f');
 else
     resolution = [num2str(targetResolution(1),'%.1f'), 'x',num2str(targetResolution(2),'%.1f'), 'x',num2str(targetResolution(3),'%.1f')];
 end
-idx = regexp(pathTrainingLabels,'brain');
-TrainingBrainNum = pathTrainingLabels(idx(end):regexp(pathTrainingLabels,'_labels.nii.gz')-1);
+
+% paths synthetic directories
 pathDirSyntheticImages = fullfile(pathTempImageSubfolder, 'synthetic_images');
-if ~exist(pathDirSyntheticImages, 'dir'), mkdir(pathDirSyntheticImages); end
-pathNewImage = fullfile(pathDirSyntheticImages, ['training_' TrainingBrainNum '.synthetic.' resolution '.nii.gz']);
 pathDirSyntheticLabels = fullfile(pathTempImageSubfolder, 'synthetic_labels');
+if ~exist(pathDirSyntheticImages, 'dir'), mkdir(pathDirSyntheticImages); end
 if ~exist(pathDirSyntheticLabels, 'dir'), mkdir(pathDirSyntheticLabels); end
+
+% paths synthetic image and labels
+pathNewImage = fullfile(pathDirSyntheticImages, ['training_' TrainingBrainNum '.synthetic.' resolution '.nii.gz']);
 pathNewSegmMap = fullfile(pathDirSyntheticLabels, ['training_' TrainingBrainNum '_labels.synthetic.' resolution '.nii.gz']);
-voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
+
 
 if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     
