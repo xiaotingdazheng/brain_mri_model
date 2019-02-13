@@ -21,6 +21,7 @@ croppedRegisteredFloatingImage = single(registeredFloatingImage.vol);
 if cropping
     croppedRegisteredFloatingImage = croppedRegisteredFloatingImage(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
 end
+croppedRegisteredFloatingImage(croppedRegisteredFloatingImage<0) = 0;
 
 % calculate similarity between test (real) image and training (synthetic) image
 likelihood = 1/sqrt(2*pi*sigma)*exp(-(croppedRefMaskedImage-croppedRegisteredFloatingImage).^2/(2*sigma^2));

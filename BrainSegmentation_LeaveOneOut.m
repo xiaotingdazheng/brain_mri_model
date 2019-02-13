@@ -4,29 +4,29 @@ fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' '
 tic
 
 % experiment title
-title = 'label fusion on CobraLab isotropic T2';
+title = 'label fusion on CobraLab anisotropic T2';
 
 % add paths for additionnal functions
 freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/usr/local/nifty_reg/';
 
 % define paths
-pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic/test_images/*nii.gz';         % test images
-pathTestFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic/test_first_labels/*nii.gz'; % FS labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic/test_gt_labels/*nii.gz';      % test labels for evaluation
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic/training_labels/*nii.gz'; % training labels
-pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic/classesTable.txt';             % table between labels and intensity classes
+pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic_anisotropic/test_images/*nii.gz';         % test images
+pathTestFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic_anisotropic/test_first_labels/*nii.gz'; % FS labels
+pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic_anisotropic/test_gt_labels/*nii.gz';      % test labels for evaluation
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic_anisotropic/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthetic_anisotropic/classesTable.txt';             % table between labels and intensity classes
 
 % parameters
-targetResolution = [0.6 0.6 0.6]; % resolution of synthetic images
+targetResolution = [0.6 0.6 2.0]; % resolution of synthetic images
 cropImage = 1;                    % perform cropping around hippocampus (0-1)
 margin = 30;                      % cropping margin
 rho = 0.5;                        % exponential decay for logOdds maps
 threshold = 0.1;                  % lower bound for logOdds maps
-sigma = 300;                       % var for Gaussian likelihhod
+sigma = 300;                      % var for Gaussian likelihhod
 labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
-recompute = 0;                    % recompute files, even if they exist (0-1)
+recompute = 1;                    % recompute files, even if they exist (0-1)
 debug = 1;                        % display debug information from registrations
 registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
 
