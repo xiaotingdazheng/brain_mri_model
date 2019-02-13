@@ -118,35 +118,33 @@ end
 function [new_image, labelsMRI] = formateAnisotropicImage...
     (new_image, labelsMRI, pathRefImage, pathTrainingLabels, pathTempImageSubfolder, labelsList, labelClasses, classesStats, niftyRegHome, debug)
 
-%write new image in nifti file.
+% define naming variables
+idx = regexp(pathRefImage,'brain');
+refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
+temp_pathTrainingLabels = strrep(pathTrainingLabels, '.nii.gz','.mgz');
+[~,name,~] = fileparts(temp_pathTrainingLabels);
+% paths registration functions
+pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
+pathRegResample = fullfile(niftyRegHome, 'reg_resample');
+% paths writen files
 pathNewImage = '/tmp/temp_anisotropic.nii.gz';
+pathTempRegisteredImage = '/tmp/temp_registered_anisotropic.nii.gz';
+aff = '/tmp/temp.aff';
+pathRegisteredTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
+pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [name '.reg_to_' refBrainNum '.nii.gz']);
+if ~exist(pathRegisteredTrainingLabelsSubfolder, 'dir'), mkdir(pathRegisteredTrainingLabelsSubfolder); end
+
+%write new image in nifti file.
 labelsMRI.vol = new_image;
 MRIwrite(labelsMRI, pathNewImage);
 
 % linear registration
-aff = '/tmp/temp_aff.nii.gz';
-pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
-cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -pad 0 -voff'];
-if debug
-    system(cmd);
-else
-    [~,~] = system(cmd);
-end
+cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -res ' pathTempRegisteredImage ' -aff ' aff ' -pad 0'];
+if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
 
-% apply linear transformation
-pathRegisteredTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
-if ~exist(pathRegisteredTrainingLabelsSubfolder, 'dir'), mkdir(pathRegisteredTrainingLabelsSubfolder); end
-pathTrainingLabels = strrep(pathTrainingLabels, '.nii.gz','.mgz');
-[~,filename,~] = fileparts(pathTrainingLabels);
-refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
-pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [filename '.reg_to_' refBrainNum '.nii.gz']);
-pathRegResample = fullfile(niftyRegHome, 'reg_resample');
-cmd = [pathRegResample ' -ref ' pathTrainingLabels ' -flo ' pathNewImage ' -trans ' aff ' -res ' pathRegisteredTrainingLabels ' -pad 0 -inter 0 -voff'];
-if debug
-    system(cmd);
-else
-    [~,~] = system(cmd);
-end
+% apply linear transformation to labels
+cmd = [pathRegResample ' -ref ' pathTempRegisteredImage ' -flo ' pathTrainingLabels ' -trans ' aff ' -res ' pathRegisteredTrainingLabels ' -pad 0 -inter 0'];
+if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
 
 % resample new intensities according to newly registered labels
 labelsMRI = MRIread(pathRegisteredTrainingLabels);
