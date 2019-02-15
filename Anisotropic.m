@@ -26,7 +26,7 @@ for i=1:length(structPathsRotatedImages)
     pathRotatedImage = fullfile(structPathsRotatedImages(i).folder, structPathsRotatedImages(i).name);
     pathAnisotropicImage = strrep(pathRotatedImage, 'rotated_images', 'anisotropic_images');
     pathOriginalLabels = fullfile(structPathsOriginalLabels(i).folder, structPathsOriginalLabels(i).name);
-    pathAnisotropicLabels = strrep(pathOriginalLabels, 'original_labels_low_res', 'anisotropic_labels');
+    pathAnisotropicLabels = strrep(pathOriginalLabels, 'original_labels_low_res', 'rotated_anisotropic_labels_low_res');
     pathRotation = strrep(pathRotatedImage, '.nii.gz', '.nii.gz.lta');
     
     % create dir if they don't exist
