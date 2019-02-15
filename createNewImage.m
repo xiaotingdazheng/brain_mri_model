@@ -123,6 +123,7 @@ idx = regexp(pathRefImage,'brain');
 refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
 temp_pathTrainingLabels = strrep(pathTrainingLabels, '.nii.gz','.mgz');
 [~,name,~] = fileparts(temp_pathTrainingLabels);
+voxsizeTrainingLabels = [num2str(labelsMRI.xsize/2,'%.1f') ' ' num2str(labelsMRI.ysize/2,'%.1f') ' ' num2str(labelsMRI.zsize/2,'%.1f')];
 % paths registration functions
 pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
@@ -132,11 +133,18 @@ pathTempRegisteredImage = '/tmp/temp_registered_anisotropic.nii.gz';
 aff = '/tmp/temp.aff';
 pathRegisteredTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
 pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [name '.reg_to_' refBrainNum '.nii.gz']);
+pathUpsampledRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [name '.reg_to_' refBrainNum '.upsampled.nii.gz']);
 if ~exist(pathRegisteredTrainingLabelsSubfolder, 'dir'), mkdir(pathRegisteredTrainingLabelsSubfolder); end
 
-%write new image in nifti file.
+% write new image in nifti file.
 labelsMRI.vol = new_image;
 MRIwrite(labelsMRI, pathNewImage);
+
+% dowsample to ref image resolution
+refImageMRI = MRIread(pathRefImage);
+voxsizeRefImage = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
+cmd = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsizeRefImage ' -rt nearest -odt float'];
+if debug, system(cmd); else, [~,~] = system(cmd); end
 
 % linear registration
 cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -res ' pathTempRegisteredImage ' -aff ' aff ' -pad 0'];
@@ -146,10 +154,14 @@ if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
 cmd = [pathRegResample ' -ref ' pathTempRegisteredImage ' -flo ' pathTrainingLabels ' -trans ' aff ' -res ' pathRegisteredTrainingLabels ' -pad 0 -inter 0'];
 if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
 
+% upsample labels to sample resolution
+cmd = ['mri_convert ' pathRegisteredTrainingLabels ' ' pathUpsampledRegisteredTrainingLabels ' -voxsize ' voxsizeTrainingLabels ' -rt nearest -odt float'];
+if debug, system(cmd); else, [~,~] = system(cmd); end
+
 % resample new intensities according to newly registered labels
-labelsMRI = MRIread(pathRegisteredTrainingLabels);
+labelsMRI = MRIread(pathUpsampledRegisteredTrainingLabels);
 labels = labelsMRI.vol;
-labelsMRI.fspec = pathRegisteredTrainingLabels;
+labelsMRI.fspec = pathUpsampledRegisteredTrainingLabels;
 new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats);
 
 end
