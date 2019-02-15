@@ -20,8 +20,10 @@ idx = regexp(pathTrainingLabels,'brain');
 TrainingBrainNum = pathTrainingLabels(idx(end):regexp(pathTrainingLabels,'_labels.nii.gz')-1);
 voxsize = [num2str(targetResolution(1),'%.1f') ' ' num2str(targetResolution(2),'%.1f') ' ' num2str(targetResolution(3),'%.1f')];
 if targetResolution(1) == targetResolution(2) && targetResolution(1) == targetResolution(3)
+    anisotropic = 0;
     resolution = num2str(targetResolution(1),'%.1f');
 else
+    anisotropic = 1;
     resolution = [num2str(targetResolution(1),'%.1f'), 'x',num2str(targetResolution(2),'%.1f'), 'x',num2str(targetResolution(3),'%.1f')];
 end
 
@@ -42,44 +44,31 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     
     % read training labels
     labelsMRI = MRIread(pathTrainingLabels);
-    labels = labelsMRI.vol;
     
     % create new image by sampling from intensity prob distribution
     disp('generating voxel intensities');
-    new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats);
-    
-    % reformate labels if they are anisotropic
-    if ~(targetResolution(1) == targetResolution(2) && targetResolution(1) == targetResolution(3))
-        [new_image, labelsMRI] = formateAnisotropicImage(new_image, labelsMRI, pathRefImage, pathTrainingLabels, pathTempImageSubfolder, ...
-            labelsList, labelClasses, classesStats, niftyRegHome, debug);
-    end
+    newImage = sampleIntensities(labelsMRI.vol, labelsList, labelClasses, classesStats);
     
     % blurring images
-    disp('blurring image to prevent alliasing');
-    sampleRes = [labelsMRI.xsize, labelsMRI.ysize, labelsMRI.zsize]; % should be 0.3
-    f=targetResolution./sampleRes;
-    sigmaFilt=0.9*f;
-    new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
-    
-    % save temporary image (at sampling resolution)
-    disp('writting created image');
-    labelsMRI.vol = new_image;
-    MRIwrite(labelsMRI, pathNewImage); %write a new nifti file.
+    blurAndSave(newImage, labelsMRI, targetResolution, pathNewImage)
     
     % save image and labels at target resolution
     disp('dowmsampling to target resolution');
-    setFreeSurfer(freeSurferHome);
-    refImageMRI = MRIread(pathRefImage);
-    refImageRes = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
-    if isequal(refImageRes, voxsize)
-        cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rl ' pathRefImage ' -rt cubic -odt float']; % downsample like template image
-        cmd2 = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rl ' pathFirstLabels ' -rt nearest -odt float']; % same for labels
-    else
-        cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rt cubic -odt float']; % downsample like template image
-        cmd2 = ['mri_convert ' labelsMRI.fspec ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rt nearest -odt float']; % same for labels
+    downsample(pathNewImage, pathNewSegmMap, labelsMRI.fspec, pathFirstLabels, pathRefImage, voxsize, anisotropic, freeSurferHome)
+    
+    if anisotropic
+        pathNewImage = strrep(pathNewImage, '.nii.gz', '.anisotropic.nii.gz');
+        % reformate labels if they are anisotropic
+        pathNewHighResLabels = convertLabelsToAnisotropic(pathNewImage, pathTrainingLabels, pathRefImage, niftyRegHome, debug);
+        % read training labels
+        labelsMRI = MRIread(pathNewHighResLabels);
+        % create new image by sampling from intensity prob distribution
+        newImage = sampleIntensities(labelsMRI.vol, labelsList, labelClasses, classesStats);
+        % blurring images
+        blurAndSave(newImage, labelsMRI, targetResolution, pathNewImage)
+        % downsample to target resolution
+        downsample(pathNewImage, pathNewSegmMap, labelsMRI.fspec, pathFirstLabels, pathRefImage, voxsize, 0, freeSurferHome)
     end
-    [~,~] = system(cmd1);
-    [~,~] = system(cmd2);
     
 else
     
@@ -115,36 +104,62 @@ new_image(new_image <0) = 0;
 
 end
 
-function [new_image, labelsMRI] = formateAnisotropicImage...
-    (new_image, labelsMRI, pathRefImage, pathTrainingLabels, pathTempImageSubfolder, labelsList, labelClasses, classesStats, niftyRegHome, debug)
+function blurAndSave(new_image, labelsMRI, targetResolution, pathNewImage)
+
+% blurring images
+disp('blurring image to prevent alliasing');
+sampleRes = [labelsMRI.xsize, labelsMRI.ysize, labelsMRI.zsize]; % should be 0.3
+f=targetResolution./sampleRes;
+sigmaFilt=0.9*f;
+new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
+
+% save temporary image (at sampling resolution)
+disp('writting created image');
+labelsMRI.vol = new_image;
+MRIwrite(labelsMRI, pathNewImage); %write a new nifti file.
+
+end
+
+function downsample(pathNewImage, pathNewSegmMap, pathOldLabels, pathFirstLabels, pathRefImage, voxsize, anisotropic, freeSurferHome)
+
+% save image and labels at target resolution
+disp('dowmsampling to target resolution');
+setFreeSurfer(freeSurferHome);
+refImageMRI = MRIread(pathRefImage);
+refImageRes = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
+if isequal(refImageRes, voxsize) || anisotropic
+    cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -rl ' pathRefImage ' -rt cubic -odt float']; % downsample like template image
+    if ~anisotropic
+        cmd2 = ['mri_convert ' pathOldLabels ' ' pathNewSegmMap ' -rl ' pathFirstLabels ' -rt nearest -odt float']; % same for labels
+    end
+else
+    cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsize ' -rt cubic -odt float']; % downsample at target resolution
+    cmd2 = ['mri_convert ' pathOldLabels ' ' pathNewSegmMap ' -voxsize ' voxsize ' -rt nearest -odt float']; % same for labels
+end
+[~,~] = system(cmd1);
+[~,~] = system(cmd2);
+
+end
+
+function pathUpsampledRegisteredTrainingLabels = convertLabelsToAnisotropic(pathNewImage, pathTrainingLabels, pathRefImage, niftyRegHome, debug)
 
 % define naming variables
 idx = regexp(pathRefImage,'brain');
 refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
 temp_pathTrainingLabels = strrep(pathTrainingLabels, '.nii.gz','.mgz');
 [~,name,~] = fileparts(temp_pathTrainingLabels);
-voxsizeTrainingLabels = [num2str(labelsMRI.xsize/2,'%.1f') ' ' num2str(labelsMRI.ysize/2,'%.1f') ' ' num2str(labelsMRI.zsize/2,'%.1f')];
+
 % paths registration functions
 pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
-% paths writen files
-pathNewImage = '/tmp/temp_anisotropic.nii.gz';
-pathTempRegisteredImage = '/tmp/temp_registered_anisotropic.nii.gz';
+
+% define paths
 aff = '/tmp/temp.aff';
+pathTempRegisteredImage = '/tmp/temp_registered_anisotropic.nii.gz';
 pathRegisteredTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
 pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [name '.reg_to_' refBrainNum '.nii.gz']);
 pathUpsampledRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [name '.reg_to_' refBrainNum '.upsampled.nii.gz']);
 if ~exist(pathRegisteredTrainingLabelsSubfolder, 'dir'), mkdir(pathRegisteredTrainingLabelsSubfolder); end
-
-% write new image in nifti file.
-labelsMRI.vol = new_image;
-MRIwrite(labelsMRI, pathNewImage);
-
-% dowsample to ref image resolution
-refImageMRI = MRIread(pathRefImage);
-voxsizeRefImage = [num2str(refImageMRI.xsize,'%.1f') ' ' num2str(refImageMRI.ysize,'%.1f') ' ' num2str(refImageMRI.zsize,'%.1f')];
-cmd = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' voxsizeRefImage ' -rt nearest -odt float'];
-if debug, system(cmd); else, [~,~] = system(cmd); end
 
 % linear registration
 cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -res ' pathTempRegisteredImage ' -aff ' aff ' -pad 0'];
@@ -157,11 +172,5 @@ if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
 % upsample labels to sample resolution
 cmd = ['mri_convert ' pathRegisteredTrainingLabels ' ' pathUpsampledRegisteredTrainingLabels ' -voxsize ' voxsizeTrainingLabels ' -rt nearest -odt float'];
 if debug, system(cmd); else, [~,~] = system(cmd); end
-
-% resample new intensities according to newly registered labels
-labelsMRI = MRIread(pathUpsampledRegisteredTrainingLabels);
-labels = labelsMRI.vol;
-labelsMRI.fspec = pathUpsampledRegisteredTrainingLabels;
-new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats);
 
 end
