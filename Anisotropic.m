@@ -5,12 +5,18 @@ tic
 
 freeSurferHome = '/usr/local/freesurfer/';
 
+% paths folders containing to process
 pathDirRotatedImages = '~/data/CobraLab/images/brains_t2/rotated_images/*nii.gz';
-pathDirOriginalLabels = '~/data/CobraLab/labels/original_labels_low_res/*nii.gz';
+pathDirOriginalLabels = '~/data/CobraLab/labels/merged_high_res/*nii.gz';
 
+% paths result folders
+pathDirResultImages = '~/data/CobraLab/images/brains_t2/anisotropic_images';
+pathDirResultLabels = '~/data/CobraLab/labels/rotated_anisotropic_merged_low_res';
+
+% parameters
 targetRes = [0.6 0.6 2];
 coronalDim = 3;
-recompute = 1;
+recompute = 0;
 debug = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -24,14 +30,14 @@ for i=1:length(structPathsRotatedImages)
     
     % define paths
     pathRotatedImage = fullfile(structPathsRotatedImages(i).folder, structPathsRotatedImages(i).name);
-    pathAnisotropicImage = strrep(pathRotatedImage, 'rotated_images', 'anisotropic_images');
-    pathOriginalLabels = fullfile(structPathsOriginalLabels(i).folder, structPathsOriginalLabels(i).name);
-    pathAnisotropicLabels = strrep(pathOriginalLabels, 'original_labels_low_res', 'rotated_anisotropic_labels_low_res');
     pathRotation = strrep(pathRotatedImage, '.nii.gz', '.nii.gz.lta');
+    pathOriginalLabels = fullfile(structPathsOriginalLabels(i).folder, structPathsOriginalLabels(i).name);
+    pathAnisotropicImage = fullfile(pathDirResultImages, structPathsRotatedImages(i).name);
+    pathAnisotropicLabels = fullfile(pathDirResultLabels, structPathsOriginalLabels(i).name);
     
-    % create dir if they don't exist
-    if ~exist(fileparts(pathAnisotropicImage), 'dir'), mkdir(fileparts(pathAnisotropicImage)); end
-    if ~exist(fileparts(pathAnisotropicLabels), 'dir'), mkdir(fileparts(pathAnisotropicLabels)); end
+    % create result folders if they don't exist
+    if ~exist(pathDirResultImages, 'dir'), mkdir(fileparts(pathAnisotropicImage)); end
+    if ~exist(pathDirResultLabels, 'dir'), mkdir(fileparts(pathAnisotropicLabels)); end
     
     if ~exist(pathAnisotropicImage, 'file') || recompute
         
@@ -73,7 +79,6 @@ for i=1:length(structPathsRotatedImages)
         % apply transformation to labels
         disp('applying transformation to labels')
         cmd = ['mri_convert ' pathOriginalLabels ' ' pathAnisotropicLabels ' -at ' pathRotation ' -rl ' pathAnisotropicImage ' -rt nearest -odt float'];
-        % cmd = ['mri_convert ' pathOriginalLabels ' ' pathAnisotropicLabels ' -rl ' pathAnisotropicImage ' -rt nearest -odt float'];
         if debug, system(cmd); else, [~,~] = system(cmd); end
         disp(' ');
         
