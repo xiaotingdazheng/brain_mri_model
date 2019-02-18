@@ -23,7 +23,7 @@ cropImage = 1;                    % perform cropping around hippocampus (0-1)
 margin = 30;                      % cropping margin
 rho = 0.5;                        % exponential decay for logOdds maps
 threshold = 0.1;                  % lower bound for logOdds maps
-sigma = 300;                      % var for Gaussian likelihhod
+sigma = 15;                      % var for Gaussian likelihhod
 labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
 recompute = 1;                    % recompute files, even if they exist (0-1)
@@ -44,7 +44,8 @@ structPathsTrainingLabels = dir(pathDirTrainingLabels);
 accuracies = cell(length(structPathsTestImages),1);
 labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
 
-for i=1:length(structPathsTestImages)
+%for i=1:length(structPathsTestImages)
+for i=length(structPathsTestImages):-1:1
     
     disp(['%%% Processing test brain ' structPathsTestImages(i).name]); disp(' ');
     
