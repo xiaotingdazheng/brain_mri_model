@@ -114,6 +114,7 @@ sampleRes = [labelsMRI.xsize, labelsMRI.ysize, labelsMRI.zsize]; % should be 0.3
 f=targetResolution./sampleRes;
 sigmaFilt=0.9*f;
 new_image = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
+new_image(new_image <0) = 0;
 
 % save temporary image (at sampling resolution)
 disp('writting created high resolution image');
