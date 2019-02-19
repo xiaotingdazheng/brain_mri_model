@@ -1,5 +1,5 @@
 function [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels,...
-    pathRegisteredFloatingHippoLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType)
+    pathRegisteredFloatingHippoLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, reduceLabelMap, brainIndices)
 
 % This function updates the labelMap matrix on which we will perform the
 % argmax operation to obatin the best segmentation possible. The update
@@ -55,27 +55,77 @@ switch labelPriorType
         
     case 'logOdds'
         
-        % calculate unmargenalisedPosterior and partitionFunction
-        unmargenalisedPosterior = zeros(size(labelMap), 'single');
-        partitionFunction = zeros(size(croppedRefMaskedImage), 'single');
-        for k=1:length(labelsList)
-            temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
-            [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, k);
+        if reduceLabelMap
+            
+            unmargenalisedPosterior = zeros(size(labelMap), 'single');
+            partitionFunction = zeros(1, length(brainIndices), 'single');
+            
+            for k=1:length(labelsList)
+                temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
+                [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
+                    cropping, k, reduceLabelMap, brainIndices);
+            end
+            %update labelMap with marginalised posterior
+            labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+            
+            % same mechanism for hipocampus logOdds
+%             unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
+%             partitionFunction = zeros(1, length(brainVoxels), 'single');
+%             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
+%             [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
+%                 cropping, 1, reduceLabelMap, brainVoxels);
+%             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_hippo.nii.gz');
+%             [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
+%                 cropping, 2, reduceLabelMap, brainVoxels);
+%             labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+            
+        else
+            
+            % calculate unmargenalisedPosterior and partitionFunction
+            unmargenalisedPosterior = zeros(size(labelMap), 'single');
+            partitionFunction = zeros(size(croppedRefMaskedImage), 'single');
+            
+            for k=1:length(labelsList)
+                temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
+                [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, k);
+            end
+            %update labelMap with marginalised posterior
+            labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+
+            % same mechanism for hipocampus logOdds
+            unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
+            partitionFunction = zeros(size(croppedRefMaskedImage), 'single');
+            temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
+            [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, 1);
+            temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_hippo.nii.gz');
+            [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, 2);
+            labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         end
-        %update labelMap with marginalised posterior
-        labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
-        
-        % same mechanism for hipocampus logOdds
-        unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
-        partitionFunction = zeros(size(croppedRefMaskedImage), 'single');
-        temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
-        [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, 1);
-        temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_hippo.nii.gz');
-        [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, 2);
-        labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
 end
 
+end
+
+function [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, ...
+    cropping, index, reduceLabelMap, brainVoxels)
+
+% load logOdds and crop it around ROI
+MRILogOdds = MRIread(temp_pathLogOdds);
+labelPrior = single(MRILogOdds.vol);
+if cropping
+    labelPrior = labelPrior(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
+end
+
+if reduceLabelMap
+    posterior = labelPrior.*likelihood;
+    partitionFunction = partitionFunction + labelPrior(brainVoxels);
+    unmargenalisedPosterior(index,:) = posterior(brainVoxels);
+else
+    % update marginalisation over all labels and compute posterior
+    partitionFunction = partitionFunction + labelPrior;
+    unmargenalisedPosterior(:,:,:,index) = labelPrior.*likelihood;
+end
+        
 end
 
 function [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, cropping, index)

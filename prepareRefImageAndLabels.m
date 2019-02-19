@@ -1,16 +1,25 @@
-function [pathRefMaskedImage, croppedRefLabels, croppedRefMaskedImage, cropping] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, ...
-    cropAll, margin, preprocessedRefBrainFolder, freeSurferHome)
+function [pathRefMaskedImage, croppedRefMaskedImage, cropping, brainIndices] = prepareRefImageAndLabels(pathRefImage, pathRefLabels, ...
+    cropAll, margin, preprocessedRefBrainFolder, freeSurferHome, reduceLabelMap)
 
 % mask real image if told so or if it doesn't exist
 pathRefMaskedImage = maskImage(pathRefImage, pathRefLabels, preprocessedRefBrainFolder, freeSurferHome);
 
 % crop ref image/labels around hippocampus if specified, otherwise read images
 if cropAll
-    [croppedRefLabels, croppedRefMaskedImage, cropping] = cropHippo(pathRefMaskedImage, pathRefLabels, margin, preprocessedRefBrainFolder);
+    [croppedRefMaskedImage, cropping] = cropHippo(pathRefMaskedImage, pathRefLabels, margin, preprocessedRefBrainFolder);
+    brainIndices = 0;
 else
-    refLabels = MRIread(pathRefLabels);
+    
+    if reduceLabelMap
+        
+        refLabelsMRI = MRIread(pathRefLabels);
+        brainMask = refLabelsMRI.vol >0;
+        brainMask1 = imdilate(brainMask, ones(margin, margin, margin));
+        brainIndices = find(brainMask1 >0)';
+    
+    end
+    
     refMaskedImage = MRIread(pathRefMaskedImage);
-    croppedRefLabels = single(refLabels.vol);
     croppedRefMaskedImage = single(refMaskedImage.vol);
     cropping = 0;
 end

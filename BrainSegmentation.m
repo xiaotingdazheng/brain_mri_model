@@ -11,23 +11,24 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/usr/local/nifty_reg/';
 
 % define paths
-pathDirTestImages = '~/data/OASIS/label_fusions/label_fusion_FS_synthetic/test_images/*nii.gz';         % test images
-pathTestFirstLabels = '~/data/OASIS/label_fusions/label_fusion_FS_synthetic/test_first_labels/*nii.gz'; % FS labels
-pathDirTestLabels = '~/data/OASIS/label_fusions/label_fusion_FS_synthetic/test_first_labels/*nii.gz';   % test labels for evaluation
-pathDirTrainingLabels = '~/data/OASIS/label_fusions/label_fusion_FS_synthetic/training_labels/*nii.gz'; % training labels
-pathClassesTable = '~/data/OASIS/label_fusions/label_fusion_FS_synthetic/classesTable.txt';             % table between labels and intensity classes
+pathDirTestImages = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/test_images/*nii.gz';         % test images
+pathTestFirstLabels = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/test_first_labels/*nii.gz'; % FS labels
+pathDirTestLabels = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/test_first_labels/*nii.gz';   % test labels for evaluation
+pathDirTrainingLabels = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/classesTable.txt';             % table between labels and intensity classes
 
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images
-cropImage = 1;              % perform cropping around hippocampus (0-1)
-margin = 30;                % cropping margin
+cropImage = 0;              % perform cropping around hippocampus (0-1)
+margin = 10;                % cropping margin
 rho = 0.5;                  % exponential decay for logOdds maps
 threshold = 0.1;            % lower bound for logOdds maps
 sigma = 15;                 % var for Gaussian likelihhod
 labelPriorType = 'logOdds'; % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;        % delete subfolder after having segmented an image
-recompute = 1;              % recompute files, even if they exist (0-1)
-debug = 0;                  % display debug information from registrations
+recompute = 0;              % recompute files, even if they exist (0-1)
+debug = 1;                  % display debug information from registrations
+reduceLabelMap = 1;
 registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -omp 3 -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,7 +63,7 @@ for i=1:length(structPathsTestImages)
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion...
-        (pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
+        (pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug, reduceLabelMap);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');
