@@ -69,7 +69,6 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
         % create new image by sampling from intensity prob distribution
         newImage = sampleIntensities(anisotropicTrainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, anisotropicTrainingLabelsRes);
         % blurring images
-        pathNewImage = strrep(pathNewImage, '.nii.gz', '.anisotropic.nii.gz');
         blurAndSave(newImage, anisotropicTrainingLabelsMRI, anisotropicTrainingLabelsRes, targetRes, pathNewImage);
         % downsample to target resolution
         downsample(pathNewImage, pathNewSegmMap, anisotropicTrainingLabelsMRI.fspec, pathFirstLabels, pathRefImage, refImageRes, targetRes, 0, freeSurferHome);
