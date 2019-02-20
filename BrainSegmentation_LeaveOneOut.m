@@ -19,6 +19,7 @@ pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/label_fusion_synthet
 
 % parameters
 targetResolution = [0.6 0.6 2.0]; % resolution of synthetic images
+rescaleIntensities = 0;           % rescale intensities between 0 and 255 (0-1)
 cropImage = 1;                    % perform cropping around hippocampus (0-1)
 margin = 30;                      % cropping margin
 rho = 0.5;                        % exponential decay for logOdds maps
@@ -62,8 +63,8 @@ for i=1:length(structPathsTestImages)
     
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
-    [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages...
-        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
+    [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
+        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])

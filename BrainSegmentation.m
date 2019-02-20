@@ -19,6 +19,7 @@ pathClassesTable = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/cl
 
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images
+rescaleIntensities = 0;     % rescale intensities between 0 and 255 (0-1)
 cropImage = 0;              % perform cropping around hippocampus (0-1)
 margin = 10;                % cropping margin
 rho = 0.5;                  % exponential decay for logOdds maps
@@ -54,8 +55,8 @@ for i=1:length(structPathsTestImages)
     
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
-    [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages...
-        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
+    [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
+        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])

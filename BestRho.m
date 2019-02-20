@@ -19,6 +19,7 @@ pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_reg9/test_first_labe
 
 % parameters
 targetResolution = [1 1 1];
+rescale = 0;
 cropImage = 1;
 margin = 30;
 rho = 0.5;
@@ -54,8 +55,8 @@ for i=1:5
     
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
-    [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages...
-        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
+    [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
+        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])

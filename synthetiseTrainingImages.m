@@ -1,5 +1,5 @@
-function [pathDirSyntheticImages, pathDirSyntheticLabels] = synthetiseTrainingImages(pathRefImage, pathFirstLabels, pathDirTrainingLabels,...
-    pathClassesTable, targetRes, recompute, freeSurferHome, niftyRegHome, debug)
+function [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages(pathRefImage, pathFirstLabels, pathDirTrainingLabels,...
+    pathClassesTable, targetRes, recompute, freeSurferHome, niftyRegHome, debug, rescale)
 
 % files handling
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
@@ -8,6 +8,10 @@ refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
 pathTempImageSubfolder = fullfile(fileparts(structPathsTrainingLabels(1).folder), ['temp_' refBrainNum]);
 if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 pathStatsMatrix = fullfile(pathTempImageSubfolder, 'ClassesStats.mat');
+
+if rescale
+    pathRefImage = rescaleIntensities(pathImage, refBrainNum, recompute);
+end
 
 % compute stats from reference image
 classesStats = computeIntensityStats(pathRefImage, pathFirstLabels, pathClassesTable, pathStatsMatrix, recompute);
