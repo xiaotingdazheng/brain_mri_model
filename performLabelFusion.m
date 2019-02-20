@@ -38,7 +38,7 @@ segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNu
 % initialising with zeros to start image with background label
 if reduceLabelMap
     labelMap = zeros(length(labelsList), length(brainIndices), 'single');
-    labelMapHippo = zeros(length(labelsList), 2, 'single');
+    labelMapHippo = zeros(2, length(brainIndices), 'single');
 else
     labelMap = zeros([size(croppedRefMaskedImage), length(labelsList)], 'single');
     labelMapHippo = zeros([size(croppedRefMaskedImage), 2], 'single');

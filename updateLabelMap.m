@@ -69,15 +69,15 @@ switch labelPriorType
             labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
             
             % same mechanism for hipocampus logOdds
-%             unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
-%             partitionFunction = zeros(1, length(brainVoxels), 'single');
-%             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
-%             [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-%                 cropping, 1, reduceLabelMap, brainVoxels);
-%             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_hippo.nii.gz');
-%             [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-%                 cropping, 2, reduceLabelMap, brainVoxels);
-%             labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+            unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
+            partitionFunction = zeros(1, length(brainIndices), 'single');
+            temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
+            [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
+                cropping, 1, reduceLabelMap, brainIndices);
+            temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_hippo.nii.gz');
+            [unmargenalisedPosterior, partitionFunction] = processLogOdds2(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
+                cropping, 2, reduceLabelMap, brainIndices);
+            labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
             
         else
             
