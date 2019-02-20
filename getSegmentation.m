@@ -1,4 +1,5 @@
-function [pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum, cropping, brainIndices, sizeSegmentationMap)
+function [pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum,...
+    voxelSelection, sizeSegmentationMap)
 
 % This function performs the argmax operation on the labels posterior
 % probability, to obtain the most probable segmentation. It takes as inputs
@@ -18,7 +19,7 @@ SegmentationMaskMRI.vox2ras0 = z; % initialse nifty files to be saved
 
 disp('finding most likely segmentation and calculating corresponding accuracy');
 
-if cropping
+if length(voxelSelection) == 6
     
     % argmax on labelMap to get final segmentation
     [~,index] = max(labelMap, [], 4);
@@ -34,13 +35,13 @@ else
     [~,index] = max(labelMap, [], 1);
     voxelLabels = arrayfun(@(x) labelsList(x), index);
     labelMap = zeros(sizeSegmentationMap, 'single');
-    labelMap(brainIndices) = voxelLabels;
+    labelMap(voxelSelection) = voxelLabels;
     
     % argmax on labelMapHippo to get final hippocampus segmentation
     [~,index] = max(labelMapHippo, [], 1);
     voxelLabels = arrayfun(@(x) hippoLabelList(x), index);
     labelMapHippo = zeros(sizeSegmentationMap, 'single');
-    labelMapHippo(brainIndices) = voxelLabels;
+    labelMapHippo(voxelSelection) = voxelLabels;
     
 end
 

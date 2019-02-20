@@ -61,12 +61,12 @@ for i=1:length(structPathsTestImages)
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
-    [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion...
+    [pathSegmentation, pathHippoSegmentation, voxelSelection] = performLabelFusion...
         (pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');
-    accuracies{i} = computeSegmentationAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, cropping);
+    accuracies{i} = computeSegmentationAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, voxelSelection);
     
 end
 

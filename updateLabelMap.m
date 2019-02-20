@@ -1,5 +1,5 @@
 function [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels,...
-    pathRegisteredFloatingHippoLabels, pathRegisteredLogOddsSubfolder, labelsList, cropping, sigma, labelPriorType, brainIndices)
+    pathRegisteredFloatingHippoLabels, pathRegisteredLogOddsSubfolder, labelsList, voxelSelection, sigma, labelPriorType)
 
 % This function updates the labelMap matrix on which we will perform the
 % argmax operation to obatin the best segmentation possible. The update
@@ -18,8 +18,9 @@ disp('cropping registered floating labels and updating sum of posteriors');
 % read registered floating image and crop it around hippocampus
 registeredFloatingImage = MRIread(pathRegisteredFloatingImage);
 croppedRegisteredFloatingImage = single(registeredFloatingImage.vol);
-if cropping
-    croppedRegisteredFloatingImage = croppedRegisteredFloatingImage(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
+if length(voxelSelection) == 6
+    croppedRegisteredFloatingImage = ...
+        croppedRegisteredFloatingImage(voxelSelection(1):voxelSelection(2), voxelSelection(3):voxelSelection(4), voxelSelection(5):voxelSelection(6));
 end
 croppedRegisteredFloatingImage(croppedRegisteredFloatingImage<0) = 0;
 
@@ -33,8 +34,9 @@ switch labelPriorType
         % crop registered floating labels and upadte labelMap
         registeredFloatingLabels = MRIread(pathRegisteredFloatingLabels);
         croppedRegisteredFloatingLabels = registeredFloatingLabels.vol;
-        if cropping
-            croppedRegisteredFloatingLabels = single(croppedRegisteredFloatingLabels(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6)));
+        if length(voxelSelection) == 6
+            croppedRegisteredFloatingLabels = ...
+                single(croppedRegisteredFloatingLabels(voxelSelection(1):voxelSelection(2), voxelSelection(3):voxelSelection(4), voxelSelection(5):voxelSelection(6)));
         end
         for k=1:length(labelsList)
             labelPrior = (croppedRegisteredFloatingLabels == labelsList(k)); % binary map of label k
@@ -44,8 +46,9 @@ switch labelPriorType
         % same mechanism for hippocampus map
         registeredFloatingHippoLabels = MRIread(pathRegisteredFloatingHippoLabels);
         croppedRegisteredFloatingHippoLabels = single(registeredFloatingHippoLabels.vol);
-        if cropping
-            croppedRegisteredFloatingHippoLabels = croppedRegisteredFloatingHippoLabels(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
+        if length(voxelSelection) == 6
+            croppedRegisteredFloatingHippoLabels = ...
+                croppedRegisteredFloatingHippoLabels(voxelSelection(1):voxelSelection(2), voxelSelection(3):voxelSelection(4), voxelSelection(5):voxelSelection(6));
         end
         labelPrior = (croppedRegisteredFloatingHippoLabels == 0); 
         labelMapHippo(:,:,:,1) = labelMapHippo(:,:,:,1) + labelPrior.*likelihood;
@@ -55,7 +58,7 @@ switch labelPriorType
     case 'logOdds'
         
         % initialisation
-        if cropping, sizePartitionFunction = size(croppedRefMaskedImage); else, sizePartitionFunction = [1, length(brainIndices)]; end
+        if length(voxelSelection) == 6, sizePartitionFunction = size(croppedRefMaskedImage); else, sizePartitionFunction = [1, length(voxelSelection)]; end
         unmargenalisedPosterior = zeros(size(labelMap), 'single');
         partitionFunction = zeros(sizePartitionFunction, 'single');
         
@@ -63,7 +66,7 @@ switch labelPriorType
         for k=1:length(labelsList)
             temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
             [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-                cropping, k, brainIndices);
+                voxelSelection, k);
         end
         %update labelMap with marginalised posterior
         labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
@@ -73,10 +76,10 @@ switch labelPriorType
         partitionFunction = zeros(sizePartitionFunction, 'single');
         temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_non_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-            cropping, 1, brainIndices);
+            voxelSelection, 1);
         temp_pathLogOdds = fullfile(pathRegisteredLogOddsSubfolder, 'logOdds_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-            cropping, 2, brainIndices);
+            voxelSelection, 2);
         labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
 end
@@ -84,21 +87,21 @@ end
 end
 
 function [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, ...
-    cropping, index, brainVoxels)
+    voxelSelection, index)
 
 % load logOdds and crop it around ROI
 MRILogOdds = MRIread(temp_pathLogOdds);
 labelPrior = single(MRILogOdds.vol);
 
-if cropping
-    labelPrior = labelPrior(cropping(1):cropping(2), cropping(3):cropping(4), cropping(5):cropping(6));
+if length(voxelSelection) == 6
+    labelPrior = labelPrior(voxelSelection(1):voxelSelection(2), voxelSelection(3):voxelSelection(4), voxelSelection(5):voxelSelection(6));
     % update marginalisation over all labels and compute posterior
     partitionFunction = partitionFunction + labelPrior;
     unmargenalisedPosterior(:,:,:,index) = labelPrior.*likelihood;
 else
     posterior = labelPrior.*likelihood;
-    partitionFunction = partitionFunction + labelPrior(brainVoxels);
-    unmargenalisedPosterior(index,:) = posterior(brainVoxels);
+    partitionFunction = partitionFunction + labelPrior(voxelSelection);
+    unmargenalisedPosterior(index,:) = posterior(voxelSelection);
 end
 
 end
