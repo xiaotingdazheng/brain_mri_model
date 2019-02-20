@@ -1,5 +1,5 @@
 function [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion...
-    (pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug, reduceLabelMap)
+    (pathRefImage, pathFirstRefLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug)
 
 % hardcoded parameters
 labelsList = [0,2,3,4,5,7,8,10,11,12,13,14,15,16,18,24,26,28,30,31,41,42,43,44,46,47,49,50,51,52,54,...
@@ -32,16 +32,16 @@ segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNu
 
 % preparing the reference image for label fusion (masking and cropping)
 [pathRefMaskedImage, croppedRefMaskedImage, cropping, brainIndices] = prepareRefImageAndLabels(pathRefImage, pathFirstRefLabels, cropImage, margin, ...
-    preprocessedRefBrainFolder, freeSurferHome, reduceLabelMap);
+    preprocessedRefBrainFolder, freeSurferHome);
 
 % initialise matrix on which label fusion will be performed
 % initialising with zeros to start image with background label
-if reduceLabelMap
-    labelMap = zeros(length(labelsList), length(brainIndices), 'single');
-    labelMapHippo = zeros(2, length(brainIndices), 'single');
-else
+if cropping
     labelMap = zeros([size(croppedRefMaskedImage), length(labelsList)], 'single');
     labelMapHippo = zeros([size(croppedRefMaskedImage), 2], 'single');
+else
+    labelMap = zeros(length(labelsList), length(brainIndices), 'single');
+    labelMapHippo = zeros(2, length(brainIndices), 'single');
 end
 
 
@@ -73,12 +73,12 @@ for i=1:length(structPathsFloatingImages)
     
     % perform summation of posterior on the fly
     [labelMap, labelMapHippo] = updateLabelMap(labelMap, labelMapHippo, croppedRefMaskedImage, pathRegisteredFloatingImage, pathRegisteredFloatingLabels, ...
-        pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType, reduceLabelMap, brainIndices);
+        pathRegisteredFloatingHippoLabels, registeredLogOddsSubFolder, labelsList, cropping, sigma, labelPriorType, brainIndices);
     
 end
 
 sizeSegmentationMap = size(croppedRefMaskedImage);
-[pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum, reduceLabelMap, brainIndices, sizeSegmentationMap); % argmax operation
+[pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum, cropping, brainIndices, sizeSegmentationMap); % argmax operation
 
 if deleteSubfolder, rmdir(tempImageSubfolder,'s'); end
 

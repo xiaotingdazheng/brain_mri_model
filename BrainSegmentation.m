@@ -28,7 +28,6 @@ labelPriorType = 'logOdds'; % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;        % delete subfolder after having segmented an image
 recompute = 0;              % recompute files, even if they exist (0-1)
 debug = 1;                  % display debug information from registrations
-reduceLabelMap = 1;
 registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -omp 3 -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,7 +62,7 @@ for i=1:length(structPathsTestImages)
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, cropping] = performLabelFusion...
-        (pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug, reduceLabelMap);
+        (pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');
