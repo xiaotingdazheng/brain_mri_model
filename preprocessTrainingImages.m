@@ -8,7 +8,7 @@ refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.ni
 pathTempImageSubfolder = fullfile(fileparts(structPathsTrainingLabels(1).folder), ['temp_' refBrainNum]);
 if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 
-% create images from stats using training labels
+% downsample image and labels at target resolution
 for i=1:length(structPathsTrainingLabels)
     
     disp(['% preprocessing ' structPathsTrainingLabels(i).name])

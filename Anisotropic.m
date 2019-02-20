@@ -16,7 +16,7 @@ pathDirResultLabels = '~/data/CobraLab/labels/rotated_anisotropic_merged_low_res
 % parameters
 targetRes = [0.6 0.6 2];
 coronalDim = 3;
-recompute = 0;
+recompute = 1;
 debug = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
