@@ -1,8 +1,9 @@
 function pathNewImage = rescaleIntensities(pathImage, refBrainNum, recompute)
 
-[folder, name, ~] = fileparts(pathImage);
+[folder, name, ext] = fileparts(pathImage);
 rescaledImagesFolder = fullfile(fileparts(folder), 'rescaled_test_images');
-pathNewImage = fullfile(rescaledImagesFolder, name);
+pathNewImage = fullfile(rescaledImagesFolder, [name ext]);
+if ~exist(rescaledImagesFolder, 'dir'), mkdir(rescaledImagesFolder); end
 
 if ~exist(pathNewImage, 'file') || recompute
     

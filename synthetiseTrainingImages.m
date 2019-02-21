@@ -10,7 +10,7 @@ if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 pathStatsMatrix = fullfile(pathTempImageSubfolder, 'ClassesStats.mat');
 
 if rescale
-    pathRefImage = rescaleIntensities(pathImage, refBrainNum, recompute);
+    pathRefImage = rescaleIntensities(pathRefImage, refBrainNum, recompute);
 end
 
 % compute stats from reference image
