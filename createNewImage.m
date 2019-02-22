@@ -52,7 +52,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     % create new image by sampling from intensity prob distribution
     newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
     % blur and save isotropic image
-    blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, minTargetRes, pathNewImage)
+    blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, minTargetRes, pathNewImage, trainingLabelsMRI.vol)
     % save image and labels at target resolution
     downsample(pathNewImage, pathNewSegmMap, trainingLabelsMRI.fspec, pathFirstLabels, pathRefImage, refImageRes, minTargetRes, isFinalImageAnisotropic, freeSurferHome);
     
@@ -113,15 +113,20 @@ new_image(new_image <0) = 0;
 
 end
 
-function blurAndSave(new_image, labelsMRI, inputImageRes, targetRes, pathNewImage)
+function blurAndSave(new_image, labelsMRI, inputImageRes, targetRes, pathNewImage, labels)
 
 % blurring images
 disp('blurring image to prevent alliasing');
 f = targetRes./inputImageRes;
 sigmaFilt = 0.9*f;
-
+sigmaFilt = circshift(sigmaFilt, 2);
 new_image2 = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
 new_image2(new_image2 <0) = 0;
+
+% pixdim = inputImageRes;
+% imageMask = labels > 0;
+% new_image3 = GaussFilt3dMask(new_image, imageMask, sigmaFilt, pixdim);
+% new_image3(new_image3<0)=0;
 
 % save temporary image (at sampling resolution)
 disp('writting created high resolution image');
