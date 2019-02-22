@@ -7,16 +7,15 @@ freeSurferHome = '/usr/local/freesurfer/';
 
 % paths folders containing to process
 pathDirRotatedImages = '~/data/CobraLab/images/brains_t2/rotated_images/*nii.gz';
-pathDirOriginalLabels = '~/data/CobraLab/labels/merged_high_res/*nii.gz';
+pathDirOriginalLabels = '~/data/CobraLab/labels/original_low_res/*nii.gz';
 
 % paths result folders
 pathDirResultImages = '~/data/CobraLab/images/brains_t2/anisotropic_images';
-pathDirResultLabels = '~/data/CobraLab/labels/rotated_anisotropic_merged_low_res';
+pathDirResultLabels = '~/data/CobraLab/labels/rotated_anisotropic_high_res';
 
 % parameters
-targetRes = [0.6 0.6 2];
-coronalDim = 3;
-recompute = 1;
+targetRes = [0.6 2.0 0.6];
+recompute = 0;
 debug = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,13 +47,13 @@ for i=1:length(structPathsRotatedImages)
         
         % define sigma and kernel size
         disp('defining sigma and kernel size');
-        sampleRes = [mri.xsize mri.ysize mri.zsize];
-        f=targetRes./sampleRes;
-        sigmaFilt=0.9*f;
-        sigma = sigmaFilt(coronalDim);
-        sizeCoronalMask = 2*ceil(2*sigmaFilt(coronalDim))+1;
+        [targetRes, coronalDim] = max(targetRes);
+        sampleRes = [mri.xsize mri.ysize mri.zsize]; sampleRes = sampleRes(coronalDim);
+        sigma = 0.9*targetRes./sampleRes;
+        sizeCoronalMask = 2*ceil(2*sigma)+1;
         sizeConvMask = ones(1,3);
         sizeConvMask(coronalDim) = sizeCoronalMask;
+        if coronalDim == 1 || coronalDim == 2, sizeCoronalMask([1 2]) = sizeCoronalMask([2 1]); end
         
         % blur image
         disp('blurring image');
