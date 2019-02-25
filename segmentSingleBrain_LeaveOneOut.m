@@ -5,10 +5,8 @@ fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' '
 tic
 
 % add paths for additionnal functions
-% freeSurferHome = '/share/apps/freesurfer';
-% niftyRegHome = '/home/bbillot/.local/NiftyReg/bin/';
-freeSurferHome = '/usr/local/freesurfer/';
-niftyRegHome = '/usr/local/nifty_reg/';
+freeSurferHome = '/share/apps/freesurfer';
+niftyRegHome = '/home/bbillot/.local/NiftyReg/bin/';
 
 % define paths
 pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/training_labels/*nii.gz'; % training labels
@@ -25,8 +23,8 @@ sigma = 15;                       % var for Gaussian likelihhod
 labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
 recompute = 1;                    % recompute files, even if they exist (0-1)
-debug = 1;                        % display debug information from registrations
-registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -omp 3 -voff'; % registration parameters
+debug = 0;                        % display debug information from registrations
+registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
