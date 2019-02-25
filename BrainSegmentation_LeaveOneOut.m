@@ -20,8 +20,8 @@ pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_a
 % parameters
 targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
 rescale = 0;                      % rescale intensities between 0 and 255 (0-1)
-cropImage = 1;                    % perform cropping around hippocampus (0-1)
-margin = 30;                      % cropping margin
+cropImage = 0;                    % perform cropping around hippocampus (0-1)
+margin = 10;                      % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
 rho = 0.5;                        % exponential decay for logOdds maps
 threshold = 0.1;                  % lower bound for logOdds maps
 sigma = 15;                       % var for Gaussian likelihhod

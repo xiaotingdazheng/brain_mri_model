@@ -5,7 +5,7 @@ function [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthe
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
 idx = regexp(pathRefImage,'brain');
 refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
-pathTempImageSubfolder = fullfile(fileparts(structPathsTrainingLabels(1).folder), ['temp_' refBrainNum]);
+pathTempImageSubfolder = fullfile(fileparts(fileparts(pathRefImage)), ['temp_' refBrainNum]);
 preprocessedRefBrainFolder = fullfile(pathTempImageSubfolder, 'test_images_preprocessed');
 if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 pathStatsMatrix = fullfile(pathTempImageSubfolder, 'ClassesStats.mat');

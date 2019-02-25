@@ -21,7 +21,7 @@ pathClassesTable = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/cl
 targetResolution = [1 1 1]; % resolution of synthetic images
 rescale = 0;                % rescale intensities between 0 and 255 (0-1)
 cropImage = 0;              % perform cropping around hippocampus (0-1)
-margin = 10;                % cropping margin
+margin = 10;                % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
 rho = 0.5;                  % exponential decay for logOdds maps
 threshold = 0.1;            % lower bound for logOdds maps
 sigma = 15;                 % var for Gaussian likelihhod

@@ -20,7 +20,7 @@ pathDirTrainingLabels = '~/data/OASIS/label_fusions/label_fusion_FS_real/trainin
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images
 cropImage = 1;              % perform cropping around hippocampus (0-1)
-margin = 30;                % cropping margin
+margin = 30;                % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
 rho = 0.5;                  % exponential decay for logOdds maps
 threshold = 0.1;            % lower bound for logOdds maps
 sigma = 150;                % var for Gaussian likelihhod
