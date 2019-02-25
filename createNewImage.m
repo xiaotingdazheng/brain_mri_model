@@ -69,7 +69,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
         % create new image by sampling from intensity prob distribution
         newImage = sampleIntensities(registeredTrainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, anisotropicTrainingLabelsRes);
         % blurring images
-        blurAndSave(newImage, registeredTrainingLabelsMRI, anisotropicTrainingLabelsRes, targetRes, pathNewImage);
+        blurAndSave(newImage, registeredTrainingLabelsMRI, anisotropicTrainingLabelsRes, targetRes, pathNewImage, registeredTrainingLabelsMRI.vol);
         % downsample to target resolution
         downsample(pathNewImage, pathNewSegmMap, registeredTrainingLabelsMRI.fspec, pathFirstLabels, pathRefImage, refImageRes, targetRes, 0, freeSurferHome);
         
@@ -115,22 +115,26 @@ end
 
 function blurAndSave(new_image, labelsMRI, inputImageRes, targetRes, pathNewImage, labels)
 
-% blurring images
+% initialisation 
 disp('blurring image to prevent alliasing');
-f = targetRes./inputImageRes;
-sigmaFilt = 0.9*f;
-sigmaFilt = circshift(sigmaFilt, 2);
-new_image2 = imgaussfilt3(new_image, sigmaFilt); %apply gaussian filter
-new_image2(new_image2 <0) = 0;
 
-% pixdim = inputImageRes;
-% imageMask = labels > 0;
-% new_image3 = GaussFilt3dMask(new_image, imageMask, sigmaFilt, pixdim);
-% new_image3(new_image3<0)=0;
+dilateShape = zeros(3,3,3); 
+dilateShape(2,2,2)=1;
+dist = bwdist(dilateShape);
+dilateShape(dist<=1)=1;
+imageMask = imdilate(imfill(labels > 0, 'holes'), dilateShape);
+
+f = targetRes./inputImageRes;
+sigmaFilt = 0.9*f; sigmaFilt([1 2]) = sigmaFilt([2 1]);
+pixdim = [1 1 1];
+
+% blurring images
+new_image = GaussFilt3dMask(new_image, imageMask, sigmaFilt, pixdim); %new blurring
+new_image(new_image<0)=0;
 
 % save temporary image (at sampling resolution)
 disp('writting created high resolution image');
-labelsMRI.vol = new_image2;
+labelsMRI.vol = new_image;
 MRIwrite(labelsMRI, pathNewImage); %write a new nifti file.
 
 end
@@ -184,8 +188,12 @@ pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [
 if ~exist(pathRegisteredTrainingLabelsSubfolder, 'dir'), mkdir(pathRegisteredTrainingLabelsSubfolder); end
 
 % linear registration
-cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -res ' pathTempRegisteredImage ' -aff ' aff ' -rigOnly -pad 0'];
+cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -res ' pathTempRegisteredImage ' -aff ' aff ' -ln 4 -lp 3 -rigOnly -pad 0'];
 if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
+
+% make it full with zeros
+cmd = ['mri_binarize --i ' pathTempRegisteredImage ' --o ' pathTempRegisteredImage ' --max -Inf'];
+[~,~] = system(cmd);
 
 % upsample to high resolution
 cmd = ['mri_convert ' pathTempRegisteredImage ' ' pathTempRegisteredImageHR ' --voxsize ' voxsizeTrainingLabelsHighRes];
