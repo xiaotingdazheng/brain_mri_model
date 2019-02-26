@@ -11,14 +11,15 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/usr/local/nifty_reg/';
 
 % define paths
-pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/test_images/*nii.gz';         % test images
-pathTestFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/test_first_labels/*nii.gz'; % FS labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/test_labels/*nii.gz';         % test labels for evaluation
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/training_labels/*nii.gz'; % training labels
-pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/classesTable.txt';             % table between labels and intensity classes
+pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/test_images/*nii.gz';         % test images
+pathRefFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/test_first_labels/*nii.gz';  % FS labels
+pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/test_labels/*nii.gz';         % test labels for evaluation
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/classesTable.txt';             % table labels vs intensity classes
 
 % parameters
 targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
+isotropicLabelFusion = 1;
 rescale = 0;                      % rescale intensities between 0 and 255 (0-1)
 cropImage = 0;                    % perform cropping around hippocampus (0-1)
 margin = 10;                      % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
@@ -39,7 +40,7 @@ addpath(genpath(pwd));
 
 % initialisation
 structPathsTestImages = dir(pathDirTestImages);
-structPathsFirstRefLabels = dir(pathTestFirstLabels);
+structPathsFirstRefLabels = dir(pathRefFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
 accuracies = cell(length(structPathsTestImages),1);
 labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
@@ -48,7 +49,7 @@ for i=1:length(structPathsTestImages)
     
     % paths of reference image and corresponding FS labels
     pathRefImage = fullfile(structPathsTestImages(i).folder, structPathsTestImages(i).name);
-    pathTestFirstLabels = fullfile(structPathsFirstRefLabels(i).folder, structPathsFirstRefLabels(i).name);
+    pathRefFirstLabels = fullfile(structPathsFirstRefLabels(i).folder, structPathsFirstRefLabels(i).name);
     pathRefLabels = fullfile(structPathsRefLabels(i).folder, structPathsRefLabels(i).name);
     
     idx = regexp(pathRefImage,'brain');
@@ -75,15 +76,20 @@ for i=1:length(structPathsTestImages)
     
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
-    [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
-        (pathRefImage, pathTestFirstLabels, temp_pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
+    [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages(pathRefImage, pathRefFirstLabels, temp_pathDirTrainingLabels,...
+        pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
+    
+    if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
+        [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels);
+    end
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
     pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
     pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
     [pathSegmentation, pathHippoSegmentation, voxelSelection] = performLabelFusion...
-        (pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
+        (pathRefImage, pathRefFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');

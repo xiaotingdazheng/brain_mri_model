@@ -9,8 +9,8 @@ freeSurferHome = '/share/apps/freesurfer';
 niftyRegHome = '/home/bbillot/.local/NiftyReg/bin/';
 
 % define paths
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/training_labels/*nii.gz'; % training labels
-pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synthetic_rescaled_anisotropic/classesTable.txt';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/test/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/test/classesTable.txt';
 
 % parameters
 targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
@@ -33,8 +33,8 @@ refBrainNum = pathTestImage(idx(end):regexp(pathTestImage,'.nii.gz')-1);
 disp(['%%% Processing test ' refBrainNum]); disp(' ');
 
 % add paths of freesurfer functions and toolobox
-addpath(fullfile(freeSurferHome, 'matlab/'));
-addpath(genpath(pwd));
+% addpath(fullfile(freeSurferHome, 'matlab/'));
+% addpath(genpath(pwd));
 
 % initialisation
 pathRefImage = pathTestImage;
