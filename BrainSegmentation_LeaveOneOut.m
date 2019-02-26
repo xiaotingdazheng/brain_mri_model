@@ -27,8 +27,8 @@ threshold = 0.1;                  % lower bound for logOdds maps
 sigma = 15;                       % var for Gaussian likelihhod
 labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
-recompute = 1;                    % recompute files, even if they exist (0-1)
-debug = 1;                        % display debug information from registrations
+recompute = 0;                    % recompute files, even if they exist (0-1)
+debug = 0;                        % display debug information from registrations
 registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,30 +41,42 @@ addpath(genpath(pwd));
 structPathsTestImages = dir(pathDirTestImages);
 structPathsFirstRefLabels = dir(pathTestFirstLabels);
 structPathsRefLabels = dir(pathDirTestLabels);
-structPathsTrainingLabels = dir(pathDirTrainingLabels);
 accuracies = cell(length(structPathsTestImages),1);
 labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
 
 for i=1:length(structPathsTestImages)
-    
-    disp(['%%% Processing test brain ' structPathsTestImages(i).name]); disp(' ');
     
     % paths of reference image and corresponding FS labels
     pathRefImage = fullfile(structPathsTestImages(i).folder, structPathsTestImages(i).name);
     pathTestFirstLabels = fullfile(structPathsFirstRefLabels(i).folder, structPathsFirstRefLabels(i).name);
     pathRefLabels = fullfile(structPathsRefLabels(i).folder, structPathsRefLabels(i).name);
     
-    % convert labels corresponding to test image into mgz
-    pathRefTrainingLabelsNifty = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-    pathRefTrainingLabelsMgz = strrep(pathRefTrainingLabelsNifty, '.nii.gz', '.mgz');
-    cmd1 = ['mri_convert ' pathRefTrainingLabelsNifty ' ' pathRefTrainingLabelsMgz];
-    cmd2 = ['rm ' pathRefTrainingLabelsNifty];
-    [~,~] = system(cmd1); [~,~] = system(cmd2);
+    idx = regexp(pathRefImage,'brain');
+    refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
+    disp(['%%% Processing ' refBrainNum]); disp(' ');
+    
+    % copies training labels to temp folder and erase labels corresponding to test image
+    pathTempImageSubfolder = fullfile(fileparts(fileparts(pathDirTrainingLabels)), ['temp_' refBrainNum]);
+    if ~exist(pathTempImageSubfolder,'dir'), mkdir(pathTempImageSubfolder); end
+    cmd = ['rm -r ' fullfile(pathTempImageSubfolder, 'training_labels')];
+    [~,~] = system(cmd);
+    cmd = ['cp -r ' fileparts(pathDirTrainingLabels) ' ' fullfile(pathTempImageSubfolder, 'training_labels')];
+    [~,~] = system(cmd);
+    temp_pathDirTrainingLabels = fullfile(pathTempImageSubfolder, 'training_labels', '*nii.gz');
+    temp_structPathsTrainingLabels = dir(temp_pathDirTrainingLabels);
+    for j=1:length(temp_structPathsTrainingLabels)
+        if contains(temp_structPathsTrainingLabels(j).name, refBrainNum)
+            pathRefTrainingLabels = fullfile(temp_structPathsTrainingLabels(j).folder, temp_structPathsTrainingLabels(j).name);
+            cmd = ['rm ' pathRefTrainingLabels];
+            [~,~] = system(cmd);
+            break
+        end
+    end
     
     % floating images generation
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
     [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
-        (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
+        (pathRefImage, pathTestFirstLabels, temp_pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])
@@ -76,11 +88,6 @@ for i=1:length(structPathsTestImages)
     % evaluation
     disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');
     accuracies{i} = computeSegmentationAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, voxelSelection);
-    
-    % convert labels corresponding to test image back into nii.gz
-    cmd3 = ['mri_convert ' pathRefTrainingLabelsMgz ' ' pathRefTrainingLabelsNifty];
-    cmd4 = ['rm ' pathRefTrainingLabelsMgz];
-    [~,~] = system(cmd3); [~,~] = system(cmd4);
     
 end
 
