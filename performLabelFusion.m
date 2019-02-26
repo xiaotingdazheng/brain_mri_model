@@ -26,7 +26,7 @@ mainFolder = fileparts(tempImageSubfolder);
 hippoLabelsFolder = fullfile(tempImageSubfolder, 'hippo_labels_delta');
 logOddsFolder = fullfile(tempImageSubfolder,'logOdds');
 registrationFolder = fullfile(tempImageSubfolder, 'registrations');
-preprocessedRefBrainFolder = fullfile(tempImageSubfolder, 'test_images_preprocessed');
+preprocessedRefBrainFolder = fullfile(tempImageSubfolder, 'test_image_preprocessed');
 maskedTrainingImagesFolder = fullfile(tempImageSubfolder, 'training_images_masked');
 segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNum]);
 
