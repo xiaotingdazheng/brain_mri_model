@@ -19,6 +19,7 @@ pathClassesTable = '~/data/OASIS/label_fusions/label_fusion_reduced_label_map/cl
 
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images
+isotropicLabelFusion = 1;
 rescale = 0;                % rescale intensities between 0 and 255 (0-1)
 cropImage = 0;              % perform cropping around hippocampus (0-1)
 margin = 10;                % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
@@ -57,6 +58,13 @@ for i=1:length(structPathsTestImages)
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
     [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
         (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
+    
+    % upsampling to isotropic resolution
+    disp('%% upsampling to isotropic resolution');
+    if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
+        [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
+    end
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])

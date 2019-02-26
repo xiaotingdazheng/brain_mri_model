@@ -19,6 +19,7 @@ pathDirTestLabels = '/home/benjamin/data/OASIS/label_fusion_reg9/test_first_labe
 
 % parameters
 targetResolution = [1 1 1];
+isotropicLabelFusion = 1;
 rescale = 0;
 cropImage = 1;
 margin = 30;
@@ -57,6 +58,13 @@ for i=1:5
     disp(['%% synthetising images for ' structPathsTestImages(i).name])
     [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
         (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
+    
+    % upsampling to isotropic resolution
+    disp('%% upsampling to isotropic resolution');
+    if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
+        [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
+    end
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])

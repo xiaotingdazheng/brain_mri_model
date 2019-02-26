@@ -1,4 +1,4 @@
-function accuracies = segmentSingleBrain_LeaveOneOut(pathTestImage, pathTestFirstLabels, pathTestLabels)
+function accuracies = segmentSingleBrain_LeaveOneOut(pathRefImage, pathRefFirstLabels, pathRefLabels)
 
 now = clock;
 fprintf('Started on %d/%d at %dh%d\n', now(3), now(2), now(4), now(5)); disp(' ');
@@ -14,6 +14,7 @@ pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/test/classesTable.tx
 
 % parameters
 targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
+isotropicLabelFusion = 1;
 rescale = 0;                      % rescale intensities between 0 and 255 (0-1)
 cropImage = 0;                    % perform cropping around hippocampus (0-1)
 margin = 15;                      % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
@@ -22,24 +23,22 @@ threshold = 0.1;                  % lower bound for logOdds maps
 sigma = 15;                       % var for Gaussian likelihhod
 labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
-recompute = 1;                    % recompute files, even if they exist (0-1)
+recompute = 0;                    % recompute files, even if they exist (0-1)
 debug = 0;                        % display debug information from registrations
 registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-idx = regexp(pathTestImage,'brain');
-refBrainNum = pathTestImage(idx(end):regexp(pathTestImage,'.nii.gz')-1);
+idx = regexp(pathRefImage,'brain');
+refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
 disp(['%%% Processing test ' refBrainNum]); disp(' ');
 
 % add paths of freesurfer functions and toolobox
-% addpath(fullfile(freeSurferHome, 'matlab/'));
-% addpath(genpath(pwd));
+addpath(fullfile(freeSurferHome, 'matlab/'));
+addpath(genpath(pwd));
 
 % initialisation
-pathRefImage = pathTestImage;
-pathRefLabels = pathTestLabels;
-pathAccuraciesSubfolder = fullfile(fileparts(fileparts(pathTestImage)), 'accuracies');
+pathAccuraciesSubfolder = fullfile(fileparts(fileparts(pathRefImage)), 'accuracies');
 if ~exist(pathAccuraciesSubfolder, 'dir'), mkdir(pathAccuraciesSubfolder); end
 pathAccuracies = fullfile(pathAccuraciesSubfolder, ['accuracy_' refBrainNum '.mat']);
 labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
@@ -65,14 +64,21 @@ end
 % floating images generation
 disp(['%% synthetising images for ' refBrainNum])
 [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages...
-    (pathRefImage, pathTestFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
+    (pathRefImage, pathRefFirstLabels, pathDirTrainingLabels, pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
+
+% upsampling to isotropic resolution
+disp('%% upsampling to isotropic resolution');
+if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
+    [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
+        (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
+end
 
 % labelFusion
 disp(' '); disp(['%% segmenting ' refBrainNum])
 pathDirFloatingImages = fullfile(pathDirSyntheticImages, '*nii.gz');
 pathDirFloatingLabels = fullfile(pathDirSyntheticLabels, '*nii.gz');
 [pathSegmentation, pathHippoSegmentation, voxelSelection] = performLabelFusion...
-    (pathRefImage, pathTestFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
+    (pathRefImage, pathRefFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
 
 % evaluation
 disp(' '); disp(['%% evaluating ' refBrainNum]); disp(' '); disp(' ');

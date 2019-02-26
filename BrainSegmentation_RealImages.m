@@ -19,6 +19,7 @@ pathDirTrainingLabels = '~/data/OASIS/label_fusions/label_fusion_FS_real/trainin
 
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images
+isotropicLabelFusion = 1;
 cropImage = 1;              % perform cropping around hippocampus (0-1)
 margin = 30;                % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
 rho = 0.5;                  % exponential decay for logOdds maps
@@ -56,6 +57,13 @@ for i=1:length(structPathsTestImages)
     disp(['%% preprocessing images for ' structPathsTestImages(i).name])
     [pathDirFloatingImages, pathDirFloatingLabels] = preprocessTrainingImages...
         (pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute, freeSurferHome);
+    
+    % upsampling to isotropic resolution
+    disp('%% upsampling to isotropic resolution');
+    if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
+        [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
+    end
     
     % labelFusion
     disp(' '); disp(['%% segmenting ' structPathsTestImages(i).name])

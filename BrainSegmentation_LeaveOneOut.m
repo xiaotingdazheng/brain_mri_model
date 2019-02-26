@@ -79,9 +79,11 @@ for i=1:length(structPathsTestImages)
     [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthetiseTrainingImages(pathRefImage, pathRefFirstLabels, temp_pathDirTrainingLabels,...
         pathClassesTable, targetResolution, recompute, freeSurferHome, niftyRegHome, debug, rescale);
     
+    % upsampling to isotropic resolution
+    disp('%% upsampling to isotropic resolution');
     if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
         [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
-            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels);
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
     end
     
     % labelFusion
