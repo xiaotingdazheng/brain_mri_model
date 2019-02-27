@@ -1,5 +1,5 @@
 function [pathNewRefImage, pathNewRefFirstLabels, pathNewRefLabels] = upsampleToIsotropic(pathDirSyntheticImages, pathDirSyntheticLabels,...
-    pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution)
+    pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution, recompute)
 
 % struct of floating images/labels
 structPathsSyntheticImages = dir(pathDirSyntheticImages);
@@ -19,14 +19,20 @@ pathNewRefLabels = fullfile(pathDirPreprocessedRefLabels, ['upsampled_' name ext
 isotropicResolutionStr = repmat([num2str(min(targetResolution),'%.1f') ' '], 1, 3);
 
 % upsample ref image
-cmd = ['mri_convert ' pathRefImage ' ' pathNewRefImage ' --voxsize ' isotropicResolutionStr ' -rt nearest -odt float'];
-[~,~]=system(cmd);
-% upsample ref image
-cmd = ['mri_convert ' pathRefFirstLabels ' ' pathNewRefFirstLabels ' --voxsize ' isotropicResolutionStr ' -rt nearest -odt float'];
-[~,~]=system(cmd);
-% upsample ref image
-cmd = ['mri_convert ' pathRefLabels ' ' pathNewRefLabels ' --voxsize ' isotropicResolutionStr ' -rt nearest -odt float'];
-[~,~]=system(cmd);
+if ~exist(pathNewRefImage, 'file') || recompute
+    cmd = ['mri_convert ' pathRefImage ' ' pathNewRefImage ' --voxsize ' isotropicResolutionStr ' -odt float'];
+    [~,~]=system(cmd);
+end
+% upsample ref first labels
+if ~exist(pathNewRefFirstLabels, 'file') || recompute
+    cmd = ['mri_convert ' pathRefFirstLabels ' ' pathNewRefFirstLabels ' --voxsize ' isotropicResolutionStr ' -rt nearest -odt float'];
+    [~,~]=system(cmd);
+end
+% upsample ref labels
+if ~exist(pathNewRefLabels, 'file') || recompute
+    cmd = ['mri_convert ' pathRefLabels ' ' pathNewRefLabels ' --voxsize ' isotropicResolutionStr ' -rt nearest -odt float'];
+    [~,~]=system(cmd);
+end
 % upsample floating images
 for i=1:length(structPathsSyntheticImages)
     pathSyntheticImage = fullfile(structPathsSyntheticImages(i).folder, structPathsSyntheticImages(i).name);
