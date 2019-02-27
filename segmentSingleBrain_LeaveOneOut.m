@@ -9,8 +9,8 @@ freeSurferHome = '/share/apps/freesurfer';
 niftyRegHome = '/home/bbillot/.local/NiftyReg/bin/';
 
 % define paths
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled/training_labels/*nii.gz'; % training labels
-pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled/classesTable.txt';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_cluster_rerun/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_cluster_rerun/classesTable.txt';
 
 % parameters
 targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
@@ -25,7 +25,7 @@ labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function'
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
 recompute = 0;                    % recompute files, even if they exist (0-1)
 debug = 0;                        % display debug information from registrations
-registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -voff'; % registration parameters
+registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
