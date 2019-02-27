@@ -4,7 +4,7 @@ fprintf('Started on %d/%d at %dh%02d\n', now(3), now(2), now(4), now(5)); disp('
 tic
 
 % experiment title
-title = 'label fusion on CobraLab anisotropic T2';
+title = 'label fusion on CobraLab upsampled anisotropic T2';
 
 % add paths for additionnal functions
 freeSurferHome = '/usr/local/freesurfer/';
