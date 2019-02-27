@@ -13,40 +13,33 @@ switch labelPriorType
     
     case 'delta function'
         
-        disp(['applying ' floBrainNum '_to_' refBrainNum '.cpp.nii.gz to labels']);
         % define pathnames of used/saved files for label registration
         filename = [floBrainNum '_to_' refBrainNum];
         pathRegisteredFloatingLabels = fullfile(registrationSubfolder, [filename '.labels.nii.gz']); % path of registered segmentation map
         % apply registration to segmentation map
         if ~exist(pathRegisteredFloatingLabels, 'file') || recompute
+            disp(['applying ' floBrainNum ' to ' refBrainNum ' registration to labels']);
             cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingLabels ' -trans ' pathTransformation ' -res ' pathRegisteredFloatingLabels ' -pad 0 -inter 0 -voff'];
-            if debug
-                system(cmd);
-            else
-                [~,~] = system(cmd);
-            end
+            if debug, system(cmd); else, [~,~] = system(cmd); end
         end
         
         % same mechanism for hippocampus segmentation map
         pathRegisteredFloatingHippoLabels = fullfile(registrationSubfolder, [filename '.hippo_labels.nii.gz']); % path of registered segmentation map
-        % apply registration to segmentation map
         if ~exist(pathRegisteredFloatingHippoLabels, 'file') || recompute
             cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingHippoLabels ' -trans ' pathTransformation ' -res ' pathRegisteredFloatingHippoLabels ' -pad 0 -inter 0 -voff'];
-            if debug
-                system(cmd);
-            else
-                [~,~] = system(cmd);
-            end
+            if debug, system(cmd); else, [~,~] = system(cmd); end
         end
         
         registeredLogOddsSubFolder = '';
         
     case 'logOdds'
         
-        disp(['applying ' floBrainNum '_to_' refBrainNum '.cpp.nii.gz to logOdds']);
         % define registered logOdds Subfolder
         registeredLogOddsSubFolder = fullfile(registrationSubfolder,'registered_logOdds');
-        if ~exist(registeredLogOddsSubFolder, 'dir'), mkdir(registeredLogOddsSubFolder), end
+        if ~exist(registeredLogOddsSubFolder, 'dir')
+            mkdir(registeredLogOddsSubFolder);
+            disp(['applying ' floBrainNum ' to ' refBrainNum ' registration to logOdds']);
+        end
         
         % apply transformation to all logOdds
         for k=1:length(labelsList)
@@ -54,11 +47,7 @@ switch labelPriorType
             if ~exist(pathRegisteredLogOdds, 'file') || recompute
                 temp_pathLogOdds = fullfile(logOddsSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']); % path of file to register
                 cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
-                if debug
-                    system(cmd);
-                else
-                    [~,~] = system(cmd);
-                end
+                if debug, system(cmd); else, [~,~] = system(cmd); end
             end
         end
         
@@ -67,21 +56,13 @@ switch labelPriorType
         if ~exist(pathRegisteredLogOdds, 'file') || recompute
             temp_pathLogOdds = fullfile(logOddsSubfolder, 'logOdds_hippo.nii.gz');
             cmd = [pathRegResample ' -ref ' pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
-            if debug
-                system(cmd);
-            else
-                [~,~] = system(cmd);
-            end
+            if debug, system(cmd); else, [~,~] = system(cmd); end
         end
         pathRegisteredLogOdds = fullfile(registeredLogOddsSubFolder, 'logOdds_non_hippo.nii.gz');
         if ~exist(pathRegisteredLogOdds, 'file') || recompute
             temp_pathLogOdds = fullfile(logOddsSubfolder, 'logOdds_non_hippo.nii.gz');
             cmd = [pathRegResample ' -ref ',pathRefMaskedImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
-            if debug
-                system(cmd);
-            else
-                [~,~] = system(cmd);
-            end
+            if debug, system(cmd); else, [~,~] = system(cmd); end
         end
         
         pathRegisteredFloatingLabels = '';

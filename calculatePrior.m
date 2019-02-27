@@ -1,14 +1,16 @@
 function pathFloatingHippoLabels = calculatePrior(pathFloatingLabels, labelPriorType, hippoLabelsFolder, logOddsSubfolder, labelsList, ...
     rho, threshold, recompute, freeSurferHome)
 
+idx = regexp(pathFloatingLabels,'brain');
+floBrainNum = pathFloatingLabels(idx(end):regexp(pathFloatingLabels,'_labels.')-1);
+
 switch labelPriorType
     
     case 'logOdds'
         
         if (~exist(logOddsSubfolder, 'dir') || recompute)
             
-            [~,filename,ext] = fileparts(pathFloatingLabels);
-            disp(['computing logOdds of ' filename ext])
+            disp(['computing logOdds of training' floBrainNum])
             
             % create sufolder if it doesn't exist
             if ~exist(logOddsSubfolder, 'dir'), mkdir(logOddsSubfolder), end
@@ -42,6 +44,8 @@ switch labelPriorType
         
         
     case 'delta function'
+        
+        disp(['computing delta function of training' floBrainNum])
         
         % builds name of hippo label file that will be saved
         temp_lab = strrep(pathFloatingLabels,'.nii.gz','');

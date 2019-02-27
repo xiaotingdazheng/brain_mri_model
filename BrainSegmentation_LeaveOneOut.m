@@ -54,7 +54,7 @@ for i=1:length(structPathsTestImages)
     
     idx = regexp(pathRefImage,'brain');
     refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
-    disp(['%%% Processing ' refBrainNum]); disp(' ');
+    disp(['%%% Processing test' refBrainNum]); disp(' ');
     
     % copies training labels to temp folder and erase labels corresponding to test image
     pathTempImageSubfolder = fullfile(fileparts(fileparts(pathDirTrainingLabels)), ['temp_' refBrainNum]);
@@ -94,7 +94,7 @@ for i=1:length(structPathsTestImages)
         (pathRefImage, pathRefFirstLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
-    disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');
+    disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' '); disp(' ');
     accuracies{i} = computeSegmentationAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, voxelSelection);
     
 end

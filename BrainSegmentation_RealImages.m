@@ -46,7 +46,7 @@ labelFusionParameters = {cropImage margin rho threshold sigma labelPriorType del
 
 for i=1:length(structPathsTestImages)
     
-    disp(['%%% Processing test brain ' structPathsTestImages(i).name]); disp(' ');
+    disp(['%%% Processing ' structPathsTestImages(i).name]); disp(' ');
     
     % paths of reference image and corresponding FS labels
     pathRefImage = fullfile(structPathsTestImages(i).folder, structPathsTestImages(i).name);
@@ -73,7 +73,7 @@ for i=1:length(structPathsTestImages)
         (pathRefImage, pathFirstTestLabels, pathDirFloatingImages, pathDirFloatingLabels, labelFusionParameters, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
-    disp(' '); disp(['%% evaluating ' structPathsTestImages(i).name]); disp(' '); disp(' ');
+    disp(' '); disp(['%% evaluating segmentation for ' structPathsTestImages(i).name]); disp(' '); disp(' ');
     accuracies{i} = computeSegmentationAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, voxelSelection);
     
 end
