@@ -11,15 +11,15 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/usr/local/nifty_reg/';
 
 % define paths
-pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/test_images/*nii.gz';         % test images
-pathRefFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/test_first_labels/*nii.gz';  % FS labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/test_labels/*nii.gz';         % test labels for evaluation
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/training_labels/*nii.gz'; % training labels
-pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/classesTable.txt';             % table labels vs intensity classes
+pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_upsampled_loc/test_images/*nii.gz';         % test images
+pathRefFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_upsampled_loc/test_first_labels/*nii.gz';  % FS labels
+pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_upsampled_loc/test_labels/*nii.gz';         % test labels for evaluation
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_upsampled_loc/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_upsampled_loc/classesTable.txt';             % table labels vs intensity classes
 
 % parameters
 targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
-isotropicLabelFusion = 0;
+isotropicLabelFusion = 1;
 rescale = 0;                      % rescale intensities between 0 and 255 (0-1)
 cropImage = 0;                    % perform cropping around hippocampus (0-1)
 margin = 10;                      % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
@@ -28,7 +28,7 @@ threshold = 0.1;                  % lower bound for logOdds maps
 sigma = 15;                       % var for Gaussian likelihhod
 labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;              % delete subfolder after having segmented an image
-recompute = 0;                    % recompute files, even if they exist (0-1)
+recompute = 1;                    % recompute files, even if they exist (0-1)
 debug = 0;                        % display debug information from registrations
 registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
 
