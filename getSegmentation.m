@@ -1,5 +1,5 @@
 function [pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, resultsFolder, refBrainNum,...
-    voxelSelection, sizeSegmentationMap)
+    pathRefImage, voxelSelection, sizeSegmentationMap)
 
 % This function performs the argmax operation on the labels posterior
 % probability, to obtain the most probable segmentation. It takes as inputs
@@ -13,9 +13,9 @@ pathSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.segmentation.n
 pathHippoSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.hippo_segmentation.nii.gz']);
 
 % initialisation
+mri = MRIread(pathRefImage);
 hippoLabelList= [0, 1];
 z = zeros(4); z(1:3,1:3) = eye(3); z(4,4) = 1;
-SegmentationMaskMRI.vox2ras0 = z; % initialse nifty files to be saved
 
 disp('finding most likely segmentation and calculating corresponding accuracy');
 
@@ -46,10 +46,10 @@ else
 end
 
 % save result whole brain segmentation
-SegmentationMaskMRI.vol = labelMap;
-MRIwrite(SegmentationMaskMRI, pathSegmentation);
+mri.vol = labelMap;
+MRIwrite(mri, pathSegmentation);
 % save result hippocampus segmentation 
-SegmentationMaskMRI.vol = labelMapHippo;
-MRIwrite(SegmentationMaskMRI, pathHippoSegmentation);
+mri.vol = labelMapHippo;
+MRIwrite(mri, pathHippoSegmentation);
 
 end

@@ -78,7 +78,7 @@ for i=1:length(structPathsFloatingImages)
 end
 
 sizeSegmentationMap = size(croppedRefMaskedImage);
-[pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum, voxelSelection, sizeSegmentationMap); % argmax operation
+[pathSegmentation, pathHippoSegmentation] = getSegmentation(labelMap, labelMapHippo, labelsList, segmentationsFolder, refBrainNum, pathRefImage, voxelSelection, sizeSegmentationMap); % argmax operation
 
 if deleteSubfolder, rmdir(tempImageSubfolder,'s'); end
 
