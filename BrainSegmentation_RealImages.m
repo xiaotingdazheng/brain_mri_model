@@ -62,7 +62,7 @@ for i=1:length(structPathsTestImages)
     disp('%% upsampling to isotropic resolution');
     if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
         [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
-            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution, recompute);
     end
     
     % labelFusion

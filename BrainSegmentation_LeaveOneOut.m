@@ -11,15 +11,15 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/usr/local/nifty_reg/';
 
 % define paths
-pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/test_images/*nii.gz';         % test images
-pathRefFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/test_first_labels/*nii.gz';  % FS labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/test_labels/*nii.gz';         % test labels for evaluation
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/training_labels/*nii.gz'; % training labels
-pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synth_anisotropic_upsampled_local/classesTable.txt';             % table labels vs intensity classes
+pathDirTestImages = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/test_images/*nii.gz';         % test images
+pathRefFirstLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/test_first_labels/*nii.gz';  % FS labels
+pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/test_labels/*nii.gz';         % test labels for evaluation
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/training_labels/*nii.gz'; % training labels
+pathClassesTable = '~/data/CobraLab/label_fusions/brains_t2/synth_ani_bis/classesTable.txt';             % table labels vs intensity classes
 
 % parameters
 targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
-isotropicLabelFusion = 1;
+isotropicLabelFusion = 0;
 rescale = 0;                      % rescale intensities between 0 and 255 (0-1)
 cropImage = 0;                    % perform cropping around hippocampus (0-1)
 margin = 10;                      % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
@@ -83,7 +83,7 @@ for i=1:length(structPathsTestImages)
     disp('%% upsampling to isotropic resolution');
     if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
         [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
-            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution, recompute);
     end
     
     % labelFusion

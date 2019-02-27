@@ -63,7 +63,7 @@ for i=1:5
     disp('%% upsampling to isotropic resolution');
     if isotropicLabelFusion && ~isequal(targetResolution(1), targetResolution(2), targetResolution(3))
         [pathRefImage, pathRefFirstLabels, pathRefLabels] = upsampleToIsotropic...
-            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution);
+            (pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage, pathRefFirstLabels, pathRefLabels, targetResolution, recompute);
     end
     
     % labelFusion
