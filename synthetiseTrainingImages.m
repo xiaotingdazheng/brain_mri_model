@@ -3,14 +3,13 @@ function [pathDirSyntheticImages, pathDirSyntheticLabels, pathRefImage] = synthe
 
 % files handling
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
-idx = regexp(pathRefImage,'brain');
-refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
 pathTempImageSubfolder = fullfile(fileparts(fileparts(pathRefImage)), ['temp_' refBrainNum]);
-if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 pathStatsMatrix = fullfile(pathTempImageSubfolder, 'ClassesStats.mat');
+pathFolderRescaledRefImage = fullfile(pathTempImageSubfolder, 'rescaled_test_images');
+if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
 
 if rescale
-    pathRefImage = rescaleIntensities(pathRefImage, refBrainNum, recompute);
+    pathRefImage = rescaleIntensities(pathRefImage, pathFolderRescaledRefImage, recompute);
 end
 
 % compute stats from reference image

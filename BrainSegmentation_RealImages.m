@@ -20,8 +20,9 @@ pathDirTrainingLabels = '~/data/OASIS/label_fusions/label_fusion_FS_real/trainin
 % parameters
 targetResolution = [1 1 1]; % resolution of synthetic images
 isotropicLabelFusion = 1;
-cropImage = 1;              % perform cropping around hippocampus (0-1)
-margin = 30;                % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
+rescale = 0;                % rescale intensities between 0 and 255 (0-1)
+cropImage = 0;              % perform cropping around hippocampus (0-1)
+margin = 15;                % cropping margin (if cropImage=1) or brain's dilation (if cropImage=0)
 rho = 0.5;                  % exponential decay for logOdds maps
 threshold = 0.1;            % lower bound for logOdds maps
 sigma = 150;                % var for Gaussian likelihhod
@@ -29,7 +30,7 @@ labelPriorType = 'logOdds'; % type of prior ('logOdds' or 'delta function')
 deleteSubfolder = 0;        % delete subfolder after having segmented an image
 recompute = 1;              % recompute files, even if they exist (0-1)
 debug = 0;                  % display debug information from registrations
-registrationOptions = '-pad 0 -ln 3 -sx 5 --lncc 5.0 -omp 3 -voff'; % registration parameters
+registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -56,7 +57,7 @@ for i=1:length(structPathsTestImages)
     % floating images generation
     disp(['%% preprocessing images for ' structPathsTestImages(i).name])
     [pathDirFloatingImages, pathDirFloatingLabels] = preprocessTrainingImages...
-        (pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, recompute, freeSurferHome);
+        (pathRefImage, pathFirstTestLabels, pathDirTrainingImages, pathDirTrainingLabels, targetResolution, rescale, recompute, freeSurferHome);
     
     % upsampling to isotropic resolution
     disp('%% upsampling to isotropic resolution');

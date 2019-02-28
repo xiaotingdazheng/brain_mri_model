@@ -1,10 +1,14 @@
-function pathNewImage = rescaleIntensities(pathImage, refBrainNum, recompute)
+function pathNewImage = rescaleIntensities(pathImage, pathFolderRescaledImage, recompute)
 
-[folder, name, ext] = fileparts(pathImage);
-rescaledImagesFolder = fullfile(fileparts(folder), 'rescaled_test_images');
-pathNewImage = fullfile(rescaledImagesFolder, [name ext]);
-if ~exist(rescaledImagesFolder, 'dir'), mkdir(rescaledImagesFolder); end
+% naming variables
+idx = regexp(pathImage,'brain');
+refBrainNum = pathImage(idx(end):regexp(pathImage,'.nii.gz')-1);
+[~, name, ext] = fileparts(pathImage);
+% handling paths
+pathNewImage = fullfile(pathFolderRescaledImage, [name ext]);
+if ~exist(pathFolderRescaledImage, 'dir'), mkdir(pathFolderRescaledImage); end
 
+% rescale image intensities
 if ~exist(pathNewImage, 'file') || recompute
     
     disp(['% rescaling ' refBrainNum])

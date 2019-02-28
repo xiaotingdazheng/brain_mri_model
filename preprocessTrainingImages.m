@@ -1,12 +1,18 @@
 function [pathDirFloatingImages, pathDirFloatingLabels] = preprocessTrainingImages(pathRefImage, pathFirstLabels, pathDirTrainingImages, pathDirTrainingLabels,...
-    targetResolution, recompute, freeSurferHome)
+    targetResolution, rescale, recompute, freeSurferHome)
 
 % files handling
+idx = regexp(pathRefImage,'brain');
+refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
 structPathsTrainingImages = dir(pathDirTrainingImages);
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
-refBrainNum = pathRefImage(regexp(pathRefImage,'brain'):regexp(pathRefImage,'.nii.gz')-1);
 pathTempImageSubfolder = fullfile(fileparts(structPathsTrainingLabels(1).folder), ['temp_' refBrainNum]);
+pathFolderRescaledRefImage = fullfile(pathTempImageSubfolder, 'rescaled_test_images');
 if ~exist(pathTempImageSubfolder, 'dir'), mkdir(pathTempImageSubfolder); end
+
+if rescale
+    pathRefImage = rescaleIntensities(pathRefImage, pathFolderRescaledRefImage, recompute);
+end
 
 % downsample image and labels at target resolution
 for i=1:length(structPathsTrainingLabels)
