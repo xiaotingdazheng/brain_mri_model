@@ -1,17 +1,20 @@
-function pathNewImage = rescaleIntensities(pathImage, pathFolderRescaledImage, recompute)
+function pathNewImage = rescaleImage(pathImage, resultFolder, recompute)
+
+% Rescale image. Result is saved in specified folder with '_rescaled' added
+% to the original filename.
 
 % naming variables
 idx = regexp(pathImage,'brain');
-refBrainNum = pathImage(idx(end):regexp(pathImage,'.nii.gz')-1);
-[~, name, ext] = fileparts(pathImage);
-% handling paths
-pathNewImage = fullfile(pathFolderRescaledImage, [name ext]);
-if ~exist(pathFolderRescaledImage, 'dir'), mkdir(pathFolderRescaledImage); end
+brainNum = pathImage(idx(end):regexp(pathImage,'.nii.gz')-1);
+temp_path = strrep(pathImage,'.nii.gz','.mgz'); [~,name,~] = fileparts(temp_path);
+% defining new paths
+pathNewImage = fullfile(resultFolder, [name '_rescaled.nii.gz']);
+if ~exist(resultFolder, 'dir'), mkdir(resultFolder); end
 
 % rescale image intensities
 if ~exist(pathNewImage, 'file') || recompute
     
-    disp(['% rescaling ' refBrainNum])
+    disp(['rescaling ' brainNum])
     
     % read image
     imageMRI = MRIread(pathImage);
@@ -40,7 +43,7 @@ if ~exist(pathNewImage, 'file') || recompute
     
 else
     
-    disp('% loading already rescaled image')
+    disp(['loading already rescaled ' brainNum])
     
 end
 

@@ -1,18 +1,20 @@
-function pathRegisteredFloatingImage = registerImage(pathRefMaskedImage, pathFloatingImage, registrationSubFolder, registrationOptions,...
-    recompute, refBrainNum, floBrainNum, niftyRegHome, debug)
+function pathRegFloImage = registerImage(pathRefImage, pathFloImage, registrationSubFolder, registrationOptions, recompute, niftyRegHome, debug)
 
-% names of files that will be used/saved during registration
-if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % logOdds folder
+% naming variables
+floBrainNum = findBrainNum(pathFloImage);
+refBrainNum = findBrainNum(pathRefImage);
 filename = [floBrainNum '_to_' refBrainNum];
-pathRegisteredFloatingImage = fullfile(registrationSubFolder,[filename '.nii.gz']); %path of registered floating image
+% names of files that will be used/saved during registration
+pathRegFloImage = fullfile(registrationSubFolder,[filename '.nii.gz']); %path of registered floating image
 aff = fullfile(registrationSubFolder, [filename '.aff']); %deformation of first registration
 pathTransformation = fullfile(registrationSubFolder, [filename '.cpp.nii.gz']); %modify name of the saved aff file
+if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % logOdds folder
 
 % compute first rigid registration
 if ~exist(aff, 'file') || recompute
-    disp(['registering with reg_aladin ',floBrainNum,' to ',refBrainNum]);
+    disp(['registering ' floBrainNum ' to ' refBrainNum ' with reg_aladin']);
     pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
-    cmd = [pathRegAladin ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -aff ' aff ' -pad 0 -voff'];
+    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathFloImage ' -aff ' aff ' -pad 0 -voff'];
     if debug
         system(cmd);
     else
@@ -20,10 +22,10 @@ if ~exist(aff, 'file') || recompute
     end
 end
 % compute registration synthetic image to real images
-if ~exist(pathRegisteredFloatingImage, 'file') || recompute
-    disp(['registering with reg_f3d ',floBrainNum,' to ',refBrainNum]);
+if ~exist(pathRegFloImage, 'file') || recompute
+    disp(['registering ' floBrainNum ' to ' refBrainNum ' with reg_f3d']);
     pathRegF3d = fullfile(niftyRegHome, 'reg_f3d');
-    cmd = [pathRegF3d ' -ref ' pathRefMaskedImage ' -flo ' pathFloatingImage ' -res ' pathRegisteredFloatingImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];
+    cmd = [pathRegF3d ' -ref ' pathRefImage ' -flo ' pathFloImage ' -res ' pathRegFloImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];
     if debug
         system(cmd);
     else

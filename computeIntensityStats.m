@@ -10,8 +10,9 @@ function classesStats = computeIntensityStats(pathImage, pathFirstLabels, pathCl
 % ususal mean and std deviation, or ths median and a std deviation based on
 % the MAD, which allows us to be more robust to outliers.
 
-idx = regexp(pathImage,'brain');
-refBrainNum = pathImage(idx(end):regexp(pathImage,'.nii.gz')-1);
+% idx = regexp(pathImage,'brain');
+% refBrainNum = pathImage(idx(end):regexp(pathImage,'.nii.gz')-1);
+refBrainNum = findBrainNum(pathImage);
 
 if recompute || ~exist(pathStatsMatrix, 'file')
     

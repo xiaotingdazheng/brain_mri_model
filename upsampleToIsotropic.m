@@ -18,6 +18,8 @@ pathNewRefLabels = fullfile(pathDirPreprocessedRefLabels, ['upsampled_' name ext
 % new resolution
 isotropicResolutionStr = repmat([num2str(min(targetResolution),'%.1f') ' '], 1, 3);
 
+disp('% upsampling ref and training data to isotropic resolution')
+
 % upsample ref image
 if ~exist(pathNewRefImage, 'file') || recompute
     cmd = ['mri_convert ' pathRefImage ' ' pathNewRefImage ' --voxsize ' isotropicResolutionStr ' -odt float'];

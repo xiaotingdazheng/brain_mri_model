@@ -2,68 +2,58 @@
 
 This repository aims to perform Brain MRI segmentation, independently of image resolution or modality.
 
+
 ## requirements
 
--recent version of matlab (>2016)
+- recent version of matlab (>2016)
 
--freesurfer package: https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
+- freesurfer package: https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
 
--nifty reg package: http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg
+- nifty_reg package: http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg
 
-## scripts
 
-There are several scripts that you can use. All the things you need to change are at the top of these scripts.
+## run segmentation
+
+The script to run is called BrainSegmentation.m
+
+All the parameters and file paths to be changed are at the top of this script.
 
 Nevertheless there are some naming conventions that you need to respect. Indeed the script expects several folders containing different things.
 
  
+- Mandatory folders (replace # by numbers):
 
--  BrainSegmentation.m : performs data synthesis and label fusion on two different datasets (training and test)
+main_folder/test_images/test_brain#.nii.gz
 
-main folder/test_images/test_brain##.nii.gz
-
-main folder/test_first_labels/test_brain##_labels.nii.gz
+main_folder/test_first_labels/test_brain#_labels.nii.gz
            
-main folder/test_labels/test_brain##_labels.nii.gz
+main_folder/test_labels/test_brain#_labels.nii.gz
            
-main folder/training_labels/training_brain#_labels.nii.gz
+main_folder/training_labels/training_brain#_labels.nii.gz
+
+
+- Optional folders/ files
            
-main folder/classesTable.txt
+main_folder/classesTable.txt (if you run the label fusion with synthetic images)
 
- 
+main_folder/training_images/training_brain#.nii.gz (if you run label fusion with real images)
 
-- BrainSegmentation_LeaveOneOut.m : performs data synthesis and label fusion on same dataset with Leave One Out evaluation
-
-main folder/test_images/test_brain##.nii.gz
-
-main folder/test_first_labels/test_brain##_labels.nii.gz
-
-main folder/test_labels/test_brain##_labels.nii.gz
-
-main folder/training_labels/training_brain#_labels.nii.gz
-
-main folder/classesTable.txt
-
- 
-
-- BrainSegmentation_RealImages.m : performs label fusion with real images. this time we don't have to provide the class table, because we don't need to generate new images.
-
-main folder/test_images/test_brain##.nii.gz
-
-main folder/test_first_labels/test_brain##_labels.nii.gz
-
-main folder/test_labels/test_brain##_labels.nii.gz
-
-main folder/training_labels/training_brain#_labels.nii.gz
-
-main folder/training_images/training_brain#.nii.gz
-           
+          
 ## files requirement
+
+- All the above-mentionned folders have to be under the same directory (called main_folder in this example)
 
 - classTable.txt consists of two simple columns (without names). Labels are on the left and corresponding classes on the right separated by few white spaces.
 
-- the test images, test_first_labels and test_labels must be aligned, meaning also the row volumes when you open them with matlab (labels.vol;)
+- the images/labels contained in test_images, test_first_labels and test_labels must be aligned, meaning also the raw volumes when you open them with matlab
 
-- same with training images and training labels (in the case of BrainSegmentation_RealImages.m)
+- the images/labels contained in training_images and training_labels must also be aligned (when runnoing label fusion with real images)
 
-- training labels are the ones at high resolution (0.3mm), but never mind  because I will give them to you alongside the images.
+
+## Parallel label fusion
+
+SingleBrainSegmentation.m is a function that will allow you to run simultaneously several brain segmentation (on a cluster for example).
+
+The pararemeters to change are also placed at the top of that function, but you still need to provide the individual name of the test image along with its first_labels and labels.
+
+The same architecture described in the run segmentation section must be applied.

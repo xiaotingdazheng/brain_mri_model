@@ -16,8 +16,7 @@ labelClasses = [2,1,12,12,4,3, 7, 8,10,11,12,12, 5,14,15,16, 9, 6,18,13, 2, 1,12
     14,15, 9, 6,18,13,17,  2,  2,  2,  2,  2,   14,   14,   14,   14,    2,   14,   14,   14,   14,    2];
 
 % names of naming variables
-idx = regexp(pathTrainingLabels,'brain');
-TrainingBrainNum = pathTrainingLabels(idx(end):regexp(pathTrainingLabels,'_labels.nii.gz')-1);
+trainingBrainNum = findBrainNum(pathTrainingLabels);
 if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
     isFinalImageAnisotropic = 0;
     resolution = num2str(targetRes(1),'%.1f');
@@ -27,22 +26,22 @@ else
 end
 
 % paths synthetic directories
-pathDirSyntheticImages = fullfile(pathTempImageSubfolder, 'synthetic_images');
-pathDirSyntheticLabels = fullfile(pathTempImageSubfolder, 'synthetic_labels');
+pathDirSyntheticImages = fullfile(pathTempImageSubfolder, 'floating_images');
+pathDirSyntheticLabels = fullfile(pathTempImageSubfolder, 'floating_labels');
 if ~exist(pathDirSyntheticImages, 'dir'), mkdir(pathDirSyntheticImages); end
 if ~exist(pathDirSyntheticLabels, 'dir'), mkdir(pathDirSyntheticLabels); end
 
 % paths synthetic image and labels
-pathNewImage = fullfile(pathDirSyntheticImages, ['training_' TrainingBrainNum '.synthetic.' resolution '.nii.gz']);
-pathNewSegmMap = fullfile(pathDirSyntheticLabels, ['training_' TrainingBrainNum '_labels.synthetic.' resolution '.nii.gz']);
+pathNewImage = fullfile(pathDirSyntheticImages, ['training_' trainingBrainNum '_synthetic_' resolution '.nii.gz']);
+pathNewSegmMap = fullfile(pathDirSyntheticLabels, ['training_' trainingBrainNum '_labels_' resolution '.nii.gz']);
 
 
 if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     
-    disp(['% creating new image from training ' TrainingBrainNum ' labels'])
+    disp(['% creating new image from training ' trainingBrainNum ' labels'])
     
     % read ref and training labels
-    refImageMRI = MRIread(pathRefImage);
+    refImageMRI = MRIread(pathRefImage, 1);
     trainingLabelsMRI = MRIread(pathTrainingLabels);
     %define resolutions
     refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
@@ -77,7 +76,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     
 else
     
-    disp(['% loading image generated from training ' TrainingBrainNum ' labels'])
+    disp(['% loading image generated from training ' trainingBrainNum ' labels'])
     
 end
 
@@ -169,12 +168,10 @@ function pathRegisteredTrainingLabels = rigidlyRegisterTrainingLabels(pathNewIma
     refImageRes, niftyRegHome, debug)
 
 % define naming variables
-idx = regexp(pathRefImage,'brain');
-refBrainNum = pathRefImage(idx(end):regexp(pathRefImage,'.nii.gz')-1);
-temp_pathTrainingLabels = strrep(pathTrainingLabels, '.nii.gz','.mgz');
-[~,name,~] = fileparts(temp_pathTrainingLabels);
-voxsizeTrainingLabelsHighRes = repmat([num2str(min(refImageRes)/2,'%.1f') ' '], 1, 3);
-
+refBrainNum = findBrainNum(pathRefImage);
+floBrainNum = findBrainNum(pathNewImage);
+highRes = num2str(min(refImageRes)/2,'%.1f');
+voxsizeTrainingLabelsHighRes = repmat([highRes ' '], 1, 3);
 % paths registration functions
 pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
@@ -184,7 +181,7 @@ aff = '/tmp/temp.aff';
 pathTempRegisteredImage = '/tmp/temp_registered_anisotropic.nii.gz';
 pathTempRegisteredImageHR = strrep(pathTempRegisteredImage, 'anisotropic.nii.gz', 'isotropic.high_res.nii.gz');
 pathRegisteredTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
-pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, [name '.reg_to_' refBrainNum '.nii.gz']);
+pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, ['training_' floBrainNum '_labels_' highRes '_reg_to_' refBrainNum '.nii.gz']);
 if ~exist(pathRegisteredTrainingLabelsSubfolder, 'dir'), mkdir(pathRegisteredTrainingLabelsSubfolder); end
 
 % linear registration

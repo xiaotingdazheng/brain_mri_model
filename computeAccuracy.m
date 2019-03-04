@@ -1,4 +1,4 @@
-function accuracy = computeSegmentationAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, voxelSelection)
+function accuracy = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels)
 
 % This function computes the dice coefficient between the segmented image
 % and the provided GT.
@@ -15,9 +15,6 @@ hippoSegmentation = hippoSegmentationMRI.vol;
 % open test labels and crop them if necessary
 refLabelsMRI = MRIread(pathRefLabels);
 refLabels = refLabelsMRI.vol;
-if length(voxelSelection) == 6
-    refLabels = refLabels(voxelSelection(1):voxelSelection(2), voxelSelection(3):voxelSelection(4), voxelSelection(5):voxelSelection(6));
-end
 
 % initialise result matrix
 accuracy = NaN(1,length(labelsList)+1);
