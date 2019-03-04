@@ -1,5 +1,7 @@
 function [leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, margin, rho, threshold, sigma, ...
     labelPriorType, registrationOptions, freeSurferHome, niftyRegHome] = readParams(params)
+
+%read params
 leaveOneOut = params{1};
 useSynthethicImages = params{2};
 recompute = params{3};
@@ -15,4 +17,21 @@ labelPriorType = params{12};
 registrationOptions = params{13};
 freeSurferHome = params{14};
 niftyRegHome = params{15};
+
+%check them
+if ~(leaveOneOut==0 || leaveOneOut==1), error('leaveOneOut should be 0 or 1'); end
+if ~(useSynthethicImages==0 || useSynthethicImages==1), error('useSynthethicImages should be 0 or 1'); end
+if ~(recompute==0 || recompute==1), error('recompute should be 0 or 1'); end
+if ~(debug==0 || debug==1), error('debug should be 0 or 1'); end
+if ~(deleteSubfolder==0 || deleteSubfolder==1), error('deleteSubfolder should be 0 or 1'); end
+if length(targetResolution)==1, targetResolution = repmat(targetResolution, 1, 3); 
+elseif ~(length(targetResolution)==3), error('targetResolution should be of length 1 (isotropic) or 3 (anisotropic)'); end
+if ~(rescale==0 || rescale==1), error('rescale should be 0 or 1'); end
+if rho<=0, error('rho should be a strictly positive number'); end
+if threshold<0, error('threshold should be a positive or null number'); end
+if sigma<=0, error('sigma should be a strictly positive number'); end
+if ~isequal(labelPriorType,'logOdds') && ~isequal(labelPriorType,'delta function'), error('labelPriorType should be "delta_function" or "logOdds"'); end
+setFreeSurfer(freeSurferHome); [a,~]=system('mri_convert --help'); if a, error('freeSurferHome not recognised'); end
+[a,~]=system([niftyRegHome '/reg_f3d --help']); if a, error('niftyRegHome not recognised'); end
+
 end
