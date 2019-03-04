@@ -7,32 +7,37 @@ tic
 freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/usr/local/nifty_reg/';
 
-% real
-pathDirTestImages = '~/data/test/synth/test_images/*nii.gz';         % test images
-pathRefFirstLabels = '~/data/test/synth/test_first_labels/*nii.gz';  % FS labels
-pathDirTestLabels = '~/data/test/synth/test_labels/*nii.gz';         % test labels for evaluation
-pathDirTrainingLabels = '~/data/test/synth/training_labels/*nii.gz'; % training labels
-pathDirTrainingImages = '~/data/test/synth/training_images/*nii.gz'; % training images (if useSynthethicImages=0)
-pathClassesTable= '~/data/test/synth/classesTable.txt';
+% cell paths test images
+pathDirTestImages= {'~/data/test/synth_leaveOneOut/test_images_t1/*nii.gz' '~/data/test/synth_leaveOneOut/test_images_t2/*nii.gz'};
+% cell paths test first labels (FS labels)
+pathRefFirstLabels= {'~/data/test/synth_leaveOneOut/test_first_labels_t1/*nii.gz' '~/data/test/synth_leaveOneOut/test_first_labels_t2/*nii.gz'};
+% cell paths test labels
+pathDirTestLabels = '~/data/test/synth_leaveOneOut/test_labels/*nii.gz';
+% cell paths training labels
+pathDirTrainingLabels = '~/data/test/synth_leaveOneOut/training_labels/*nii.gz';
+% optional paths
+pathDirTrainingImages = {'~/data/test/synth_leaveOneOut/training_images_t1/*nii.gz' '~/data/test/synth_leaveOneOut/training_images_t2/*nii.gz'};
+pathClassesTable= '~/data/test/synth_leaveOneOut/classesTable.txt';
 
 % experiment title
 title = 'label fusion on CobraLab upsampled anisotropic T2';
 % general parameters
-leaveOneOut = 0;                  % evaluate one image with the rest of the datatset
-useSynthethicImages = 1;          % use real or synthetic images
-recompute = 1;                    % recompute files, even if they exist (0-1)
-debug = 0;                        % display debug information from registrations
-deleteSubfolder = 0;              % delete subfolder after having segmented an image
+leaveOneOut = 1;             % evaluate one image with the rest of the datatset
+useSynthethicImages = 1;     % use real or synthetic images
+recompute = 1;               % recompute files, even if they exist (0-1)
+debug = 0;                   % display debug information from registrations
+deleteSubfolder = 0;         % delete subfolder after having segmented an image
 % preprocessing parameters
-targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
-rescale = 0;                      % rescale intensities between 0 and 255 (0-1)
+targetResolution = 0.6;      % resolution of synthetic images
+rescale = 0;                 % rescale intensities between 0 and 255 (0-1)
 % label fusion parameters
-margin = 10;                      % margin for brain voxels selection
-rho = 0.5;                        % exponential decay for logOdds maps
-threshold = 0.1;                  % lower bound for logOdds maps
-sigma = 15;                       % var for Gaussian likelihood
-labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
-registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
+margin = 10;                 % margin for brain voxels selection
+rho = 0.5;                   % exponential decay for logOdds maps
+threshold = 0.1;             % lower bound for logOdds maps
+sigma = 15;                  % var for Gaussian likelihood
+labelPriorType = 'logOdds';  % type of prior ('logOdds' or 'delta function')
+% registration parameters
+registrationOptions = {'-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'}; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

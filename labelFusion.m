@@ -27,10 +27,8 @@ registrationFolder = fullfile(tempImageSubfolder, 'registrations');
 segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNum]);
 if isequal(labelPriorType, 'delta function')
     priorFolder = fullfile(tempImageSubfolder, 'hippo_labels_delta');
-elseif isequal(labelPriorType, 'logOdds')
-    priorFolder = fullfile(tempImageSubfolder,'logOdds');
 else
-    error('wrong entry for labelPriorType, should be "delta_function" or "logOdds"');
+    priorFolder = fullfile(tempImageSubfolder,'logOdds');
 end
 
 % initialise label maps fusion with zeros (background label)

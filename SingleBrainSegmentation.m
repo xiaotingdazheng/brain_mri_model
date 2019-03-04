@@ -71,11 +71,11 @@ disp(' '); disp(['%% preprocessing test ' refBrainNum]);
 if useSynthethicImages
     disp(['%% synthetising images for ' refBrainNum]);
     [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages(temp_pathDirTrainingLabels, pathClassesTable, pathRefImage, ...
-        pathRefFirstLabels, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
+        pathRefFirstLabels, recompute, freeSurferHome, niftyRegHome, debug);
 else
     disp('%% preprocessing real training images');
     [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages, temp_pathDirTrainingLabels, ...
-        pathRefImage, targetResolution, rescale, recompute, freeSurferHome);
+        pathRefImage, rescale, recompute, freeSurferHome);
 end
 
 % labelFusion
