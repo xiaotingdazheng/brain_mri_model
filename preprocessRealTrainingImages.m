@@ -1,12 +1,15 @@
 function [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(pathDirTrainingImages, pathDirTrainingLabels, ...
-    pathRefImage, targetRes, rescale, recompute, freeSurferHome)
+    pathRefImage, rescale, recompute, freeSurferHome)
 
+% define resolutions of created images
+refImageMRI = MRIread(pathRefImage, 1);
+refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
 % naming variables
-voxsize = [num2str(targetRes(1),'%.1f') ' ' num2str(targetRes(2),'%.1f') ' ' num2str(targetRes(3),'%.1f')];
-if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
-    resolution = num2str(targetRes(1),'%.1f');
+voxsize = [num2str(refImageRes(1),'%.1f') ' ' num2str(refImageRes(2),'%.1f') ' ' num2str(refImageRes(3),'%.1f')];
+if refImageRes(1) == refImageRes(2) && refImageRes(1) == refImageRes(3)
+    resolution = num2str(refImageRes(1),'%.1f');
 else
-    resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
+    resolution = [num2str(refImageRes(1),'%.1f'), 'x',num2str(refImageRes(2),'%.1f'), 'x',num2str(refImageRes(3),'%.1f')];
 end
 % files handling
 structPathsTrainingImages = dir(pathDirTrainingImages);

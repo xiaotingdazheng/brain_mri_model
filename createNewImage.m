@@ -1,4 +1,4 @@
-function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats, targetRes,...
+function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats,...
     pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freeSurferHome, niftyRegHome, debug)
 
 % This script generates a synthetic image from a segmentation map and basic
@@ -15,14 +15,19 @@ labelsList = [  2,3, 4, 5,7,8,10,11,12,13,14,15,16,17,18,24,26,28,30,31,41,42,43
 labelClasses = [2,1,12,12,4,3, 7, 8,10,11,12,12, 5,14,15,16, 9, 6,18,13, 2, 1,12,12, 4, 3, 7, 8,10,11,...
     14,15, 9, 6,18,13,17,  2,  2,  2,  2,  2,   14,   14,   14,   14,    2,   14,   14,   14,   14,    2];
 
+% define resolutions of created images
+refImageMRI = MRIread(pathRefImage, 1);
+refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
+minTargetRes = min(refImageRes)*ones(1,3);
+
 % names of naming variables
 trainingBrainNum = findBrainNum(pathTrainingLabels);
-if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3)
+if refImageRes(1) == refImageRes(2) && refImageRes(1) == refImageRes(3)
     isFinalImageAnisotropic = 0;
-    resolution = num2str(targetRes(1),'%.1f');
+    resolution = num2str(refImageRes(1),'%.1f');
 else
     isFinalImageAnisotropic = 1;
-    resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
+    resolution = [num2str(refImageRes(1),'%.1f'), 'x',num2str(refImageRes(2),'%.1f'), 'x',num2str(refImageRes(3),'%.1f')];
 end
 
 % paths synthetic directories
@@ -40,13 +45,9 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
     
     disp(['% creating new image from training ' trainingBrainNum ' labels'])
     
-    % read ref and training labels
-    refImageMRI = MRIread(pathRefImage, 1);
+    % read training labels and corresponding resolution
     trainingLabelsMRI = MRIread(pathTrainingLabels);
-    %define resolutions
-    refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
     trainingLabelsRes = [trainingLabelsMRI.xsize trainingLabelsMRI.ysize trainingLabelsMRI.zsize];
-    minTargetRes = min(targetRes)*ones(1,3);
     
     % create new image by sampling from intensity prob distribution
     newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
@@ -68,9 +69,9 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewSegmMap, 'file')
         % create new image by sampling from intensity prob distribution
         newImage = sampleIntensities(registeredTrainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, anisotropicTrainingLabelsRes);
         % blurring images
-        blurAndSave(newImage, registeredTrainingLabelsMRI, anisotropicTrainingLabelsRes, targetRes, pathNewImage, registeredTrainingLabelsMRI.vol);
+        blurAndSave(newImage, registeredTrainingLabelsMRI, anisotropicTrainingLabelsRes, refImageRes, pathNewImage, registeredTrainingLabelsMRI.vol);
         % downsample to target resolution
-        downsample(pathNewImage, pathNewSegmMap, registeredTrainingLabelsMRI.fspec, pathFirstLabels, pathRefImage, refImageRes, targetRes, 0, freeSurferHome);
+        downsample(pathNewImage, pathNewSegmMap, registeredTrainingLabelsMRI.fspec, pathFirstLabels, pathRefImage, refImageRes, refImageRes, 0, freeSurferHome);
         
     end
     
