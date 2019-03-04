@@ -1,11 +1,16 @@
-function newPathDirTrainingData = copyTrainingData(pathDirTrainingData, refBrainNum)
+function newPathDirTrainingData = copyTrainingData(pathDirTrainingData, refBrainNum, channel)
 
 % create temp test image subfolder
 pathTrainingDataFolder = fileparts(pathDirTrainingData);
 [mainFolder,name,~] = fileparts(pathTrainingDataFolder);
 pathTempImageSubfolder = fullfile(mainFolder, ['temp_' refBrainNum]);
-newPathDirTrainingData = fullfile(pathTempImageSubfolder, name);
 if ~exist(pathTempImageSubfolder,'dir'), mkdir(pathTempImageSubfolder); end
+newPathDirTrainingData = fullfile(pathTempImageSubfolder, name);
+if ~exist(newPathDirTrainingData,'dir'), mkdir(newPathDirTrainingData); end
+% new training channel
+if channel > 0
+    newPathDirTrainingData = fullfile(newPathDirTrainingData, ['channel_' num2str(channel)]);
+end
 
 % copy all training labels
 cmd = ['rm -r ' newPathDirTrainingData];
