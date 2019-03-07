@@ -1,5 +1,5 @@
 function [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(pathDirTrainingImages, pathDirTrainingLabels, ...
-    pathRefImage, rescale, recompute, freeSurferHome)
+    pathRefImage, channel, rescale, recompute, freeSurferHome)
 
 % define resolutions of created images
 refImageMRI = MRIread(pathRefImage, 1);
@@ -14,10 +14,19 @@ end
 % files handling
 structPathsTrainingImages = dir(pathDirTrainingImages);
 structPathsTrainingLabels = dir(pathDirTrainingLabels);
-pathTempImageSubfolder = fileparts(fileparts(pathRefImage));
+
 % paths floating images/labels directories
-pathDirFloatingImages = fullfile(pathTempImageSubfolder, 'floating_images');
-pathDirFloatingLabels = fullfile(pathTempImageSubfolder, 'floating_labels');
+if channel == 0 
+    pathTempImageSubfolder = fileparts(fileparts(pathRefImage));
+    pathDirFloatingImages = fullfile(pathTempImageSubfolder, 'floating_images');
+    pathDirFloatingLabels = fullfile(pathTempImageSubfolder, 'floating_labels');
+elseif channel > 0
+    pathTempImageSubfolder = fileparts(fileparts(fileparts(pathRefImage)));
+    pathDirFloatingImages = fullfile(pathTempImageSubfolder, 'floating_images', ['channel_' num2str(channel)]);
+    pathDirFloatingLabels = fullfile(pathTempImageSubfolder, 'floating_labels', ['channel_' num2str(channel)]);
+else
+    error('channel should be a strictly positive number');
+end
 if ~exist(pathDirFloatingImages, 'dir'), mkdir(pathDirFloatingImages); end
 if ~exist(pathDirFloatingLabels, 'dir'), mkdir(pathDirFloatingLabels); end
 

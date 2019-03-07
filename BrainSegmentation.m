@@ -1,11 +1,12 @@
 clear
 now = clock;
-fprintf('Started on %d/%d at %dh%02d\n', now(3), now(2), now(4), now(5)); disp(' ');
+fprintf('Started on %d/%d at %dh%02d\n', now(3), now(2), now(4), now(5));
 tic
 
 % add paths for additionnal functions
 freeSurferHome = '/usr/local/freesurfer/';
-niftyRegHome = '/usr/local/nifty_reg/';
+% niftyRegHome = '/usr/local/nifty_reg/';
+niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 
 % cell paths test images
 pathDirTestImages= {'~/data/test/synth_leaveOneOut/test_images_t1/*nii.gz' '~/data/test/synth_leaveOneOut/test_images_t2/*nii.gz'};
@@ -24,7 +25,7 @@ title = 'label fusion on CobraLab upsampled anisotropic T2';
 % general parameters
 leaveOneOut = 1;             % evaluate one image with the rest of the datatset
 useSynthethicImages = 1;     % use real or synthetic images
-recompute = 1;               % recompute files, even if they exist (0-1)
+recompute = 0;               % recompute files, even if they exist (0-1)
 debug = 0;                   % display debug information from registrations
 deleteSubfolder = 0;         % delete subfolder after having segmented an image
 % preprocessing parameters
@@ -57,4 +58,4 @@ accuracy = segment(pathDirTestImages, pathRefFirstLabels, pathDirTestLabels, pat
 % plot results
 comparisonGraph({accuracy,'regions'}, title)
 
-tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));
+disp(' '); tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));

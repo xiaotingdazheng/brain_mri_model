@@ -1,5 +1,5 @@
 function [pathDirSyntheticImages, pathDirSyntheticLabels] = createNewImage(pathTrainingLabels, classesStats,...
-    pathTempImageSubfolder, pathRefImage, pathFirstLabels, recompute, freeSurferHome, niftyRegHome, debug)
+    pathTempImageSubfolder, pathRefImage, pathFirstLabels, channel, recompute, freeSurferHome, niftyRegHome, debug)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -33,6 +33,10 @@ end
 % paths synthetic directories
 pathDirSyntheticImages = fullfile(pathTempImageSubfolder, 'floating_images');
 pathDirSyntheticLabels = fullfile(pathTempImageSubfolder, 'floating_labels');
+if channel > 0
+    pathDirSyntheticImages = fullfile(pathDirSyntheticImages, ['channel_' num2str(channel)]);
+    pathDirSyntheticLabels = fullfile(pathDirSyntheticLabels, ['channel_' num2str(channel)]);
+end
 if ~exist(pathDirSyntheticImages, 'dir'), mkdir(pathDirSyntheticImages); end
 if ~exist(pathDirSyntheticLabels, 'dir'), mkdir(pathDirSyntheticLabels); end
 
@@ -178,12 +182,14 @@ pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
 
 % define paths
-aff = '/tmp/temp.aff';
+pathRegistrationTransformation = fullfile(pathTempImageSubfolder, 'rigid_transformations');
+aff = fullfile(pathRegistrationTransformation, [floBrainNum '_to_' refBrainNum '.aff']);
 pathTempRegisteredImage = '/tmp/temp_registered_anisotropic.nii.gz';
 pathTempRegisteredImageHR = strrep(pathTempRegisteredImage, 'anisotropic.nii.gz', 'isotropic.high_res.nii.gz');
 pathRegisteredTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
 pathRegisteredTrainingLabels = fullfile(pathRegisteredTrainingLabelsSubfolder, ['training_' floBrainNum '_labels_' highRes '_reg_to_' refBrainNum '.nii.gz']);
 if ~exist(pathRegisteredTrainingLabelsSubfolder, 'dir'), mkdir(pathRegisteredTrainingLabelsSubfolder); end
+if ~exist(pathRegistrationTransformation, 'dir'), mkdir(pathRegistrationTransformation); end
 
 % linear registration
 cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -res ' pathTempRegisteredImage ' -aff ' aff ' -ln 4 -lp 3 -rigOnly -pad 0'];

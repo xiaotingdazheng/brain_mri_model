@@ -7,7 +7,7 @@ pathTempImageSubfolder = fullfile(mainFolder, ['temp_' refBrainNum]);
 if ~exist(pathTempImageSubfolder,'dir'), mkdir(pathTempImageSubfolder); end
 newPathDirTrainingData = fullfile(pathTempImageSubfolder, name);
 if ~exist(newPathDirTrainingData,'dir'), mkdir(newPathDirTrainingData); end
-% new training channel
+% extend path if multi channel
 if channel > 0
     newPathDirTrainingData = fullfile(newPathDirTrainingData, ['channel_' num2str(channel)]);
 end

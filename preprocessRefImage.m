@@ -1,10 +1,14 @@
-function [pathNewRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, rescale, recompute, margin, freeSurferHome)
+function [pathNewRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, margin, channel, rescale, recompute, freeSurferHome)
 
 % naming variables
 refBrainNum = findBrainNum(pathRefImage);
 % define path preprocessed subfodler
 pathTempImageSubfolder = fullfile(fileparts(fileparts(pathRefImage)), ['temp_' refBrainNum]);
 pathPreprocessedRefImageSubfolder = fullfile(pathTempImageSubfolder, 'preprocessed_test_image');
+% extend path if multi channel
+if channel > 0
+    pathPreprocessedRefImageSubfolder = fullfile(pathPreprocessedRefImageSubfolder, ['channel_' num2str(channel)]);
+end
 if ~exist(pathPreprocessedRefImageSubfolder, 'dir'), mkdir(pathPreprocessedRefImageSubfolder); end
 
 % rescale image

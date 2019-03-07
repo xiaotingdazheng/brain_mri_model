@@ -2,7 +2,6 @@ function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTes
 
 % read and check parameters
 nChannel = length(pathDirTestImages);
-if nChannel > 1, multi_channel = 1; else, multi_channel = 0; end
 [leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, margin, rho,...
     threshold, sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome] = readParams(params, nChannel);
 % build paths structures
@@ -12,10 +11,13 @@ for i=1:length(pathDirTestImages), structPathsTestImages{i} = dir(pathDirTestIma
 for i=1:length(pathDirRefFirstLabels), structPathsFirstRefLabels{i} = dir(pathDirRefFirstLabels{i}); end
 structPathsRefLabels = dir(pathDirTestLabels);
 % parameters initialisation
+if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 nImages = length(structPathsTestImages{1});
 accuracies = cell(nImages,1);
 labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
 brainVoxels = cell(nChannel, 1);
+pathDirFloatingImages = cell(nChannel, 1);
+pathDirFloatingLabels = cell(nChannel, 1);
 
 for i=1:nImages
     
@@ -28,12 +30,12 @@ for i=1:nImages
         
         % display processed test brain
         refBrainNum = findBrainNum(pathRefImage);
-        disp(['%%% Processing test ' refBrainNum]);
+        if channel==1, disp(' '); disp(['%%% Processing test ' refBrainNum]); end
         
         % copies training labels to temp folder and erase labels corresponding to test image
         if leaveOneOut && ~useSynthethicImages
             temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, refBrainNum, 0);
-            temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages{channel}, refBrainNum, channel*multi_channel);
+            temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages{channel}, refBrainNum, channel*multiChannel);
         elseif leaveOneOut && useSynthethicImages
             temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, refBrainNum, 0);
             temp_pathDirTrainingImages = pathDirTrainingImages{channel};
@@ -43,20 +45,28 @@ for i=1:nImages
         end
     
         % preprocessing test image
-        disp(' '); disp(['%% preprocessing test ' refBrainNum]);
-        [pathRefImage, brainVoxels{channel}] = preprocessRefImage(pathRefImage, pathRefFirstLabels, rescale, recompute, margin, freeSurferHome);
+        if multiChannel, disp(' '); disp(['%% preprocessing test ' refBrainNum ' channel ' num2str(channel)]);
+        else, disp(' '); disp(['%% preprocessing test ' refBrainNum ]); end
+        [pathRefImage, brainVoxels{channel}] = preprocessRefImage(pathRefImage, pathRefFirstLabels, margin, channel*multiChannel,rescale, ...
+            recompute,  freeSurferHome);
         
         % floating images generation or preprocessing of real training images
         if useSynthethicImages
-            disp(['%% synthetising images for ' refBrainNum]);
-            [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages(temp_pathDirTrainingLabels, pathClassesTable, pathRefImage, ...
-                pathRefFirstLabels, recompute, freeSurferHome, niftyRegHome, debug);
+            if multiChannel, disp(' '); disp(['%% synthetising images for ' refBrainNum ' channel ' num2str(channel)]);
+            else, disp(' '); disp(['%% synthetising images for ' refBrainNum]); end
+            [pathDirFloatingImages{channel}, pathDirFloatingLabels{channel}] = generateTrainingImages(temp_pathDirTrainingLabels, pathClassesTable,...
+                pathRefImage, pathRefFirstLabels, channel*multiChannel, recompute, freeSurferHome, niftyRegHome, debug);
         else
-            disp('%% preprocessing real training images');
-            [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages, temp_pathDirTrainingLabels, ...
-                pathRefImage, rescale, recompute, freeSurferHome);
+            if multiChannel, disp(' '); disp(['%% preprocessing real training images for ' refBrainNum ' channel ' num2str(channel)]);
+            else, disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]); end
+            [pathDirFloatingImages{channel}, pathDirFloatingLabels{channel}] = preprocessRealTrainingImages(temp_pathDirTrainingImages,...
+                temp_pathDirTrainingLabels, pathRefImage, channel*multiChannel, rescale, recompute, freeSurferHome);
         end
         
+    end
+    
+    if multiChannel
+        alignFloatingImages(pathDirFloatingImages, debug, niftyRegHome)
     end
     
     % labelFusion
@@ -65,7 +75,7 @@ for i=1:nImages
         (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
-    disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' '); disp(' ');
+    disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
     accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels);
     
 end

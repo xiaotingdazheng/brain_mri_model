@@ -65,13 +65,14 @@ end
 
 % preprocessing test image
 disp(' '); disp(['%% preprocessing test ' refBrainNum]);
-[pathRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, rescale, recompute, margin, freeSurferHome);
+[pathRefImage, brainVoxels{channel}] = preprocessRefImage(pathRefImage, pathRefFirstLabels, margin, channel*multiChannel,rescale, ...
+    recompute,  freeSurferHome);
 
 % floating images generation or preprocessing of real training images
 if useSynthethicImages
     disp(['%% synthetising images for ' refBrainNum]);
     [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages(temp_pathDirTrainingLabels, pathClassesTable, pathRefImage, ...
-        pathRefFirstLabels, recompute, freeSurferHome, niftyRegHome, debug);
+        pathRefFirstLabels, channel*multiChannel, recompute, freeSurferHome, niftyRegHome, debug);
 else
     disp('%% preprocessing real training images');
     [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages, temp_pathDirTrainingLabels, ...
