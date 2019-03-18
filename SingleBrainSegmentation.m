@@ -64,19 +64,19 @@ disp(['%%% Processing test ' refBrainNum]);
 nChannel = length(pathRefImage);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 [leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
-    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params);
+    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
 % build path resulting accuracies
 pathMainFolder = fileparts(fileparts(pathRefImage));
 pathAccuracies = fullfile(pathMainFolder, 'accuracies', ['accuracy_' refBrainNum '.mat']);
 if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
-labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
+labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder multiChannel recompute registrationOptions};
 
 % copies training labels to temp folder and erase labels corresponding to test image
 if leaveOneOut && ~useSynthethicImages
-    temp_pathDirTrainingLabels = copyTrainingData2(pathDirTrainingLabels, refBrainNum, length(pathDirTrainingLabels));
-    temp_pathDirTrainingImages = copyTrainingData2(pathDirTrainingImages, refBrainNum, nChannel);
+    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, refBrainNum, length(pathDirTrainingLabels));
+    temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, refBrainNum, nChannel);
 elseif leaveOneOut && useSynthethicImages
-    temp_pathDirTrainingLabels = copyTrainingData2(pathDirTrainingLabels, refBrainNum, 1);
+    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, refBrainNum, 1);
     temp_pathDirTrainingImages = pathDirTrainingImages;
 else
     temp_pathDirTrainingLabels = pathDirTrainingLabels;
@@ -85,29 +85,31 @@ end
 
 % preprocessing test image
 disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']); else, disp(['%% preprocessing test ' refBrainNum]); end
-[pathRefImage, brainVoxels] = preprocessRefImage2(pathRefImage, pathRefFirstLabels, margin, rescale, alignTestImages, ...
+[pathRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, margin, rescale, alignTestImages, ...
     freeSurferHome, niftyRegHome, recompute, debug);
 
 % floating images generation or preprocessing of real training images
 if useSynthethicImages
     disp(' '); disp(['%% synthetising images for ' refBrainNum]);
-    [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages2(temp_pathDirTrainingLabels, labelsList, labelClasses,...
+    [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages(temp_pathDirTrainingLabels, labelsList, labelClasses,...
         pathRefImage, pathRefFirstLabels, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
 else
     disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]);
-    [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages2(temp_pathDirTrainingImages,...
+    [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages,...
         temp_pathDirTrainingLabels, pathRefImage, targetResolution, rescale, freeSurferHome, niftyRegHome, recompute, debug);
 end
 
 % upsample ref data to targetRes
-[pathRefImage, pathRefLabels] = upsampleToTargetRes(pathRefImage, pathRefLabels, targetResolution, multiChannel);
+if targetResolution
+    [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, targetResolution, multiChannel, margin);
+end
 
 % remove old hippocampus labels and add background
 [updatedLabelsList, ~] = updateLabelsList(labelsList, labelsNames);
 
 % labelFusion
 disp(' '); disp(['%% segmenting ' refBrainNum]);
-[pathSegmentation, pathHippoSegmentation] = labelFusion2...
+[pathSegmentation, pathHippoSegmentation] = labelFusion...
     (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, ...
     freeSurferHome, niftyRegHome, debug);
 
