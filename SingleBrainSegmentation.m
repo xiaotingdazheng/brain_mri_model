@@ -43,6 +43,9 @@ else
     targetResolution = str2double(targetResolution);
     alignTestImages = str2double(alignTestImages);
     rescale = str2double(rescale);
+    margin = str2double(margin);
+    rho = str2double(rho);
+    threshold = str2double(threshold);
     sigma = str2double(sigma);
 end
 
