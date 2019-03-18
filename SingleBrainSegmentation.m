@@ -1,8 +1,9 @@
 function SingleBrainSegmentation(pathRefImage, pathRefFirstLabels, pathRefLabels, ...
     pathDirTrainingLabels, pathDirTrainingImages, pathClassesTable, ...
     leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder,...
-    targetResolution, alignTestImages, rescale, ...
-    sigma, registrationOptions, ...
+    targetResolution, alignTestImages, rescale,...
+    margin, rho, threshold, sigma, labelPriorType, ...
+    registrationOptions, ...
     freeSurferHome, niftyRegHome)
 
 now = clock;
@@ -10,22 +11,22 @@ fprintf('Started on %d/%d at %dh%02d\n', now(3), now(2), now(4), now(5)); disp('
 tic
 
 %%%%%%% general parameters
-% leaveOneOut                % evaluate one image with the rest of the datatset (0-1)
-% useSynthethicImages        % use real or synthetic images (0-1)
-% recompute                  % recompute files, even if they exist (0-1)
-% debug                      % display debug information from registrations (0-1)
-% deleteSubfolder            % delete subfolder after having segmented an image (0-1)
+% leaveOneOut                 % evaluate one image with the rest of the datatset (0-1)
+% useSynthethicImages         % use real or synthetic images (0-1)
+% recompute                   % recompute files, even if they exist (0-1)
+% debug                       % display debug information from registrations (0-1)
+% deleteSubfolder             % delete subfolder after having segmented an image (0-1)
 %%%%%%% preprocessing parameters
-% targetResolution           % resolution of synthetic images
-% alignTestImages            % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
-% rescale                    % rescale intensities between 0 and 255 (0-1)
+% targetResolution            % resolution of synthetic images
+% alignTestImages             % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
+% rescale = 1;                % rescale intensities between 0 and 255 (0-1)
 %%%%%%% label fusion parameters
-margin = 10;                 % margin for brain voxels selection
-rho = 0.5;                   % exponential decay for logOdds maps
-threshold = 0.1;             % lower bound for logOdds maps
-% sigma                      % var for Gaussian likelihood
-labelPriorType = 'logOdds';  % type of prior ('logOdds' or 'delta function')
-% registrationOptions        % label fusion registrations options (weights are automated)
+% margin = 10;                % margin for brain voxels selection
+% rho = 0.5;                  % exponential decay for logOdds maps
+% threshold = 0.1;            % lower bound for logOdds maps
+% sigma = 15;                 % var for Gaussian likelihood
+% labelPriorType = 'logOdds'; % type of prior ('logOdds' or 'delta function')
+% registrationOptions         % label fusion registrations options (weights are automated)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
