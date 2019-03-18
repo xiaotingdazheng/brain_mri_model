@@ -21,15 +21,23 @@ hippoLabelList = [0 1];
 regFloImage = MRIread(pathRegFloImage);
 regFloImage = single(regFloImage.vol);
 regFloImage(regFloImage<0) = 0;
+regFloImage(isnan(regFloImage)) = 0;
 
 % read ref masked image
 refImage = MRIread(pathRefImage);
 refImage = single(refImage.vol);
 refImage(refImage<0) = 0;
-sizeSegmMap = size(refImage);
+refImage(isnan(refImage)) = 0;
+sizeSegmMap = size(refImage(:,:,:,1));
 
 % calculate similarity between test (real) image and training (synthetic) image
-likelihood = 1/sqrt(2*pi*sigma)*exp(-(refImage-regFloImage).^2/(2*sigma^2));
+nChannel = size(refImage,4);
+likelihood = ones([size(refImage,1), size(refImage,2), size(refImage,3)], 'single');
+for channel=1:nChannel
+    temp_image = 1/sqrt(2*pi*sigma)*exp(-(refImage(:,:,:,channel)-regFloImage(:,:,:,channel)).^2/(2*sigma^2));
+    temp_image(isnan(temp_image)) = 1;
+    likelihood = likelihood.*temp_image;
+end
 
 switch labelPriorType
     
@@ -40,40 +48,40 @@ switch labelPriorType
         regFloLabels = MRIread(pathRegFloLabels);
         regFloLabels = single(regFloLabels.vol);
         for k=1:length(labelsList)
-            labelMap = processDeltaFunction(labelMap, regFloLabels, likelihood, labelsList, brainVoxels, k);
+            labelMap = processDeltaFunction(labelMap, regFloLabels, likelihood, labelsList, brainVoxels{1}, k);
         end
         
         % upadte labelMapHippo with registered hippo labels
         pathRegFloHippoLabels = fullfile(regPriorSubfolder, 'hippo_labels.nii.gz');
         regFloHippoLabels = MRIread(pathRegFloHippoLabels);
         regFloHippoLabels = single(regFloHippoLabels.vol);
-        labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels, 1);
-        labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels, 2);
+        labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels{1}, 1);
+        labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels{1}, 2);
         
     case 'logOdds'
         
         % initialisation
         unmargenalisedPosterior = zeros(size(labelMap), 'single');
-        partitionFunction = zeros([1, length(brainVoxels)], 'single');
+        partitionFunction = zeros([1, length(brainVoxels{1})], 'single');
         
         % calculate unmargenalisedPosterior and partition function
         for k=1:length(labelsList)
             temp_pathLogOdds = fullfile(regPriorSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
             [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-                brainVoxels, k);
+                brainVoxels{1}, k);
         end
         %update labelMap with marginalised posterior
         labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
         % same mechanism for hipocampus logOdds
         unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
-        partitionFunction = zeros([1, length(brainVoxels)], 'single');
+        partitionFunction = zeros([1, length(brainVoxels{1})], 'single');
         temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_non_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-            brainVoxels, 1);
+            brainVoxels{1}, 1);
         temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-            brainVoxels, 2);
+            brainVoxels{1}, 2);
         labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
 end

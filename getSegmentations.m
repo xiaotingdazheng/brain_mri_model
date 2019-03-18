@@ -17,19 +17,19 @@ pathHippoSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.hippo_seg
 mri = MRIread(pathRefImage);
 hippoLabelList= [0, 1];
 
-disp('finding most likely segmentation and calculating corresponding accuracy');
+disp('% finding most likely segmentation');
 
 % argmax on labelMap to get final segmentation
 [~,index] = max(labelMap, [], 1);
 voxelLabels = arrayfun(@(x) labelsList(x), index);
 labelMap = zeros(sizeSegmMap, 'single');
-labelMap(brainVoxels) = voxelLabels;
+labelMap(brainVoxels{1}) = voxelLabels;
 
 % argmax on labelMapHippo to get final hippocampus segmentation
 [~,index] = max(labelMapHippo, [], 1);
 voxelLabels = arrayfun(@(x) hippoLabelList(x), index);
 labelMapHippo = zeros(sizeSegmMap, 'single');
-labelMapHippo(brainVoxels) = voxelLabels;
+labelMapHippo(brainVoxels{1}) = voxelLabels;
 
 % save result whole brain segmentation
 mri.vol = labelMap;

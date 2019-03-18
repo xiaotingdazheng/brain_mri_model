@@ -1,62 +1,82 @@
-function SingleBrainSegmentation(pathRefImage, pathRefFirstLabels, pathRefLabels)
+function SingleBrainSegmentation(pathRefImage, pathRefFirstLabels, pathRefLabels, ...
+    pathDirTrainingLabels, pathDirTrainingImages, pathClassesTable, ...
+    leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder,...
+    targetResolution, alignTestImages, rescale, ...
+    sigma, registrationOptions, ...
+    freeSurferHome, niftyRegHome)
 
 now = clock;
 fprintf('Started on %d/%d at %dh%02d\n', now(3), now(2), now(4), now(5)); disp(' ');
 tic
 
-% add paths for additionnal functions
-freeSurferHome = '/share/apps/freesurfer';
-niftyRegHome = '/home/bbillot/.local/NiftyReg/bin/';
-
-% real
-pathDirTrainingLabels = '~/data/test/synth/training_labels/*nii.gz'; % training labels
-pathDirTrainingImages = '~/data/test/synth/training_images/*nii.gz'; % training images (if useSynthethicImages=0)
-pathClassesTable= '~/data/test/synth/classesTable.txt';
-
-% general parameters
-leaveOneOut = 0;                  % evaluate one image with the rest of the datatset
-useSynthethicImages = 1;          % use real or synthetic images
-recompute = 0;                    % recompute files, even if they exist (0-1)
-debug = 0;                        % display debug information from registrations
-deleteSubfolder = 0;              % delete subfolder after having segmented an image
-% preprocessing parameters
-targetResolution = [0.6 2.0 0.6]; % resolution of synthetic images
-rescale = 0;                      % rescale intensities between 0 and 255 (0-1)
-% label fusion parameters
-margin = 10;                      % margin for brain voxels selection
-rho = 0.5;                        % exponential decay for logOdds maps
-threshold = 0.1;                  % lower bound for logOdds maps
-sigma = 15;                       % var for Gaussian likelihood
-labelPriorType = 'logOdds';       % type of prior ('logOdds' or 'delta function')
-registrationOptions = '-pad 0 -ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel -voff'; % registration parameters
+%%%%%%% general parameters
+% leaveOneOut                % evaluate one image with the rest of the datatset (0-1)
+% useSynthethicImages        % use real or synthetic images (0-1)
+% recompute                  % recompute files, even if they exist (0-1)
+% debug                      % display debug information from registrations (0-1)
+% deleteSubfolder            % delete subfolder after having segmented an image (0-1)
+%%%%%%% preprocessing parameters
+% targetResolution           % resolution of synthetic images
+% alignTestImages            % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
+% rescale                    % rescale intensities between 0 and 255 (0-1)
+%%%%%%% label fusion parameters
+margin = 10;                 % margin for brain voxels selection
+rho = 0.5;                   % exponential decay for logOdds maps
+threshold = 0.1;             % lower bound for logOdds maps
+% sigma                      % var for Gaussian likelihood
+labelPriorType = 'logOdds';  % type of prior ('logOdds' or 'delta function')
+% registrationOptions        % label fusion registrations options (weights are automated)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% adds function paths
 if ~isdeployed
-    % add paths of freesurfer functions and toolbox
     addpath(fullfile(freeSurferHome, 'matlab/'));
     addpath(genpath(pwd));
+else
+    leaveOneOut = str2double(leaveOneOut);
+    useSynthethicImages = str2double(useSynthethicImages);     
+    recompute = str2double(recompute);
+    debug = str2double(debug);
+    deleteSubfolder = str2double(deleteSubfolder);
+    targetResolution = str2double(targetResolution);
+    alignTestImages = str2double(alignTestImages);
+    rescale = str2double(rescale);
+    sigma = str2double(sigma);
 end
+
+% read paths
+if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
+[pathRefImage, pathRefFirstLabels, pathRefLabels, pathDirTrainingLabels, pathDirTrainingImages] = readPaths...
+    (pathRefImage, pathRefFirstLabels, pathRefLabels, pathDirTrainingLabels, pathDirTrainingImages, useSynthethicImages);
+
+% regroup parameters
+params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
+    margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome, pathClassesTable};
+
+%------------------------- equivalent of segment -------------------------%
 
 % display processed test brain
 refBrainNum = findBrainNum(pathRefImage);
 disp(['%%% Processing test ' refBrainNum]);
 
-% deal with potential inexistant variables
-if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
-if ~exist('pathClassesTable','var'), pathClassesTable=''; end
 % initialisation
-pathAccuraciesSubfolder = fullfile(fileparts(fileparts(pathRefImage)), 'accuracies');
-if ~exist(pathAccuraciesSubfolder, 'dir'), mkdir(pathAccuraciesSubfolder); end
-pathAccuracies = fullfile(pathAccuraciesSubfolder, ['accuracy_' refBrainNum '.mat']);
+nChannel = length(pathRefImage);
+if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
+[leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
+    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params);
+% build path resulting accuracies
+pathMainFolder = fileparts(fileparts(pathRefImage));
+pathAccuracies = fullfile(pathMainFolder, 'accuracies', ['accuracy_' refBrainNum '.mat']);
+if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
 labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder recompute registrationOptions};
 
 % copies training labels to temp folder and erase labels corresponding to test image
 if leaveOneOut && ~useSynthethicImages
-    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, refBrainNum);
-    temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, refBrainNum);
+    temp_pathDirTrainingLabels = copyTrainingData2(pathDirTrainingLabels, refBrainNum, length(pathDirTrainingLabels));
+    temp_pathDirTrainingImages = copyTrainingData2(pathDirTrainingImages, refBrainNum, nChannel);
 elseif leaveOneOut && useSynthethicImages
-    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, refBrainNum);
+    temp_pathDirTrainingLabels = copyTrainingData2(pathDirTrainingLabels, refBrainNum, 1);
     temp_pathDirTrainingImages = pathDirTrainingImages;
 else
     temp_pathDirTrainingLabels = pathDirTrainingLabels;
@@ -64,30 +84,39 @@ else
 end
 
 % preprocessing test image
-disp(' '); disp(['%% preprocessing test ' refBrainNum]);
-[pathRefImage, brainVoxels{channel}] = preprocessRefImage(pathRefImage, pathRefFirstLabels, margin, channel*multiChannel,rescale, ...
-    recompute,  freeSurferHome);
+disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']); else, disp(['%% preprocessing test ' refBrainNum]); end
+[pathRefImage, brainVoxels] = preprocessRefImage2(pathRefImage, pathRefFirstLabels, margin, rescale, alignTestImages, ...
+    freeSurferHome, niftyRegHome, recompute, debug);
 
 % floating images generation or preprocessing of real training images
 if useSynthethicImages
-    disp(['%% synthetising images for ' refBrainNum]);
-    [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages(temp_pathDirTrainingLabels, pathClassesTable, pathRefImage, ...
-        pathRefFirstLabels, channel*multiChannel, recompute, freeSurferHome, niftyRegHome, debug);
+    disp(' '); disp(['%% synthetising images for ' refBrainNum]);
+    [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages2(temp_pathDirTrainingLabels, labelsList, labelClasses,...
+        pathRefImage, pathRefFirstLabels, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
 else
-    disp('%% preprocessing real training images');
-    [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages, temp_pathDirTrainingLabels, ...
-        pathRefImage, rescale, recompute, freeSurferHome);
+    disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]);
+    [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages2(temp_pathDirTrainingImages,...
+        temp_pathDirTrainingLabels, pathRefImage, targetResolution, rescale, freeSurferHome, niftyRegHome, recompute, debug);
 end
 
+% upsample ref data to targetRes
+[pathRefImage, pathRefLabels] = upsampleToTargetRes(pathRefImage, pathRefLabels, targetResolution, multiChannel);
+
+% remove old hippocampus labels and add background
+[updatedLabelsList, ~] = updateLabelsList(labelsList, labelsNames);
+
 % labelFusion
-disp(' '); disp(['%% segmenting ' refBrainNum])
-[pathSegmentation, pathHippoSegmentation] = labelFusion...
-    (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, freeSurferHome, niftyRegHome, debug);
+disp(' '); disp(['%% segmenting ' refBrainNum]);
+[pathSegmentation, pathHippoSegmentation] = labelFusion2...
+    (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, ...
+    freeSurferHome, niftyRegHome, debug);
 
 % evaluation
-disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' '); disp(' ');
-accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels);
+disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
+accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList);
 save(pathAccuracies, 'accuracies');
+
+%-------------------------------------------------------------------------%
 
 tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));
 

@@ -9,6 +9,11 @@ function means = comparisonGraph(varargin)
 
 % create simplified list of brain region names
 regions_names = varargin{1}{1}(1,2:end-1);
+regions_names = strip(regions_names);
+regions_names = strrep(regions_names,'L_','');
+regions_names = strrep(regions_names,'L ','');
+regions_names = strrep(regions_names,'R_','');
+regions_names = strrep(regions_names,'R ','');
 regions_names = strrep(regions_names,'left','');
 regions_names = strrep(regions_names,'right','');
 regions_names = strrep(regions_names,'mid','');

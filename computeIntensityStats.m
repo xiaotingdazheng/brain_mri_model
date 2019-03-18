@@ -1,4 +1,4 @@
-function classesStats = computeIntensityStats(pathImage, pathFirstLabels, pathClassesTable, pathStatsMatrix, recompute)
+function classesStats = computeIntensityStats(pathImage, pathFirstLabels, labelsList, labelClasses, pathStatsMatrix, channel, recompute)
 
 % This function compute basic intensity statistics for different regions of
 % the brain. It takes as inputs the image to derive the stats from, a first
@@ -10,13 +10,10 @@ function classesStats = computeIntensityStats(pathImage, pathFirstLabels, pathCl
 % ususal mean and std deviation, or ths median and a std deviation based on
 % the MAD, which allows us to be more robust to outliers.
 
-% idx = regexp(pathImage,'brain');
-% refBrainNum = pathImage(idx(end):regexp(pathImage,'.nii.gz')-1);
-refBrainNum = findBrainNum(pathImage);
-
 if recompute || ~exist(pathStatsMatrix, 'file')
     
-    disp(['% computing intensity stats for test ' refBrainNum])
+    if channel, disp(['% computing intensity stats of channel ' num2str(channel)]);
+    else, disp('% computing intensity stats'); end
 
     %read image
     imageMRI = MRIread(pathImage);
@@ -27,12 +24,7 @@ if recompute || ~exist(pathStatsMatrix, 'file')
     firstLabelsMRI = MRIread(pathFirstLabels);
     firstLabels = firstLabelsMRI.vol;
 
-    %read classes
-    fid = fopen(pathClassesTable, 'r');
-    txt = textscan(fid,'%d %d');
-    fclose(fid);
-    labelsList = txt{1};
-    labelClasses = txt{2};
+    % read label List
     classesNumber = length(unique(labelClasses));
 
     %define stat vectors
@@ -57,7 +49,7 @@ if recompute || ~exist(pathStatsMatrix, 'file')
         end
 
         % compute basic stats and save it in matrix
-        classesStats(:,lC) = [mean(intensities); median(intensities); std(intensities); 1.4826*mad(intensities,1)];
+        classesStats(:,lC) = [mean(intensities,'omitnan'); median(intensities,'omitnan'); std(intensities,'omitnan'); 1.4826*mad(intensities,'omitnan')];
 
     end
 
@@ -65,7 +57,8 @@ if recompute || ~exist(pathStatsMatrix, 'file')
 
 else 
     
-   disp(['% loading intensity stats for test ' refBrainNum])
+   if channel, disp(['% loading intensity stats for channel ' num2str(channel)]);
+   else, disp('% loading intensity stats'); end
    load(pathStatsMatrix, 'classesStats');
     
 end
