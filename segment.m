@@ -58,7 +58,8 @@ for i=1:nImages
     
     % upsample ref data to targetRes
     if targetResolution
-        [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, targetResolution, multiChannel, margin);
+        [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels,...
+            targetResolution, multiChannel, margin, recompute);
     end
     
     % remove old hippocampus labels and add background
@@ -74,7 +75,6 @@ for i=1:nImages
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
     accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList);
     
-end
 
 % save results
 accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);

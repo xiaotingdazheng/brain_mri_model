@@ -61,7 +61,7 @@ params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder target
 %------------------------- equivalent of segment -------------------------%
 
 % display processed test brain
-refBrainNum = findBrainNum(pathRefImage);
+refBrainNum = findBrainNum(pathRefImage{1});
 disp(['%%% Processing test ' refBrainNum]);
 
 % initialisation
@@ -70,7 +70,8 @@ if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 [leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
     sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
 % build path resulting accuracies
-pathMainFolder = fileparts(fileparts(pathRefImage));
+pathRefLabels = pathRefLabels{1};
+pathMainFolder = fileparts(fileparts(pathRefImage{1}));
 pathAccuracies = fullfile(pathMainFolder, 'accuracies', ['accuracy_' refBrainNum '.mat']);
 if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
 labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder multiChannel recompute registrationOptions};
