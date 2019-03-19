@@ -31,10 +31,7 @@ tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % adds function paths
-if ~isdeployed
-    addpath(fullfile(freeSurferHome, 'matlab/'));
-    addpath(genpath(pwd));
-else
+if isdeployed
     leaveOneOut = str2double(leaveOneOut);
     useSynthethicImages = str2double(useSynthethicImages);     
     recompute = str2double(recompute);
@@ -47,6 +44,9 @@ else
     rho = str2double(rho);
     threshold = str2double(threshold);
     sigma = str2double(sigma);
+else
+    addpath(fullfile(freeSurferHome, 'matlab/'));
+    addpath(genpath(pwd));
 end
 
 % read paths

@@ -42,6 +42,7 @@ if threshold<0, error('threshold should be a positive or null number'); end
 if sigma<=0, error('sigma should be a strictly positive number'); end
 if ~isequal(labelPriorType,'logOdds') && ~isequal(labelPriorType,'delta function'), error('labelPriorType should be "delta_function" or "logOdds"'); end
 if ~isequal(class(regOptions), 'char'), error('registrationOptions should be a string'); end
+regOptions=strrep(regOptions,'_',' ');
 setFreeSurfer(freeSurferHome); [a,~]=system('mri_convert --help'); if a, error('freeSurferHome not recognised'); end
 [a,~]=system([niftyRegHome '/reg_f3d --help']); if a, error('niftyRegHome not recognised'); end
 if isequal(class(pathClassesTable),'cell'), pathClassesTable=pathClassesTable{1}; end
