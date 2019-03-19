@@ -31,10 +31,10 @@ main_folder/test_labels/test_brain#_labels.nii.gz
            
 main_folder/training_labels/training_brain#_labels.nii.gz
 
+main_folder/classesTable.txt (if you run the label fusion with synthetic images)
+
 
 - Optional folders/ files
-           
-main_folder/classesTable.txt (if you run the label fusion with synthetic images)
 
 main_folder/training_images/training_brain#.nii.gz (if you run label fusion with real images)
 
