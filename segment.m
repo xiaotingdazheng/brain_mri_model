@@ -75,6 +75,7 @@ for i=1:nImages
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
     accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList);
     
+end
 
 % save results
 accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);
