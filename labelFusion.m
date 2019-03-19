@@ -21,8 +21,7 @@ if ~contains(pathDirFloLabels, '*'), pathDirFloLabels = fullfile(pathDirFloLabel
 structPathsFloImages = dir(pathDirFloImages);
 structPathsFloLabels = dir(pathDirFloLabels);
 % define subfolders
-if multiChannel, tempImageSubfolder = fileparts(fileparts(fileparts(pathRefImage))); 
-else, tempImageSubfolder = fileparts(fileparts(pathRefImage)); end
+tempImageSubfolder = fileparts(fileparts(pathRefImage));
 mainFolder = fileparts(tempImageSubfolder);
 registrationFolder = fullfile(tempImageSubfolder, 'registrations');
 segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNum]);

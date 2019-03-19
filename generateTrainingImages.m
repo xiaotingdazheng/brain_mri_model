@@ -35,7 +35,7 @@ for channel=1:nChannel
             cellPathsNewImages{i,channel} = alignImages...
                 (cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 1, channel, freeSurferHome, niftyRegHome, recompute, debug);
         end
-        maskWithNaNs(cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel});
+        mask(cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, 0, NaN, 0, freeSurferHome, 1, 0);
     end
     
 end

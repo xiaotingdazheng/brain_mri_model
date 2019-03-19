@@ -50,14 +50,14 @@ for channel=1:nChannel
         else, disp(['% preprocessing training ' floBrainNum]); end
         
         % rescale and/or mask image
-        padNaNs = 0;
         if rescale
             pathRescaledTrainingImage = rescaleImage(pathTrainingImage, pathFolderFloatingImages, channel, recompute);
-            pathMaskedTrainingImage = mask(pathRescaledTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, padNaNs, freeSurferHome, recompute);
+            pathMaskedTrainingImage = mask(pathRescaledTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, 0, 1, ...
+                freeSurferHome, recompute, 1);
             cellPathsNewImages{i,channel} = fullfile(pathFolderFloatingImages, ['training_' floBrainNum '_real_rescaled_masked_' resolution '.nii.gz']);
             [~,~]=system(['rm ' pathRescaledTrainingImage]); % delete temp image
         else
-            pathMaskedTrainingImage = mask(pathTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, padNaNs, freeSurferHome, recompute);
+            pathMaskedTrainingImage = mask(pathTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, 0, 1, freeSurferHome, recompute, 1);
             cellPathsNewImages{i,channel} = fullfile(pathFolderFloatingImages, ['training_' floBrainNum '_real_masked_' resolution '.nii.gz']);
         end
         
@@ -69,7 +69,7 @@ for channel=1:nChannel
             cmd2 = ['mri_convert ' pathTrainingLabels ' ' cellPathsNewLabels{i,channel} ' -voxsize ' voxsize ' -rt nearest -odt float'];
             [~,~] = system(cmd1);
             [~,~] = system(cmd2);
-            maskWithNaNs(cellPathsNewImages{i, channel}, cellPathsNewLabels{i,channel}, cellPathsNewImages{i, channel})
+            mask(cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}, cellPathsNewImages{i,channel}, 0, NaN, 0, freeSurferHome, 1, 0);
         end
         if channel == 1, [~,~] = system(['rm ' pathMaskedTrainingImage]); else, movefile(pathMaskedTrainingImage, cellPathsNewImages{i,channel}); end
         
@@ -78,7 +78,7 @@ for channel=1:nChannel
             % realign the images coming from the same labels
             cellPathsNewImages{i,channel} = alignImages...
                 (cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 1, channel, freeSurferHome, niftyRegHome, recompute, debug);
-            maskWithNaNs(cellPathsNewImages{i,channel}, cellPathsNewLabels{i,1}, cellPathsNewImages{i,channel})
+            mask(cellPathsNewImages{i,channel}, cellPathsNewLabels{i,1}, cellPathsNewImages{i,channel}, 0, NaN, 0, freeSurferHome, 1, 0);
         end
         
     end
@@ -90,7 +90,7 @@ pathFolderFloatingLabels = fileparts(cellPathsNewLabels{1,1});
 
 if multiChannel
     pathFolderFloatingImages =  strrep(pathFolderFloatingImages, 'channel_1', 'concatenated_images');
-    for i=1:length(structPathsTrainingLabels)
+    for i=1:length(structPathsTrainingImages)
         % concatenate all the channels into a single image
         pathCatRefImage = strrep(cellPathsNewImages{i,1}, 'channel_1', 'concatenated_images');
         pathCatRefImage = strrep(pathCatRefImage, '.nii.gz', '_cat.nii.gz');
