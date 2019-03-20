@@ -31,15 +31,6 @@ for input=1:nargin-1
                 varargin{input}{i}=fullfile(varargin{input}{i}, '*nii.gz');
             end
         end
-        % check if all files are writen under the same main folder
-        current_mainFolder = fileparts(fileparts(varargin{input}{i}));
-        if i>1 && ~isequal(current_mainFolder, previous_mainFolder)
-            error(['paths in ' inputname(input) ' should have the same main folder']);
-        elseif input > 1 && ~isequal(current_mainFolder, previous_mainFolder) && (input < 5 || (~useSynthethicImages && input == 5))
-            error(['paths in ' inputname(input) ' and ' inputname(input-1) ' should have the same main folder']);
-        else
-            previous_mainFolder = current_mainFolder;
-        end
     end
     varargout{input} = varargin{input};
     

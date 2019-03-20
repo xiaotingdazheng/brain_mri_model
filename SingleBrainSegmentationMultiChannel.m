@@ -87,10 +87,10 @@ labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder multiCha
 pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
 if ~exist(pathTempImFolder,'dir'), mkdir(pathTempImFolder); end
 if leaveOneOut && ~useSynthethicImages
-    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1);
-    temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, pathTempImFolder, refBrainNum, nChannel);
+    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1, 'labels');
+    temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, pathTempImFolder, refBrainNum, nChannel, 'images');
 elseif leaveOneOut && useSynthethicImages
-    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1);
+    temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1, 'labels');
     temp_pathDirTrainingImages = pathDirTrainingImages;
 else
     temp_pathDirTrainingLabels = pathDirTrainingLabels;

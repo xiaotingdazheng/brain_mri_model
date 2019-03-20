@@ -90,10 +90,11 @@ pathFolderFloatingImages = fileparts(cellPathsNewImages{1,1});
 pathFolderFloatingLabels = fileparts(cellPathsNewLabels{1,1});
 
 if multiChannel
-    pathFolderFloatingImages =  strrep(pathFolderFloatingImages, 'channel_1', 'concatenated_images');
+    pathFolderFloatingImages = fullfile(fileparts(pathFolderFloatingImages), 'concatenated_images');
     for i=1:length(structPathsTrainingImages)
         % concatenate all the channels into a single image
-        pathCatRefImage = strrep(cellPathsNewImages{i,1}, 'channel_1', 'concatenated_images');
+        [~,name,ext] = fileparts(cellPathsNewImages{i,1});
+        pathCatRefImage = fullfile(pathFolderFloatingImages, [name ext]);
         pathCatRefImage = strrep(pathCatRefImage, '.nii.gz', '_cat.nii.gz');
         catImages(cellPathsNewImages(i,:), pathCatRefImage, recompute);
     end

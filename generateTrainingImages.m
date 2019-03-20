@@ -39,10 +39,11 @@ pathDirSyntheticImages = fileparts(cellPathsNewImages{1,1});
 pathDirSyntheticLabels = fileparts(cellPathsNewLabels{1,1});
 
 if multiChannel
-    pathDirSyntheticImages = strrep(pathDirSyntheticImages, 'channel_1', 'concatenated_images');
+    pathDirSyntheticImages = fullfile(fileparts(pathDirSyntheticImages), 'concatenated_images');
     for i=1:length(structPathsTrainingLabels)
         % concatenate all the channels into a single image
-        pathCatRefImage = strrep(cellPathsNewImages{i,1}, 'channel_1', 'concatenated_images');
+        [~,name,ext] = fileparts(cellPathsNewImages{i,1});
+        pathCatRefImage = fullfile(pathDirSyntheticImages, [name ext]);
         pathCatRefImage = strrep(pathCatRefImage, '.nii.gz', '_cat.nii.gz');
         catImages(cellPathsNewImages(i,:), pathCatRefImage, recompute);
     end

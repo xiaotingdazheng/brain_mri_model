@@ -1,5 +1,5 @@
-function [pathNewRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, margin, rescale, realignImages,...
-    freeSurferHome, niftyRegHome, recompute, debug)
+function [pathNewRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, margin, ...
+    rescale, realignImages, freeSurferHome, niftyRegHome, recompute, debug)
 
 % naming variables
 nChannel = length(pathRefImage);

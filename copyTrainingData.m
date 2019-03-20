@@ -1,12 +1,9 @@
-function cellPathDirTrainingData = copyTrainingData(pathDirTrainingData, pathTempImFolder, refBrainNum, nChannel)
+function cellPathDirTrainingData = copyTrainingData(pathDirTrainingData, pathTempImFolder, refBrainNum, nChannel, dataType)
 
 cellPathDirTrainingData = cell(1,nChannel);
 
-% create temp test image subfolder
-pathTrainingDataFolder = fileparts(pathDirTrainingData{1});
-[~,name,~] = fileparts(pathTrainingDataFolder);
-name = strrep(name, '_t1', ''); name = strrep(name, '_t2', '');
-newPathDirTrainingData = fullfile(pathTempImFolder, name);
+% create folder where data is going to be copied
+newPathDirTrainingData = fullfile(pathTempImFolder, ['training_' dataType]);
 if ~exist(newPathDirTrainingData,'dir'), mkdir(newPathDirTrainingData); end
 
 for channel=1:nChannel

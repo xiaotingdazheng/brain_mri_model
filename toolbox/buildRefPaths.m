@@ -12,6 +12,6 @@ for channel=1:nChannel
 end
 pathRefLabels = fullfile(structPathsRefLabels(index).folder, structPathsRefLabels(index).name);
 
-refBrainNum = findBrainNum(pathRefLabels);
+refBrainNum = findBrainNum(pathRefImage{1});
 
 end
