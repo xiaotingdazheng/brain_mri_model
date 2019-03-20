@@ -11,6 +11,11 @@ else
     idxUnderscore = 2;
 end
 
-brainNum = name(indicesBrain(end):indicesStop(idxUnderscore)-1);
+try
+    brainNum = name(indicesBrain(end):indicesStop(idxUnderscore)-1);
+catch
+    warning('no clear brain num could be identified from ref image name')
+    brainNum = 'brainN';
+end
 
 end
