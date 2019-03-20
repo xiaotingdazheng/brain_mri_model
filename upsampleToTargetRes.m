@@ -1,16 +1,11 @@
-function [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, targetRes,...
+function [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, targetRes,...
     multiChannel, margin, recompute)
 
 voxsize = [num2str(targetRes(1),'%.2f') ' ' num2str(targetRes(2),'%.2f') ' ' num2str(targetRes(3),'%.2f')];
 if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3), resolution = num2str(targetRes(1),'%.1f');
 else, resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')]; end
-if multiChannel
-    pathTempImageSubfolder = fileparts(fileparts(fileparts(pathRefImage{1})));
-else
-    pathTempImageSubfolder = fileparts(fileparts(pathRefImage{1}));
-    brainVoxels = cell(1);
-end
-pathUpsampledRefDataSubfolder = fullfile(pathTempImageSubfolder, 'upsampled_test_image_and_labels');
+if ~multiChannel, brainVoxels = cell(1); end
+pathUpsampledRefDataSubfolder = fullfile(pathTempImFolder, 'upsampled_test_image_and_labels');
 if ~exist(pathUpsampledRefDataSubfolder, 'dir'), mkdir(pathUpsampledRefDataSubfolder); end
 temp_pathRefImage = strrep(pathRefImage{end},'.nii.gz','.mgz'); [~,name,~] = fileparts(temp_pathRefImage);
 pathUpsampledRefImage = fullfile(pathUpsampledRefDataSubfolder, [name '_' resolution '.nii.gz']);

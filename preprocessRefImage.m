@@ -1,4 +1,4 @@
-function [pathNewRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, margin, rescale, realignImages,...
+function [pathNewRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, margin, rescale, realignImages,...
     freeSurferHome, niftyRegHome, recompute, debug)
 
 % naming variables
@@ -6,8 +6,7 @@ nChannel = length(pathRefImage);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 refBrainNum = findBrainNum(pathRefImage{1});
 % define path preprocessed subfodler
-pathTempImageSubfolder = fullfile(fileparts(fileparts(pathRefImage{1})), ['temp_' refBrainNum]);
-pathPreprocessedRefImageSubfolder = fullfile(pathTempImageSubfolder, 'preprocessed_test_image');
+pathPreprocessedRefImageSubfolder = fullfile(pathTempImFolder, 'preprocessed_test_image');
 % initialisation
 brainVoxels = cell(1,nChannel);
 

@@ -1,5 +1,5 @@
 function [pathFolderFloatingImages, pathFolderFloatingLabels] = preprocessRealTrainingImages(pathDirTrainingImages, pathDirTrainingLabels, ...
-    pathRefImage, targetRes, nChannel, rescale, freeSurferHome, niftyRegHome, recompute, debug)
+    pathRefImage, pathTempImFolder, targetRes, nChannel, rescale, freeSurferHome, niftyRegHome, recompute, debug)
 
 % initialisation
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
@@ -23,15 +23,9 @@ for channel=1:nChannel
     
     % files handling
     structPathsTrainingImages = dir(pathDirTrainingImages{channel});
-    if multiChannel
-        pathTempImageSubfolder = fileparts(fileparts(fileparts(pathRefImage{1})));
-        pathFolderFloatingImages = fullfile(pathTempImageSubfolder, 'floating_images', ['channel_' num2str(channel)]);
-        pathFolderFloatingLabels = fullfile(pathTempImageSubfolder, 'floating_labels');
-    else
-        pathTempImageSubfolder = fileparts(fileparts(pathRefImage{1}));
-        pathFolderFloatingImages = fullfile(pathTempImageSubfolder, 'floating_images');
-        pathFolderFloatingLabels = fullfile(pathTempImageSubfolder, 'floating_labels');
-    end
+    if multiChannel, pathFolderFloatingImages = fullfile(pathTempImFolder, 'floating_images', ['channel_' num2str(channel)]);
+    else, pathFolderFloatingImages = fullfile(pathTempImFolder, 'floating_images'); end
+    pathFolderFloatingLabels = fullfile(pathTempImFolder, 'floating_labels');
     if ~exist(pathFolderFloatingImages, 'dir'), mkdir(pathFolderFloatingImages); end
     if ~exist(pathFolderFloatingLabels, 'dir'), mkdir(pathFolderFloatingLabels); end
     

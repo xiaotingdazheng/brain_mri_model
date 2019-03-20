@@ -1,5 +1,5 @@
-function [pathSegm, pathHippoSegm] = labelFusion(pathRefImage, pathDirFloImages, pathDirFloLabels, brainVoxels, labelFusionParameters, labelsList,...
-    freeSurferHome, niftyRegHome, debug)
+function [pathSegm, pathHippoSegm] = labelFusion(pathRefImage, pathDirFloImages, pathDirFloLabels, brainVoxels, ...
+    labelFusionParameters, labelsList, pathTempImFolder, freeSurferHome, niftyRegHome, debug)
 
 % read parameters
 rho = labelFusionParameters{1};
@@ -21,12 +21,11 @@ if ~contains(pathDirFloLabels, '*'), pathDirFloLabels = fullfile(pathDirFloLabel
 structPathsFloImages = dir(pathDirFloImages);
 structPathsFloLabels = dir(pathDirFloLabels);
 % define subfolders
-tempImageSubfolder = fileparts(fileparts(pathRefImage));
-mainFolder = fileparts(tempImageSubfolder);
-registrationFolder = fullfile(tempImageSubfolder, 'registrations');
+mainFolder = fileparts(pathTempImFolder);
+registrationFolder = fullfile(pathTempImFolder, 'registrations');
 segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNum]);
-if isequal(labelPriorType, 'delta function'), priorFolder = fullfile(tempImageSubfolder, 'hippo_labels_delta');
-else, priorFolder = fullfile(tempImageSubfolder,'logOdds'); end
+if isequal(labelPriorType, 'delta function'), priorFolder = fullfile(pathTempImFolder, 'hippo_labels_delta');
+else, priorFolder = fullfile(pathTempImFolder,'logOdds'); end
 
 % initialise label maps fusion with zeros (background label)
 labelMap = zeros(length(labelsList), length(brainVoxels{1}), 'single');
@@ -64,6 +63,6 @@ end
 [pathSegm, pathHippoSegm] = getSegmentations(labelMap, labelMapHippo, segmentationsFolder, pathRefImage, brainVoxels, labelsList, sizeSegmMap);
 
 % delete temp subfolder if specified
-if deleteSubfolder, rmdir(tempImageSubfolder,'s'); end
+if deleteSubfolder, rmdir(pathTempImFolder,'s'); end
 
 end

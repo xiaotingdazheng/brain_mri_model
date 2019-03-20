@@ -1,15 +1,10 @@
 function [pathDirSyntheticImages, pathDirSyntheticLabels] = generateTrainingImages(pathDirTrainingLabels, labelsList, labelClasses, pathRefImage,...
-    pathRefFirstLabels, targetRes, recompute, freeSurferHome, niftyRegHome, debug)
+    pathRefFirstLabels, pathTempImFolder, targetRes, recompute, freeSurferHome, niftyRegHome, debug)
 
 % files handling
 nChannel = length(pathRefFirstLabels);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
-if multiChannel
-    pathTempImageSubfolder = fileparts(fileparts(fileparts(pathRefImage{1})));
-else
-    pathTempImageSubfolder = fileparts(fileparts(pathRefImage{1}));
-end
-pathStatsMatrixFolder = fullfile(pathTempImageSubfolder, 'ClassesStats');
+pathStatsMatrixFolder = fullfile(pathTempImFolder, 'ClassesStats');
 if ~exist(pathStatsMatrixFolder, 'dir'), mkdir(pathStatsMatrixFolder); end
 
 % initialisation
@@ -28,7 +23,7 @@ for channel=1:nChannel
     for i=1:length(structPathsTrainingLabels)
         % we now use pathRefFirstLabels{1}, because all channels are now aligned
         pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImageSubfolder, ...
+        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, ...
             pathRefImage{channel}, targetRes, labelsList, labelClasses, channel*multiChannel, recompute, freeSurferHome, niftyRegHome, debug);
         if multiChannel && channel > 1
             % realign the images coming from the same labels (1=align by registration)
