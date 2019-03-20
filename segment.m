@@ -33,7 +33,7 @@ for i=1:nImages
     if ~exist(pathTempImFolder,'dir'), mkdir(pathTempImFolder); end
     if leaveOneOut && ~useSynthethicImages
         temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1);
-        temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, pathTempImFolder, nChannel);
+        temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, pathTempImFolder, refBrainNum, nChannel);
     elseif leaveOneOut && useSynthethicImages
         temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1);
         temp_pathDirTrainingImages = pathDirTrainingImages;

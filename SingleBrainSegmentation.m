@@ -67,8 +67,9 @@ disp(['%%% Processing test ' refBrainNum]);
 % initialisation
 nChannel = length(pathRefImage);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
-[leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
-    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
+[leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, ...
+    margin, rho, threshold, sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, ...
+    labelClasses, labelsNames] = readParams(params, nChannel);
 % build path resulting accuracies
 pathRefLabels = pathRefLabels{1};
 pathMainFolder = fileparts(fileparts(pathRefImage{1}));
@@ -91,7 +92,8 @@ else
 end
 
 % preprocessing test image
-disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']); else, disp(['%% preprocessing test ' refBrainNum]); end
+disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']); 
+else, disp(['%% preprocessing test ' refBrainNum]); end
 [pathRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, margin, rescale, alignTestImages, ...
     freeSurferHome, niftyRegHome, recompute, debug);
 
@@ -103,12 +105,14 @@ if useSynthethicImages
 else
     disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]);
     [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages,...
-        temp_pathDirTrainingLabels, pathRefImage, pathTempImFolder, targetResolution, nChannel, rescale, freeSurferHome, niftyRegHome, recompute, debug);
+        temp_pathDirTrainingLabels, pathRefImage, pathTempImFolder, targetResolution, nChannel, rescale, freeSurferHome, ...
+        niftyRegHome, recompute, debug);
 end
 
 % upsample ref data to targetRes
 if targetResolution
-    [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, targetResolution, multiChannel, margin);
+    [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, ...
+        targetResolution, multiChannel, margin, recompute);
 end
 
 % remove old hippocampus labels and add background

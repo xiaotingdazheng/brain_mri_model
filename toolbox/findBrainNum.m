@@ -14,7 +14,8 @@ end
 try
     brainNum = name(indicesBrain(end):indicesStop(idxUnderscore)-1);
 catch
-    warning('no clear brain num could be identified from ref image name')
+    warning('no clear brain num could be identified from ref image name');
+    warning('brainN will be used by default');
     brainNum = 'brainN';
 end
 
