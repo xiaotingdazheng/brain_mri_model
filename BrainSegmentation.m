@@ -16,8 +16,7 @@ pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/real_leaveO
 % cell paths test labels
 pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = {'~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/training_labels_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/training_labels_t2'};
+pathDirTrainingLabels = {'~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/training_labels_t1'};
 % path labels table
 pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/classesTable.txt';
 % optional paths

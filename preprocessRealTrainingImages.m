@@ -1,8 +1,7 @@
 function [pathFolderFloatingImages, pathFolderFloatingLabels] = preprocessRealTrainingImages(pathDirTrainingImages, pathDirTrainingLabels, ...
-    pathRefImage, targetRes, rescale, freeSurferHome, niftyRegHome, recompute, debug)
+    pathRefImage, targetRes, nChannel, rescale, freeSurferHome, niftyRegHome, recompute, debug)
 
 % initialisation
-nChannel = length(pathDirTrainingImages);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 structPathsTrainingLabels = dir(pathDirTrainingLabels{1});
 cellPathsNewImages = cell(length(structPathsTrainingLabels), nChannel);
@@ -24,7 +23,6 @@ for channel=1:nChannel
     
     % files handling
     structPathsTrainingImages = dir(pathDirTrainingImages{channel});
-    structPathsTrainingLabels = dir(pathDirTrainingLabels{channel});
     if multiChannel
         pathTempImageSubfolder = fileparts(fileparts(fileparts(pathRefImage{1})));
         pathFolderFloatingImages = fullfile(pathTempImageSubfolder, 'floating_images', ['channel_' num2str(channel)]);
@@ -52,12 +50,21 @@ for channel=1:nChannel
         % rescale and/or mask image
         if rescale
             pathRescaledTrainingImage = rescaleImage(pathTrainingImage, pathFolderFloatingImages, channel, recompute);
-            pathMaskedTrainingImage = mask(pathRescaledTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, 0, 1, ...
-                freeSurferHome, recompute, 1);
+            if channel == 1
+                pathMaskedTrainingImage = mask(pathRescaledTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, 0, 1, ...
+                    freeSurferHome, recompute, 1);
+            else
+                pathMaskedTrainingImage = mask(pathRescaledTrainingImage, pathRescaledTrainingImage, pathFolderFloatingImages, channel, 0, 0, ...
+                    freeSurferHome, recompute, 1);
+            end
             cellPathsNewImages{i,channel} = fullfile(pathFolderFloatingImages, ['training_' floBrainNum '_real_rescaled_masked_' resolution '.nii.gz']);
             [~,~]=system(['rm ' pathRescaledTrainingImage]); % delete temp image
         else
-            pathMaskedTrainingImage = mask(pathTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, 0, 1, freeSurferHome, recompute, 1);
+            if channel == 1
+                pathMaskedTrainingImage = mask(pathTrainingImage, pathTrainingLabels, pathFolderFloatingImages, channel, 0, 1, freeSurferHome, recompute, 1);
+            else
+                pathMaskedTrainingImage = mask(pathTrainingImage, pathTrainingImage, pathFolderFloatingImages, channel, 0, 0, freeSurferHome, recompute, 1);
+            end
             cellPathsNewImages{i,channel} = fullfile(pathFolderFloatingImages, ['training_' floBrainNum '_real_masked_' resolution '.nii.gz']);
         end
         

@@ -53,7 +53,7 @@ for i=1:nImages
     else
         disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]);
         [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages,...
-            temp_pathDirTrainingLabels, pathRefImage, targetResolution, rescale, freeSurferHome, niftyRegHome, recompute, debug);
+            temp_pathDirTrainingLabels, pathRefImage, targetResolution, nChannel, rescale, freeSurferHome, niftyRegHome, recompute, debug);
     end
     
     % upsample ref data to targetRes
