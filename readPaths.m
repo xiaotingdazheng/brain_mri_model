@@ -1,10 +1,11 @@
 function varargout = readPaths(varargin)
 
 nChannel = length(varargin{1});
-useSynthethicImages = varargin{end};
+useSynthethicImages = varargin{end-1};
+singleBrain = varargin{end};
 if isequal(varargin{5}, '') && ~useSynthethicImages, error(['please provide ' inputname(5)]); end
 
-for input=1:nargin-1
+for input=1:nargin-2
     
     % check if input is a cell or a string. Transfrom string into cell
     if ~isequal(class(varargin{input}),'cell')
@@ -24,8 +25,12 @@ for input=1:nargin-1
     end
     for i=1:length(varargin{input})
         % add *nii.gz to folder names and check no mgz files
-        if ~contains(varargin{input}{i}, 'nii.gz') || ~contains(varargin{input}{i}, '.mgz')
-            varargin{input}{i}=fullfile(varargin{input}{i}, '*gz');
+        if ~contains(varargin{input}{i}, 'nii.gz') && ~contains(varargin{input}{i}, '.mgz')
+            if singleBrain && input < 4
+                error([inputname(1) ' should only contain nifty or mgz files'])
+            else
+                varargin{input}{i}=fullfile(varargin{input}{i}, '*gz');
+            end
         end
     end
     varargout{input} = varargin{input};

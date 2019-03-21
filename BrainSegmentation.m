@@ -29,7 +29,7 @@ recompute = 0;               % recompute files, even if they exist (0-1)
 debug = 0;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)
 % preprocessing parameters
-targetResolution = 0;      % resolution of synthetic images (0 = test image resolution, only if one channel)
+targetResolution = 0.6;      % resolution of synthetic images (0 = test image resolution, only if one channel)
 alignTestImages = 1;         % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
 rescale = 1;                 % rescale intensities between 0 and 255 (0-1)
 % label fusion parameters
@@ -50,7 +50,7 @@ addpath(genpath(pwd));
 % read paths
 if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
 [pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages] = readPaths...
-    (pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, useSynthethicImages);
+    (pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, useSynthethicImages, 0);
 
 % regroup parameters
 params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
