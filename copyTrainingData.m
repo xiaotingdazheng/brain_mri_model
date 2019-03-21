@@ -1,6 +1,7 @@
-function cellPathDirTrainingData = copyTrainingData(pathDirTrainingData, pathTempImFolder, refBrainNum, nChannel, dataType)
+function cellPathDirTrainingData = copyTrainingData(pathDirTrainingData, pathTempImFolder, refBrainNum, nChannel, dataType, freeSurferHome, recompute, leaveOneOut)
 
 cellPathDirTrainingData = cell(1,nChannel);
+if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 
 % create folder where data is going to be copied
 newPathDirTrainingData = fullfile(pathTempImFolder, ['training_' dataType]);
@@ -9,7 +10,7 @@ if ~exist(newPathDirTrainingData,'dir'), mkdir(newPathDirTrainingData); end
 for channel=1:nChannel
     
     % extend path if multi channel
-    if nChannel > 1
+    if multiChannel
         temp_newPathDirTrainingData = fullfile(newPathDirTrainingData, ['channel_' num2str(channel)]);
     else 
         temp_newPathDirTrainingData = newPathDirTrainingData;
@@ -23,16 +24,19 @@ for channel=1:nChannel
     [~,~] = system(cmd);
 
     % list all training labels
-    temp_newPathDirTrainingData = fullfile(temp_newPathDirTrainingData, '*nii.gz');
+    temp_newPathDirTrainingData = fullfile(temp_newPathDirTrainingData, '*gz');
     cellPathDirTrainingData{channel} = temp_newPathDirTrainingData;
 
     structPathsTrainingLabels = dir(temp_newPathDirTrainingData);
     % remove labels corresponding to test images
     for j=1:length(structPathsTrainingLabels)
-        if contains(structPathsTrainingLabels(j).name, refBrainNum)
-            cmd = ['rm ' fullfile(structPathsTrainingLabels(j).folder, structPathsTrainingLabels(j).name)]; [~,~] = system(cmd);
-            break
+        temp_pathTrainingData = fullfile(structPathsTrainingLabels(j).folder, structPathsTrainingLabels(j).name);
+        temp_brainNum = findBrainNum(temp_pathTrainingData);
+        if strcmp(temp_brainNum, refBrainNum) && leaveOneOut
+            cmd = ['rm ' temp_pathTrainingData]; [~,~] = system(cmd);
+            continue
         end
+        mgz2nii(temp_pathTrainingData, 'same', 1, dataType, channel*multiChannel, freeSurferHome, recompute);
     end
     
 end

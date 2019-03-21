@@ -1,4 +1,4 @@
-function [pathNewRefImage, brainVoxels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, margin, ...
+function [pathNewRefImage, pathRefFirstLabels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, ...
     rescale, realignImages, freeSurferHome, niftyRegHome, recompute, debug)
 
 % naming variables
@@ -7,8 +7,6 @@ if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 refBrainNum = findBrainNum(pathRefImage{1});
 % define path preprocessed subfodler
 pathPreprocessedRefImageSubfolder = fullfile(pathTempImFolder, 'preprocessed_test_image');
-% initialisation
-brainVoxels = cell(1,nChannel);
 
 for channel=1:nChannel
     
@@ -16,6 +14,11 @@ for channel=1:nChannel
     if multiChannel, temp_pathPreprocessedRefImFolder = fullfile(pathPreprocessedRefImageSubfolder, ['channel_' num2str(channel)]);
     else, temp_pathPreprocessedRefImFolder = pathPreprocessedRefImageSubfolder; end
     if ~exist(temp_pathPreprocessedRefImFolder, 'dir'), mkdir(temp_pathPreprocessedRefImFolder); end
+    
+    % convert image and labels from mgz to nii.gz
+    pathRefImage{channel} = mgz2nii(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, 0, 'images', channel*multiChannel, freeSurferHome, recompute);
+    pathRefFirstLabels{channel} = mgz2nii(pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, 0, 'labels', channel*multiChannel, ...
+        freeSurferHome, recompute);
     
     % rescale image
     if rescale
@@ -28,20 +31,17 @@ for channel=1:nChannel
     
 end
 
-% preparing the reference image for label fusion (masking and cropping)
-brainVoxels{1} = selectBrainVoxels(pathRefFirstLabels{1}, margin);
-
 if multiChannel
-    [pathNewRefImage, brainVoxels] = multiChannelPreprocessing(pathRefImage, brainVoxels, temp_pathPreprocessedRefImFolder, nChannel, rescale, ...
-        realignImages, margin, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug);
+    pathNewRefImage = multiChannelPreprocessing(pathRefImage, temp_pathPreprocessedRefImFolder, nChannel, rescale, ...
+        realignImages, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug);
 else
     pathNewRefImage = pathRefImage;
 end
 
 end
 
-function [pathNewRefImage, brainVoxels] = multiChannelPreprocessing(pathRefImage, brainVoxels, temp_pathPreprocessedRefImFolder, nChannel, rescale, ...
-    realignImages, margin, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug)
+function pathNewRefImage = multiChannelPreprocessing(pathRefImage, temp_pathPreprocessedRefImFolder, nChannel, rescale, ...
+    realignImages, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug)
 
 % create concatenated image subfolder
 pathCatSubfolder = fullfile(fileparts(temp_pathPreprocessedRefImFolder), 'concatenated_image');
@@ -62,9 +62,6 @@ end
 % pad all images with NaNs
 for channel=1:nChannel
     mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, freeSurferHome, 1, 0);
-    if channel > 1
-        brainVoxels{channel} = selectBrainVoxels(pathAlignedRefImages{channel}, margin);
-    end
 end
 
 % concatenate all the channels into a single image

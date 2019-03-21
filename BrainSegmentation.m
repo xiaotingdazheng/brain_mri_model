@@ -8,31 +8,28 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 
 % cell paths test images
-pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/test_images_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/test_images_t2'};
+pathDirTestImages= '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutTest/test_images';
 % cell paths test first labels (FS labels)
-pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/test_first_labels_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/test_first_labels_t2'};
+pathDirRefFirstLabels= '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutTest/test_first_labels';
 % cell paths test labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/test_labels';
+pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutTest/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = {'~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/training_labels_t1'};
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutTest/training_labels';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/classesTable.txt';
+pathClassesTable= '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutTest/classesTable.txt';
 % optional paths
-pathDirTrainingImages = {'~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/training_images_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/real_leaveOneOut/training_images_t2'};
+% pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOut/training_images_t1';
 
 % experiment title
 title = 'label fusion on synthetic t1s generated from CobraLab data';
 % general parameters
 leaveOneOut = 1;             % evaluate one image with the rest of the datatset (0-1)
-useSynthethicImages = 0;     % use real or synthetic images (0-1)
+useSynthethicImages = 1;     % use real or synthetic images (0-1)
 recompute = 0;               % recompute files, even if they exist (0-1)
 debug = 0;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)
 % preprocessing parameters
-targetResolution = 0.6;      % resolution of synthetic images (0 = test image resolution, only if one channel)
+targetResolution = 0;      % resolution of synthetic images (0 = test image resolution, only if one channel)
 alignTestImages = 1;         % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
 rescale = 1;                 % rescale intensities between 0 and 255 (0-1)
 % label fusion parameters

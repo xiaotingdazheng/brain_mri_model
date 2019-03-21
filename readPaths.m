@@ -24,12 +24,8 @@ for input=1:nargin-1
     end
     for i=1:length(varargin{input})
         % add *nii.gz to folder names and check no mgz files
-        if ~contains(varargin{input}{i}, 'nii.gz')
-            if contains(varargin{input}{i}, '.mgz')
-                error('all files should be nii.gz');
-            else
-                varargin{input}{i}=fullfile(varargin{input}{i}, '*nii.gz');
-            end
+        if ~contains(varargin{input}{i}, 'nii.gz') || ~contains(varargin{input}{i}, '.mgz')
+            varargin{input}{i}=fullfile(varargin{input}{i}, '*gz');
         end
     end
     varargout{input} = varargin{input};

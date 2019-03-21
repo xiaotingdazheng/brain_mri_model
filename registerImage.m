@@ -7,6 +7,7 @@ filename = [floBrainNum '_to_' refBrainNum];
 % names of files that will be used/saved during registration
 pathRegFloImage = fullfile(registrationSubFolder,[filename '.nii.gz']); %path of registered floating image
 aff = fullfile(registrationSubFolder, [filename '.aff']); %deformation of first registration
+pathRigidRegFloImage = fullfile(registrationSubFolder, [filename '.rigid.nii.gz']);
 pathTransformation = fullfile(registrationSubFolder, [filename '.cpp.nii.gz']); %modify name of the saved aff file
 if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % logOdds folder
 
@@ -14,7 +15,7 @@ if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % log
 if ~exist(aff, 'file') || recompute
     disp(['registering ' floBrainNum ' to ' refBrainNum ' with reg_aladin']);
     pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
-    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathFloImage ' -aff ' aff ' -pad 0 -voff'];
+    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathFloImage ' -aff ' aff ' -res ' pathRigidRegFloImage ' -pad 0 -voff'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
 end
 % compute registration synthetic image to real images
