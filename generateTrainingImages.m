@@ -1,5 +1,5 @@
 function [pathDirSyntheticImages, pathDirSyntheticLabels] = generateTrainingImages(pathDirTrainingLabels, labelsList, labelClasses, pathRefImage,...
-    pathRefFirstLabels, pathTempImFolder, targetRes, recompute, freeSurferHome, niftyRegHome, debug)
+    pathRefFirstLabels, pathTempImFolder, targetRes, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug)
 
 % files handling
 nChannel = length(pathRefFirstLabels);
@@ -24,13 +24,13 @@ for channel=1:nChannel
         % we now use pathRefFirstLabels{1}, because all channels are now aligned
         pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
         [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, ...
-            pathRefImage{channel}, targetRes, labelsList, labelClasses, channel*multiChannel, recompute, freeSurferHome, niftyRegHome, debug);
+            pathRefImage{channel}, targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
         if multiChannel && channel > 1
             % realign the images coming from the same labels (1=align by registration)
             cellPathsNewImages{i,channel} = alignImages...
                 (cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 1, channel, freeSurferHome, niftyRegHome, recompute, debug);
         end
-        mask(cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, 0, NaN, 0, freeSurferHome, 1, 0);
+        mask(cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, 0, NaN, 0, refBrainNum, freeSurferHome, 1, 0);
     end
     
 end

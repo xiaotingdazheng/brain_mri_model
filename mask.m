@@ -1,10 +1,8 @@
-function pathMaskedImage = mask(pathImage, pathMask, result, channel, padChar, padFS, freeSurferHome, recompute, verbose)
+function pathMaskedImage = mask(pathImage, pathMask, result, channel, padChar, padFS, brainNum, freeSurferHome, recompute, verbose)
 
 % Mask image with provided mask. Result is saved in specified folder with
 % '_masked' added to the original filename.
 
-% naming variables
-brainNum = findBrainNum(pathImage);
 % create name of masked file
 if ~contains(result,'.nii.gz')
     temp_path = strrep(pathImage,'.nii.gz','.mgz'); [~,name,~] = fileparts(temp_path);

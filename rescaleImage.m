@@ -1,11 +1,9 @@
-function pathNewImage = rescaleImage(pathImage, resultFolder, channel, recompute)
+function pathNewImage = rescaleImage(pathImage, resultFolder, channel, brainNum, recompute)
 
 % Rescale image. Result is saved in specified folder with '_rescaled' added
 % to the original filename.
 
 % naming variables
-idx = regexp(pathImage,'brain');
-brainNum = findBrainNum(pathImage);
 temp_path = strrep(pathImage,'.nii.gz','.mgz'); [~,name,~] = fileparts(temp_path);
 % defining new paths
 pathNewImage = fullfile(resultFolder, [name '_rescaled.nii.gz']);

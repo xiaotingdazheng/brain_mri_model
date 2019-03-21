@@ -1,8 +1,8 @@
-function pathRegFloImage = registerImage(pathRefImage, pathFloImage, registrationSubFolder, registrationOptions, multiChannel, brainVoxels, recompute, niftyRegHome, debug)
+function pathRegFloImage = registerImage(pathRefImage, pathFloImage, registrationSubFolder, registrationOptions, multiChannel, brainVoxels, recompute, ...
+    refBrainNum, niftyRegHome, debug)
 
 % naming variables
 floBrainNum = findBrainNum(pathFloImage);
-refBrainNum = findBrainNum(pathRefImage);
 filename = [floBrainNum '_to_' refBrainNum];
 % names of files that will be used/saved during registration
 pathRegFloImage = fullfile(registrationSubFolder,[filename '.nii.gz']); %path of registered floating image

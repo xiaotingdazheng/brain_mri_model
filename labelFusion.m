@@ -1,5 +1,5 @@
 function [pathSegm, pathHippoSegm] = labelFusion(pathRefImage, pathDirFloImages, pathDirFloLabels, brainVoxels, ...
-    labelFusionParameters, labelsList, pathTempImFolder, freeSurferHome, niftyRegHome, debug)
+    labelFusionParameters, labelsList, pathTempImFolder, refBrainNum, freeSurferHome, niftyRegHome, debug)
 
 % read parameters
 rho = labelFusionParameters{1};
@@ -13,7 +13,6 @@ registrationOptions = labelFusionParameters{8};
 
 % define paths of real image and corresponding labels
 pathRefImage = pathRefImage{end};
-refBrainNum = findBrainNum(pathRefImage);
 
 % handling paths floating data
 if ~contains(pathDirFloImages, '*'), pathDirFloImages = fullfile(pathDirFloImages, '*nii.gz'); end
@@ -47,11 +46,11 @@ for i=1:length(structPathsFloImages)
     % registration of synthetic image to real image
     registrationSubfolder = fullfile(registrationFolder, ['training_' floBrainNum '_reg_to_test_' refBrainNum]);
     pathRegFloImage = registerImage(pathRefImage, pathFloImage, registrationSubfolder, registrationOptions, multiChannel, brainVoxels,...
-        recompute, niftyRegHome, debug);
+        recompute, refBrainNum, niftyRegHome, debug);
 
     % registration of priors
     regPriorSubfolder = registerLabels(pathFloLabels, priorSubfolder, pathRefImage, registrationSubfolder, labelPriorType, labelsList,...
-        niftyRegHome, recompute, debug);
+        refBrainNum, niftyRegHome, recompute, debug);
     
     % perform summation of posterior on the fly
     [labelMap, labelMapHippo, sizeSegmMap] = updateLabelMaps(labelMap, labelMapHippo, pathRefImage, pathRegFloImage, regPriorSubfolder, ...
@@ -60,7 +59,7 @@ for i=1:length(structPathsFloImages)
 end
 
 % get most likely segmentation
-[pathSegm, pathHippoSegm] = getSegmentations(labelMap, labelMapHippo, segmentationsFolder, pathRefImage, brainVoxels, labelsList, sizeSegmMap);
+[pathSegm, pathHippoSegm] = getSegmentations(labelMap, labelMapHippo, segmentationsFolder, pathRefImage, brainVoxels, labelsList, sizeSegmMap, refBrainNum);
 
 % delete temp subfolder if specified
 if deleteSubfolder, rmdir(pathTempImFolder,'s'); end

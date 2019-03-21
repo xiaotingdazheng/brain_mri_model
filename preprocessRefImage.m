@@ -1,10 +1,9 @@
 function [pathNewRefImage, pathRefFirstLabels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, ...
-    rescale, realignImages, freeSurferHome, niftyRegHome, recompute, debug)
+    rescale, realignImages, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug)
 
 % naming variables
 nChannel = length(pathRefImage);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
-refBrainNum = findBrainNum(pathRefImage{1});
 % define path preprocessed subfodler
 pathPreprocessedRefImageSubfolder = fullfile(pathTempImFolder, 'preprocessed_test_image');
 
@@ -16,18 +15,18 @@ for channel=1:nChannel
     if ~exist(temp_pathPreprocessedRefImFolder, 'dir'), mkdir(temp_pathPreprocessedRefImFolder); end
     
     % convert image and labels from mgz to nii.gz
-    pathRefImage{channel} = mgz2nii(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, 0, 'images', channel*multiChannel, freeSurferHome, recompute);
-    pathRefFirstLabels{channel} = mgz2nii(pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, 0, 'labels', channel*multiChannel, ...
+    pathRefImage{channel} = mgz2nii(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, 0, 'images', channel*multiChannel, refBrainNum, freeSurferHome, recompute);
+    pathRefFirstLabels{channel} = mgz2nii(pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, 0, 'labels', channel*multiChannel, refBrainNum, ...
         freeSurferHome, recompute);
     
     % rescale image
     if rescale
-        pathRefImage{channel} = rescaleImage(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, channel*multiChannel, recompute);
+        pathRefImage{channel} = rescaleImage(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, channel*multiChannel, refBrainNum, recompute);
     end
     
     % mask image with zeros using its labels
     pathRefImage{channel} = mask(pathRefImage{channel}, pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, ...
-        channel*multiChannel, 0, 1, freeSurferHome, recompute, 1);
+        channel*multiChannel, 0, 1, refBrainNum, freeSurferHome, recompute, 1);
     
 end
 
@@ -61,7 +60,7 @@ end
 
 % pad all images with NaNs
 for channel=1:nChannel
-    mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, freeSurferHome, 1, 0);
+    mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, refBrainNum, freeSurferHome, 1, 0);
 end
 
 % concatenate all the channels into a single image

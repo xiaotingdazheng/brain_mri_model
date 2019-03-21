@@ -1,5 +1,5 @@
 function [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, targetRes,...
-    multiChannel, margin, recompute)
+    multiChannel, margin, refBrainNum, recompute)
 
 % path upsampled ref folder
 if ~multiChannel, brainVoxels = cell(1); end
@@ -22,7 +22,7 @@ if targetRes
         [~,~] = system(cmd);
     end
     % mask ref image with nans
-    mask(pathUpsampledRefImage, pathUpsampledRefImage, pathUpsampledRefImage, 0, NaN, 0, '', 1, 0);
+    mask(pathUpsampledRefImage, pathUpsampledRefImage, pathUpsampledRefImage, 0, NaN, 0, refBrainNum, '', 1, 0);
     % upsample ref labels
     if ~exist(pathUpsampledRefLabels, 'file') || recompute
         cmd = ['mri_convert ' pathRefLabels ' ' pathUpsampledRefLabels ' --voxsize ' voxsize ' -odt float -rt nearest'];

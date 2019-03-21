@@ -36,7 +36,8 @@ for channel=1:nChannel
             cmd = ['rm ' temp_pathTrainingData]; [~,~] = system(cmd);
             continue
         end
-        mgz2nii(temp_pathTrainingData, 'same', 1, dataType, channel*multiChannel, freeSurferHome, recompute);
+        floBrainNum = findBrainNum(temp_pathTrainingData);
+        mgz2nii(temp_pathTrainingData, 'same', 1, dataType, channel*multiChannel, floBrainNum, freeSurferHome, recompute);
     end
     
 end

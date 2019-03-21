@@ -43,13 +43,13 @@ for i=1:nImages
     % preprocessing test image
     disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']); else, disp(['%% preprocessing test ' refBrainNum]); end
     [pathRefImage, pathRefFirstLabels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, rescale, ...
-        alignTestImages, freeSurferHome, niftyRegHome, recompute, debug);
+        alignTestImages, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug);
     
     % floating images generation or preprocessing of real training images
     if useSynthethicImages
         disp(' '); disp(['%% synthetising images for ' refBrainNum]);
         [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages(temp_pathDirTrainingLabels, labelsList, labelClasses,...
-            pathRefImage, pathRefFirstLabels, pathTempImFolder, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
+            pathRefImage, pathRefFirstLabels, pathTempImFolder, targetResolution, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
     else
         disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]);
         [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages,...
@@ -58,7 +58,7 @@ for i=1:nImages
     
     % upsample ref data to targetRes
     [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, ...
-        targetResolution, multiChannel, margin, recompute);
+        targetResolution, multiChannel, margin, refBrainNum, recompute);
     
     % remove old hippocampus labels and add background
     [updatedLabelsList, updatedLabelsNames] = updateLabelsList(labelsList, labelsNames);
@@ -67,7 +67,7 @@ for i=1:nImages
     disp(' '); disp(['%% segmenting ' refBrainNum]);
     [pathSegmentation, pathHippoSegmentation] = labelFusion...
         (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, ...
-        pathTempImFolder, freeSurferHome, niftyRegHome, debug);
+        pathTempImFolder, refBrainNum, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');

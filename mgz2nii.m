@@ -1,7 +1,6 @@
-function pathImageNii = mgz2nii(pathImage, resultFolder, eraseOld, Imagetype, channel, freeSurferHome, recompute)
+function pathImageNii = mgz2nii(pathImage, resultFolder, eraseOld, Imagetype, channel, brainNum, freeSurferHome, recompute)
 
 [folder,name,ext] = fileparts(pathImage);
-brainNum = findBrainNum(pathImage);
 
 if strcmp(ext, '.mgz')
     

@@ -1,5 +1,5 @@
 function regPriorSubfolder = registerLabels(pathFloLabels, priorSubfolder, pathRefImage, registrationSubfolder, labelPriorType, labelsList,...
-    niftyRegHome, recompute, debug)
+    refBrainNum, niftyRegHome, recompute, debug)
 
 % It applies to the logOdds files the warping computed during the registration
 % of the floating image to the reference one. The registered logOdds are
@@ -7,7 +7,6 @@ function regPriorSubfolder = registerLabels(pathFloLabels, priorSubfolder, pathR
 
 % naming variables
 floBrainNum = findBrainNum(pathFloLabels);
-refBrainNum = findBrainNum(pathRefImage);
 pathTransformation = fullfile(registrationSubfolder, [floBrainNum '_to_' refBrainNum '.cpp.nii.gz']);
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
 

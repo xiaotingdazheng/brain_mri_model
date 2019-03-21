@@ -4,7 +4,7 @@ function SingleBrainSegmentationMultiChannel(pathRefImaget1, pathRefImaget2, ...
     pathDirTrainingLabels, ...
     pathDirTrainingImages1, pathDirTrainingImages2, ...
     pathClassesTable, ...
-    leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder,...
+    leaveOneOut, useSynthethicImages, recompute, id, debug, deleteSubfolder,...
     targetResolution, alignTestImages, rescale,...
     margin, rho, threshold, sigma, labelPriorType, ...
     registrationOptions, ...
@@ -68,7 +68,18 @@ params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder target
 %------------------------- equivalent of segment -------------------------%
 
 % display processed test brain
-refBrainNum = findBrainNum(pathRefImage{1});
+if recompute, refBrainNum = findBrainNum(pathRefImage{1}); else, refBrainNum = id; end
+pathMainFolder = fileparts(fileparts(pathRefImage{1}));
+pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
+if ~exist(pathTempImFolder,'dir')
+    mkdir(pathTempImFolder);
+    if ~recompute
+        refBrainNum = findBrainNum(pathRefImage{1});
+        disp([id ' did not exist, switched to new id: ' refBrainNum]); disp(' ');
+    end
+elseif exist(pathTempImFolder,'dir') && ~recompute
+    disp(['using files already computed in ' pathTempImFolder]); disp(' ');
+end
 disp(['%%% Processing test ' refBrainNum]);
 
 % initialisation
@@ -78,15 +89,11 @@ if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
     sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
 % build path resulting accuracies
 pathRefLabels = pathRefLabels{1};
-pathMainFolder = fileparts(fileparts(pathRefImage{1}));
 pathAccuracies = fullfile(pathMainFolder, 'accuracies', ['accuracy_' refBrainNum '.mat']);
-if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
 labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder multiChannel recompute registrationOptions};
 
 % copies training labels to temp folder and erase labels corresponding to test image
 disp(' '); disp('%% copying training data');
-pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
-if ~exist(pathTempImFolder,'dir'), mkdir(pathTempImFolder); end
 if ~useSynthethicImages
     temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1, 'labels', freeSurferHome, recompute, leaveOneOut);
     temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, pathTempImFolder, refBrainNum, nChannel, 'images', freeSurferHome, recompute, leaveOneOut);
@@ -98,13 +105,13 @@ end
 % preprocessing test image
 disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']); else, disp(['%% preprocessing test ' refBrainNum]); end
 [pathRefImage, pathRefFirstLabels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, rescale, alignTestImages, ...
-    freeSurferHome, niftyRegHome, recompute, debug);
+    refBrainNum, freeSurferHome, niftyRegHome, recompute, debug);
 
 % floating images generation or preprocessing of real training images
 if useSynthethicImages
     disp(' '); disp(['%% synthetising images for ' refBrainNum]);
     [pathDirFloatingImages, pathDirFloatingLabels] = generateTrainingImages(temp_pathDirTrainingLabels, labelsList, labelClasses,...
-        pathRefImage, pathRefFirstLabels, pathTempImFolder, targetResolution, recompute, freeSurferHome, niftyRegHome, debug);
+        pathRefImage, pathRefFirstLabels, pathTempImFolder, targetResolution, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
 else
     disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]);
     [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages,...
@@ -114,7 +121,7 @@ end
 
 % upsample ref data to targetRes
 [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, ...
-        targetResolution, multiChannel, margin, recompute);
+    targetResolution, multiChannel, margin, refBrainNum, recompute);
 
 % remove old hippocampus labels and add background
 [updatedLabelsList, ~] = updateLabelsList(labelsList, labelsNames);
@@ -123,11 +130,12 @@ end
 disp(' '); disp(['%% segmenting ' refBrainNum]);
 [pathSegmentation, pathHippoSegmentation] = labelFusion...
     (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, ...
-    pathTempImFolder, freeSurferHome, niftyRegHome, debug);
+    pathTempImFolder, refBrainNum, freeSurferHome, niftyRegHome, debug);
 
 % evaluation
 disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
 accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList);
+if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
 save(pathAccuracies, 'accuracies');
 
 %-------------------------------------------------------------------------%

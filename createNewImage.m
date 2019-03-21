@@ -1,5 +1,5 @@
 function [pathNewImage, pathNewLabels] = createNewImage(pathTrainingLabels, classesStats,...
-    pathTempImageSubfolder, pathRefImage, targetRes, labelsList, labelClasses, channel, recompute, freeSurferHome, niftyRegHome, debug)
+    pathTempImageSubfolder, pathRefImage, targetRes, labelsList, labelClasses, channel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -11,7 +11,6 @@ function [pathNewImage, pathNewLabels] = createNewImage(pathTrainingLabels, clas
 
 
 % resolutions of ref image
-refBrainNum = findBrainNum(pathRefImage);
 refImageMRI = MRIread(pathRefImage, 1);
 refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
 if ~any(targetRes), targetRes = refImageRes; end % set targetRes to refImageRes if specified
@@ -76,7 +75,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
         
         % reformate labels if they are anisotropic
         pathRegTrainingLabels = rigidlyRegisterTrainingLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImageSubfolder, ...
-            channel, niftyRegHome, debug, recompute);
+            channel, refBrainNum, niftyRegHome, debug, recompute);
         % read training labels
         regTrainingLabelsMRI = MRIread(pathRegTrainingLabels);
         regTrainingLabelsRes = [regTrainingLabelsMRI.xsize regTrainingLabelsMRI.ysize regTrainingLabelsMRI.zsize];
@@ -179,10 +178,9 @@ end
 end
 
 function pathRegTrainingLabels = rigidlyRegisterTrainingLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImageSubfolder, ...
-    channel, niftyRegHome, debug, recompute)
+    channel, refBrainNum, niftyRegHome, debug, recompute)
 
 % define naming variables
-refBrainNum = findBrainNum(pathRefImage);
 floBrainNum = findBrainNum(pathNewImage);
 % paths registration functions
 pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
