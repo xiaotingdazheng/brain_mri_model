@@ -93,12 +93,12 @@ end
     targetResolution, multiChannel, margin, refBrainNum, recompute, evaluate);
 
 % remove old hippocampus labels and add background
-[updatedLabelsList, ~] = updateLabelsList(labelsList, labelsNames);
+[updatedLabelsList, updatedLabelsNames] = updateLabelsList(labelsList, labelsNames);
 
 % labelFusion
 disp(' '); disp(['%% segmenting ' refBrainNum]);
 [pathSegmentation, pathHippoSegmentation] = labelFusion...
-    (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, ...
+    (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, updatedLabelsNames, ...
     pathTempImFolder, pathResultPrefix, refBrainNum, freeSurferHome, niftyRegHome, debug);
 
 % evaluation

@@ -54,16 +54,22 @@ switch labelPriorType
         end
         
         % apply same mechanism to hippo and non-hippo logOdds
-        pathRegisteredLogOdds = fullfile(regPriorSubfolder, 'logOdds_hippo.nii.gz');
-        if ~exist(pathRegisteredLogOdds, 'file') || recompute
-            temp_pathLogOdds = fullfile(priorSubfolder, 'logOdds_hippo.nii.gz');
-            cmd = [pathRegResample ' -ref ' pathRefImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
-            if debug, system(cmd); else, [~,~] = system(cmd); end
-        end
         pathRegisteredLogOdds = fullfile(regPriorSubfolder, 'logOdds_non_hippo.nii.gz');
         if ~exist(pathRegisteredLogOdds, 'file') || recompute
             temp_pathLogOdds = fullfile(priorSubfolder, 'logOdds_non_hippo.nii.gz');
             cmd = [pathRegResample ' -ref ',pathRefImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
+            if debug, system(cmd); else, [~,~] = system(cmd); end
+        end
+        pathRegisteredLogOdds = fullfile(regPriorSubfolder, 'logOdds_right_hippo.nii.gz');
+        if ~exist(pathRegisteredLogOdds, 'file') || recompute
+            temp_pathLogOdds = fullfile(priorSubfolder, 'logOdds_right_hippo.nii.gz');
+            cmd = [pathRegResample ' -ref ' pathRefImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
+            if debug, system(cmd); else, [~,~] = system(cmd); end
+        end
+        pathRegisteredLogOdds = fullfile(regPriorSubfolder, 'logOdds_left_hippo.nii.gz');
+        if ~exist(pathRegisteredLogOdds, 'file') || recompute
+            temp_pathLogOdds = fullfile(priorSubfolder, 'logOdds_left_hippo.nii.gz');
+            cmd = [pathRegResample ' -ref ' pathRefImage ' -flo ' temp_pathLogOdds ' -trans ' pathTransformation ' -res ' pathRegisteredLogOdds ' -pad 0 -inter 0 -voff'];
             if debug, system(cmd); else, [~,~] = system(cmd); end
         end
         

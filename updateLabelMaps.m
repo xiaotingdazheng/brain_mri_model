@@ -15,7 +15,7 @@ function [labelMap, labelMapHippo, sizeSegmMap] = updateLabelMaps(labelMap, labe
 
 disp('updating sum of posteriors');
 
-hippoLabelList = [0 1];
+hippoLabelList = [0 53 17];
 
 % read registered floating image
 regFloImage = MRIread(pathRegFloImage);
@@ -57,6 +57,7 @@ switch labelPriorType
         regFloHippoLabels = single(regFloHippoLabels.vol);
         labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels{1}, 1);
         labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels{1}, 2);
+        labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels{1}, 3);
         
     case 'logOdds'
         
@@ -79,9 +80,12 @@ switch labelPriorType
         temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_non_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
             brainVoxels{1}, 1);
-        temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_hippo.nii.gz');
+        temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_right_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
             brainVoxels{1}, 2);
+        temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_left_hippo.nii.gz');
+        [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
+            brainVoxels{1}, 3);
         labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
 end

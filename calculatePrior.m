@@ -9,7 +9,7 @@ switch labelPriorType
         
         if ~exist(priorSubfolder, 'dir'), mkdir(priorSubfolder); end
         structLogOddsFile = dir(fullfile(priorSubfolder,'*.nii.gz'));
-        if length(structLogOddsFile) < nLabels + 2 || recompute
+        if length(structLogOddsFile) < nLabels + 3 || recompute
             disp(['computing logOdds of training ' floBrainNum])
         end
         
@@ -27,16 +27,22 @@ switch labelPriorType
                 computeLogOdds(mask, brainMask, temp_path, LabelsMRI, rho, threshold)
             end
         end
-        % calculate logOdds for whole hippocampus
-        temp_path = fullfile(priorSubfolder, 'logOdds_hippo.nii.gz');
+        % calculate logOdds for left hippocampus
+        temp_path = fullfile(priorSubfolder, 'logOdds_left_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
-            maskHippo = Labels > 20000;
+            maskHippo = Labels > 20100;
+            computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
+        end
+        % calculate logOdds for right hippocampus
+        temp_path = fullfile(priorSubfolder, 'logOdds_right_hippo.nii.gz');
+        if ~exist(temp_path, 'file') || recompute
+            maskHippo = Labels > 20000 & Labels < 20100;
             computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
         end
         % calculate logOdds for non-hippocampus structures
         temp_path = fullfile(priorSubfolder, 'logOdds_non_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
-            maskNonHippo = ~maskHippo;
+            maskNonHippo = Labels < 20000;
             computeLogOdds(maskNonHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
         end
         
@@ -53,7 +59,8 @@ switch labelPriorType
             
             setFreeSurfer(freeSurferHome);
             floLabels = MRIread(pathFloLabels); % read labels
-            hippoMap = floLabels.vol > 20000 | floLabels.vol == 17 | floLabels.vol == 53; % hippo mask
+            hippoMap((floLabels.vol > 20000 & floLabels.vol < 20100) | floLabels.vol == 53) = 53; % right hippo
+            hippoMap(floLabels.vol > 20100 | floLabels.vol == 17) = 17; % left hippo
             floLabels.vol = hippoMap;
             MRIwrite(floLabels, pathFloHippoLabels); % write new file
             

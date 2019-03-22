@@ -12,6 +12,6 @@ labelsNames = ['background' labelsNames'];
 labelsList = [0 labelsList'];
 
 % add whole hippocampus label
-labelsNames = [labelsNames 'hippocampus'];
+labelsNames = [labelsNames 'right hippocampus' 'left hippocampus'];
 
 end
