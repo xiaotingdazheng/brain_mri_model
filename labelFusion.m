@@ -1,5 +1,5 @@
 function [pathSegm, pathHippoSegm] = labelFusion(pathRefImage, pathDirFloImages, pathDirFloLabels, brainVoxels, ...
-    labelFusionParameters, labelsList, pathTempImFolder, refBrainNum, freeSurferHome, niftyRegHome, debug)
+    labelFusionParameters, labelsList, pathTempImFolder, pathResultPrefix, refBrainNum, freeSurferHome, niftyRegHome, debug)
 
 % read parameters
 rho = labelFusionParameters{1};
@@ -20,9 +20,7 @@ if ~contains(pathDirFloLabels, '*'), pathDirFloLabels = fullfile(pathDirFloLabel
 structPathsFloImages = dir(pathDirFloImages);
 structPathsFloLabels = dir(pathDirFloLabels);
 % define subfolders
-mainFolder = fileparts(pathTempImFolder);
 registrationFolder = fullfile(pathTempImFolder, 'registrations');
-segmentationsFolder = fullfile(mainFolder, 'segmentations', ['test_'  refBrainNum]);
 if isequal(labelPriorType, 'delta function'), priorFolder = fullfile(pathTempImFolder, 'hippo_labels_delta');
 else, priorFolder = fullfile(pathTempImFolder,'logOdds'); end
 
@@ -59,7 +57,7 @@ for i=1:length(structPathsFloImages)
 end
 
 % get most likely segmentation
-[pathSegm, pathHippoSegm] = getSegmentations(labelMap, labelMapHippo, segmentationsFolder, pathRefImage, brainVoxels, labelsList, sizeSegmMap, refBrainNum);
+[pathSegm, pathHippoSegm] = getSegmentations(labelMap, labelMapHippo, pathResultPrefix, pathRefImage, brainVoxels, labelsList, sizeSegmMap);
 
 % delete temp subfolder if specified
 if deleteSubfolder, rmdir(pathTempImFolder,'s'); end

@@ -1,5 +1,5 @@
-function [pathSegmentation, pathHippoSegmentation] = getSegmentations(labelMap, labelMapHippo, resultsFolder, pathRefImage, brainVoxels, ...
-    labelsList, sizeSegmMap, refBrainNum)
+function [pathSegmentation, pathHippoSegmentation] = getSegmentations(labelMap, labelMapHippo, pathResultPrefix, pathRefImage, brainVoxels, ...
+    labelsList, sizeSegmMap)
 
 % This function performs the argmax operation on the labels posterior
 % probability, to obtain the most probable segmentation. It takes as inputs
@@ -8,9 +8,10 @@ function [pathSegmentation, pathHippoSegmentation] = getSegmentations(labelMap, 
 % files.
 
 % path files to be saved
+pathSegmentation = [pathResultPrefix '.all_segmentation.nii.gz'];
+pathHippoSegmentation = [pathResultPrefix '.hippo_vs_rest_segmentation.nii.gz'];
+resultsFolder = fileparts(pathSegmentation);
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder); end
-pathSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.segmentation.nii.gz']);
-pathHippoSegmentation = fullfile(resultsFolder, ['test_' refBrainNum '.hippo_segmentation.nii.gz']);
 
 % initialisation
 mri = MRIread(pathRefImage);

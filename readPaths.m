@@ -7,11 +7,12 @@ function varargout = readPaths(varargin)
 % input 5: pathDirTrainingImages
 
 nChannel = length(varargin{1});
-useSynthethicImages = varargin{end-1};
-singleBrain = varargin{end};
+useSynthethicImages = varargin{end-2};
+singleBrain = varargin{end-1};
+evaluate = varargin{end};
 if isequal(varargin{5}, '') && ~useSynthethicImages, error(['please provide ' inputname(5)]); end
 
-for input=1:nargin-2
+for input=1:nargin-3
     
     % check if input is a cell or a string. Transfrom string into cell
     if ~isequal(class(varargin{input}),'cell')
@@ -33,19 +34,19 @@ for input=1:nargin-2
         % add *gz to folder names
         if ~contains(varargin{input}{i}, '.nii.gz') && ~contains(varargin{input}{i}, '.mgz')
             % check if ref files are nii.gz or mgz for singleBrainSegmentation(MultiChannel) only case with files instead of folders
-            if singleBrain && input < 4
+            if singleBrain && ((evaluate && input < 4) || (~evaluate && input < 3))
                 error([inputname(input) ' channel ' num2str(i) ' is not nifty nor mgz file'])
             else
                 % add *gz to folder names
                 varargin{input}{i}=fullfile(varargin{input}{i}, '*gz');
                 % check that they are not empty (except for pathDirTrainingImages when useSyntheticImage=1)
-                if input < 5 || (input == 5 && ~useSynthethicImages)
+                if (input ~= 5 || (input == 5 && ~useSynthethicImages)) &&  (input ~= 3 || (input == 3 && evaluate))
                     temp_struct = dir(varargin{input}{i});
-                    %if isempty(temp_struct), error(['folder for ' inputname(input) ' channel ' num2str(i) ' is empty']); end
+                    if isempty(temp_struct), error(['folder for ' inputname(input) ' channel ' num2str(i) ' is empty']); end
                 end
             end
         elseif singleBrain && input < 4 && (contains(varargin{input}{i}, 'nii.gz') || contains(varargin{input}{i}, '.mgz'))
-            if ~exist(varargin{input}{i}, 'file'), error([varargin{input}{i} ' does not exist']); end
+            if ~exist(varargin{input}{i}, 'file') &&  (input ~= 3 || (input == 3 && evaluate)), error([varargin{input}{i} ' does not exist']); end
         end
         % transform paths to absolute paths
         varargin{input}{i} = abspath(varargin{input}{i});

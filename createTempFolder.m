@@ -19,7 +19,7 @@ if ~exist(pathTempImFolder,'dir')
         disp([id ' did not exist, switched to new id: ' refBrainNum]); disp(' ');
         pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
     end
-    mkdir(pathTempImFolder);
+    if ~exist(pathTempImFolder, 'dir'), mkdir(pathTempImFolder); end
 elseif exist(pathTempImFolder,'dir') && ~recompute
     disp(['using files already computed in ' pathTempImFolder]); disp(' ');
 end

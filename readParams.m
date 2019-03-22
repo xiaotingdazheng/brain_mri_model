@@ -32,6 +32,8 @@ if length(targetResolution)==1
     else
         targetResolution = repmat(targetResolution, 1, 3); 
     end
+elseif length(targetResolution)==3 && ~all(targetResolution)
+    error('targetResolution should not contain zeros when it has 3 elements')
 elseif ~(length(targetResolution)==3)
     error('targetResolution should be of length 1 (isotropic) or 3 (anisotropic)'); 
 end

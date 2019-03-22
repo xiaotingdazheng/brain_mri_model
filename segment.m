@@ -14,6 +14,7 @@ structPathsRefLabels = dir(pathDirTestLabels{1});
 pathMainFolder = fileparts(structPathsRefLabels(1).folder);
 pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
 % parameters initialisation
+evaluate = 1;
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 nImages = length(structPathsTestImages{1});
 accuracies = cell(nImages,1);
@@ -24,6 +25,7 @@ for i=1:nImages
     % paths of reference image and corresponding FS labels
     [pathRefImage, pathRefFirstLabels, pathRefLabels, refBrainNum] = buildRefPaths(structPathsTestImages,...
         structPathsFirstRefLabels, structPathsRefLabels, i);
+    pathResultPrefix = fullfile(pathMainFolder, refBrainNum, refBrainNum);
     
     % display processed test brain
     disp(' '); disp(['%%% Processing test ' refBrainNum]);
@@ -58,7 +60,7 @@ for i=1:nImages
     
     % upsample ref data to targetRes
     [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, ...
-        targetResolution, multiChannel, margin, refBrainNum, recompute);
+        targetResolution, multiChannel, margin, refBrainNum, recompute, evaluate);
     
     % remove old hippocampus labels and add background
     [updatedLabelsList, updatedLabelsNames] = updateLabelsList(labelsList, labelsNames);
@@ -67,7 +69,7 @@ for i=1:nImages
     disp(' '); disp(['%% segmenting ' refBrainNum]);
     [pathSegmentation, pathHippoSegmentation] = labelFusion...
         (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, ...
-        pathTempImFolder, refBrainNum, freeSurferHome, niftyRegHome, debug);
+        pathTempImFolder, pathResultPrefix, refBrainNum, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
