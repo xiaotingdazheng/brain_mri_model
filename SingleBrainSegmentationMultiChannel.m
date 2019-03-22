@@ -67,27 +67,16 @@ params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder target
 
 %------------------------- equivalent of segment -------------------------%
 
-% display processed test brain
-if recompute, refBrainNum = findBrainNum(pathRefImage{1}); else, refBrainNum = id; end
-pathMainFolder = fileparts(fileparts(pathRefImage{1}));
-pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
-if ~exist(pathTempImFolder,'dir')
-    if ~recompute
-        refBrainNum = findBrainNum(pathRefImage{1});
-        disp([id ' did not exist, switched to new id: ' refBrainNum]); disp(' ');
-        pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
-    end
-    mkdir(pathTempImFolder);
-elseif exist(pathTempImFolder,'dir') && ~recompute
-    disp(['using files already computed in ' pathTempImFolder]); disp(' ');
-end
-disp(['%%% Processing test ' refBrainNum]);
-
 % initialisation
 nChannel = length(pathRefImage);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 [leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
     sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
+
+% display processed test brain
+[refBrainNum, pathMainFolder, pathTempImFolder] = createTempFolder(pathRefImage, id, recompute);
+disp(['%%% Processing test ' refBrainNum]);
+
 % build path resulting accuracies
 pathRefLabels = pathRefLabels{1};
 pathAccuracies = fullfile(pathMainFolder, 'accuracies', ['accuracy_' refBrainNum '.mat']);

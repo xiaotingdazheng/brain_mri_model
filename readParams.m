@@ -50,6 +50,7 @@ if ~isequal(class(pathClassesTable), 'char'), error('registrationOptions should 
 
 %read classes
 fid = fopen(pathClassesTable, 'r');
+if fid == -1, error([pathClassesTable ' does not exist']); end
 txt = textscan(fid,'%f %f %q');
 fclose(fid);
 labelsList = txt{1};

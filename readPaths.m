@@ -41,13 +41,16 @@ for input=1:nargin-2
                 % check that they are not empty (except for pathDirTrainingImages when useSyntheticImage=1)
                 if input < 5 || (input == 5 && ~useSynthethicImages)
                     temp_struct = dir(varargin{input}{i});
-                    if isempty(temp_struct), error(['folder for ' inputname(input) ' channel ' num2str(i) ' is empty']); end
+                    %if isempty(temp_struct), error(['folder for ' inputname(input) ' channel ' num2str(i) ' is empty']); end
                 end
             end
         elseif singleBrain && input < 4 && (contains(varargin{input}{i}, 'nii.gz') || contains(varargin{input}{i}, '.mgz'))
             if ~exist(varargin{input}{i}, 'file'), error([varargin{input}{i} ' does not exist']); end
         end
+        % transform paths to absolute paths
+        varargin{input}{i} = abspath(varargin{input}{i});
     end
+    % outputs are absolute paths
     varargout{input} = varargin{input};
     
 end
