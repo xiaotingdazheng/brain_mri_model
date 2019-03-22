@@ -30,17 +30,17 @@ if targetRes
     end
     % put back paths of modified images
     pathRefImage{end} = pathUpsampledRefImage;
+    pathRefLabels = pathUpsampledRefLabels;
 else
     [~,name,ext] = fileparts(pathRefLabels);
     if strcmp(ext,'.mgz')
         pathUpsampledRefLabels = fullfile(pathUpsampledRefDataSubfolder, [name '.nii.gz']);
         cmd = ['mri_convert ' pathRefLabels ' ' pathUpsampledRefLabels ' -odt float -rt nearest'];
         [~,~] = system(cmd);
+        % put back paths of modified ref labels
+        pathRefLabels = pathUpsampledRefLabels;
     end
 end
-
-% put back paths of modified ref labels
-pathRefLabels = pathUpsampledRefLabels;
 
 % find brain voxels
 if multiChannel

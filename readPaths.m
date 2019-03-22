@@ -1,5 +1,11 @@
 function varargout = readPaths(varargin)
 
+% input 1: pathRefImage
+% input 2: pathRefFirstLabels
+% input 3: pathRefLabels
+% input 4: pathDirTrainingLabels
+% input 5: pathDirTrainingImages
+
 nChannel = length(varargin{1});
 useSynthethicImages = varargin{end-1};
 singleBrain = varargin{end};
@@ -24,13 +30,22 @@ for input=1:nargin-2
         error([inputname(input) ' contains too many paths']);
     end
     for i=1:length(varargin{input})
-        % add *nii.gz to folder names and check no mgz files
-        if ~contains(varargin{input}{i}, 'nii.gz') && ~contains(varargin{input}{i}, '.mgz')
+        % add *gz to folder names
+        if ~contains(varargin{input}{i}, '.nii.gz') && ~contains(varargin{input}{i}, '.mgz')
+            % check if ref files are nii.gz or mgz for singleBrainSegmentation(MultiChannel) only case with files instead of folders
             if singleBrain && input < 4
-                error([inputname(1) ' should only contain nifty or mgz files'])
+                error([inputname(input) ' channel ' num2str(i) ' is not nifty nor mgz file'])
             else
+                % add *gz to folder names
                 varargin{input}{i}=fullfile(varargin{input}{i}, '*gz');
+                % check that they are not empty (except for pathDirTrainingImages when useSyntheticImage=1)
+                if input < 5 || (input == 5 && ~useSynthethicImages)
+                    temp_struct = dir(varargin{input}{i});
+                    if isempty(temp_struct), error(['folder for ' inputname(input) ' channel ' num2str(i) ' is empty']); end
+                end
             end
+        elseif singleBrain && input < 4 && (contains(varargin{input}{i}, 'nii.gz') || contains(varargin{input}{i}, '.mgz'))
+            if ~exist(varargin{input}{i}, 'file'), error([varargin{input}{i} ' does not exist']); end
         end
     end
     varargout{input} = varargin{input};

@@ -65,11 +65,12 @@ if recompute, refBrainNum = findBrainNum(pathRefImage{1}); else, refBrainNum = i
 pathMainFolder = fileparts(fileparts(pathRefImage{1}));
 pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
 if ~exist(pathTempImFolder,'dir')
-    mkdir(pathTempImFolder);
     if ~recompute
         refBrainNum = findBrainNum(pathRefImage{1});
-        disp(' '); disp([id ' did not exist, switched to new id: ' refBrainNum]); disp(' ');
+        disp([id ' did not exist, switched to new id: ' refBrainNum]); disp(' ');
+        pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
     end
+    mkdir(pathTempImFolder);
 elseif exist(pathTempImFolder,'dir') && ~recompute
     disp(['using files already computed in ' pathTempImFolder]); disp(' ');
 end
