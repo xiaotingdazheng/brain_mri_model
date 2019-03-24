@@ -48,7 +48,7 @@ elseif length(sigma) ~= nChannel
     error(['sigma should be of length 1 (same value for all channels), or length ' num2str(nChannel) ' (number of channels)']);
 end
 
-if sigma<=0, error('sigma should be a strictly positive number'); end
+for i=1:nChannel, if sigma(i)<=0, error('sigma should only contain strictly positive numbers'); end; end
 
 if ~isequal(labelPriorType,'logOdds') && ~isequal(labelPriorType,'delta function'), error('labelPriorType should be "delta_function" or "logOdds"'); end
 if ~isequal(class(regOptions), 'char'), error('registrationOptions should be a string'); end
