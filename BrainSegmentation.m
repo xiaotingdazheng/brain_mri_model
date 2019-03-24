@@ -23,9 +23,9 @@ pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOu
 % experiment title
 title = 'label fusion on synthetic t1s generated from CobraLab data';
 % general parameters
-evaluate = 0;                % evaluate test scans segmentations aginst provided ref labels (0-1)
+evaluate = 1;                % evaluate test scans segmentations aginst provided ref labels (0-1)
 leaveOneOut = 1;             % segment one image with the rest of the datatset (0-1)
-useSynthethicImages = 1;     % use real or synthetic images (0-1)
+useSynthethicImages = 0;     % use real or synthetic images (0-1)
 recompute = 0;               % recompute files, even if they exist (0-1)
 debug = 0;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)

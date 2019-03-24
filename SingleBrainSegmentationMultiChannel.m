@@ -7,7 +7,7 @@ function SingleBrainSegmentationMultiChannel(pathRefImageChannel1, pathRefImageC
     pathClassesTable, ...
     leaveOneOut, useSynthethicImages, recompute, id, debug, deleteSubfolder,...
     targetResolution, alignTestImages, rescale,...
-    margin, rho, threshold, sigma, labelPriorType, ...
+    margin, rho, threshold, sigma1, sigma2, labelPriorType, ...
     registrationOptions, ...
     freeSurferHome, niftyRegHome,...
     evaluate)
@@ -31,7 +31,9 @@ if isdeployed
     margin = str2double(margin);
     rho = str2double(rho);
     threshold = str2double(threshold);
-    sigma = str2double(sigma);
+    sigma1 = str2double(sigma1);
+    sigma2 = str2double(sigma2);
+    evaluate = str2double(evaluate);
 else
     addpath(fullfile(freeSurferHome, 'matlab/'));
     addpath(genpath(pwd));
@@ -46,6 +48,7 @@ if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
     (pathRefImage, pathRefFirstLabels, pathRefLabels, pathDirTrainingLabels, pathDirTrainingImages, useSynthethicImages, 1, evaluate);
 
 % regroup parameters
+sigma = [sigma1 sigma2];
 params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
     margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome, pathClassesTable};
 

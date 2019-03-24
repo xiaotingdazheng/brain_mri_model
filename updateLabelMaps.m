@@ -34,7 +34,7 @@ sizeSegmMap = size(refImage(:,:,:,1));
 nChannel = size(refImage,4);
 likelihood = ones([size(refImage,1), size(refImage,2), size(refImage,3)], 'single');
 for channel=1:nChannel
-    temp_image = 1/sqrt(2*pi*sigma)*exp(-(refImage(:,:,:,channel)-regFloImage(:,:,:,channel)).^2/(2*sigma^2));
+    temp_image = 1/sqrt(2*pi*sigma(channel))*exp(-(refImage(:,:,:,channel)-regFloImage(:,:,:,channel)).^2/(2*sigma^2));
     temp_image(isnan(temp_image)) = 1;
     likelihood = likelihood.*temp_image;
 end

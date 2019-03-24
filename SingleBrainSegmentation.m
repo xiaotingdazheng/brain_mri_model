@@ -28,6 +28,7 @@ if isdeployed
     rho = str2double(rho);
     threshold = str2double(threshold);
     sigma = str2double(sigma);
+    evaluate = str2double(evaluate);
 else
     addpath(fullfile(freeSurferHome, 'matlab/'));
     addpath(genpath(pwd));

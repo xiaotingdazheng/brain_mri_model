@@ -41,7 +41,15 @@ if ~(rescale==0 || rescale==1), error('rescale should be 0 or 1'); end
 if ~(alignTestImages == 0 || alignTestImages == 1 || alignTestImages == 2), error('alignImages should be 0, 1 or 2'); end
 if rho<=0, error('rho should be a strictly positive number'); end
 if threshold<0, error('threshold should be a positive or null number'); end
+
+if length(sigma) == 1
+    sigma = repmat(sigma, 1, nChannel);
+elseif length(sigma) ~= nChannel
+    error(['sigma should be of length 1 (same value for all channels), or length ' num2str(nChannel) ' (number of channels)']);
+end
+
 if sigma<=0, error('sigma should be a strictly positive number'); end
+
 if ~isequal(labelPriorType,'logOdds') && ~isequal(labelPriorType,'delta function'), error('labelPriorType should be "delta_function" or "logOdds"'); end
 if ~isequal(class(regOptions), 'char'), error('registrationOptions should be a string'); end
 regOptions=strrep(regOptions,'_',' ');
