@@ -1,5 +1,5 @@
 function [pathSegmentation, pathHippoSegmentation] = getSegmentations(labelMap, labelMapHippo, pathResultPrefix, pathRefImage, brainVoxels, ...
-    labelsList, labelsNames, sizeSegmMap)
+    labelsList, labelsNames, sizeSegmMap, pathTempImFolder)
 
 % This function performs the argmax operation on the labels posterior
 % probability, to obtain the most probable segmentation. It takes as inputs
@@ -15,7 +15,7 @@ resultsFolder = fileparts(pathSegmentation);
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder); end
 
 % initialisation
-mri = MRIread(pathRefImage);
+mri = myMRIread(pathRefImage, 0, pathTempImFolder);
 refImageRes = [mri.xsize mri.ysize mri.zsize];
 hippoLabelList= [0 53 17];
 
@@ -43,10 +43,10 @@ labelMapHippo(brainVoxels{1}) = voxelLabels;
 
 % save result whole brain segmentation
 mri.vol = labelMap;
-MRIwrite(mri, pathSegmentation);
+myMRIwrite(mri, pathSegmentation, 'float', pathTempImFolder);
 % save result hippocampus segmentation
 mri.vol = labelMapHippo;
-MRIwrite(mri, pathHippoSegmentation);
+myMRIwrite(mri, pathHippoSegmentation, 'float', pathTempImFolder);
 % save text file with volume of each structure
 fid=fopen(pathVolumesTxt, 'w');
 for i=2:length(volumes), fprintf(fid, '%s: %.3f \n', strip(labelsNames{i}), volumes(i)); end

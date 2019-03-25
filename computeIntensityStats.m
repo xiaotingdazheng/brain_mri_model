@@ -1,4 +1,4 @@
-function classesStats = computeIntensityStats(pathImage, pathFirstLabels, labelsList, labelClasses, pathStatsMatrix, channel, recompute)
+function classesStats = computeIntensityStats(pathImage, pathFirstLabels, labelsList, labelClasses, pathStatsMatrix, channel, pathTempImFolder, recompute)
 
 % This function compute basic intensity statistics for different regions of
 % the brain. It takes as inputs the image to derive the stats from, a first
@@ -16,12 +16,12 @@ if recompute || ~exist(pathStatsMatrix, 'file')
     else, disp('% computing intensity stats'); end
 
     %read image
-    imageMRI = MRIread(pathImage);
+    imageMRI = myMRIread(pathImage, 0, pathTempImFolder);
     image = imageMRI.vol;
     image = round(image);
 
     %read labels
-    firstLabelsMRI = MRIread(pathFirstLabels);
+    firstLabelsMRI = myMRIread(pathFirstLabels, 0, pathTempImFolder);
     firstLabels = firstLabelsMRI.vol;
 
     % read label List

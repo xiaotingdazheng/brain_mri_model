@@ -106,7 +106,7 @@ disp(' '); disp(['%% segmenting ' refBrainNum]);
 if evaluate
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
     pathAccuracies = [pathResultPrefix '.regions_accuracies.mat'];
-    accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList);
+    accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder);
     if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
     save(pathAccuracies, 'accuracies');
 end

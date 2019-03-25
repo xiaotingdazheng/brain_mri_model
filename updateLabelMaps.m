@@ -1,5 +1,5 @@
 function [labelMap, labelMapHippo, sizeSegmMap] = updateLabelMaps(labelMap, labelMapHippo, pathRefImage, pathRegFloImage, regPriorSubfolder, ...
-    labelPriorType, brainVoxels, sigma, labelsList)
+    labelPriorType, brainVoxels, sigma, labelsList, pathTempImFolder)
 
 % This function updates the labelMap matrix on which we will perform the
 % argmax operation to obatin the best segmentation possible. The update
@@ -18,13 +18,13 @@ disp('updating sum of posteriors');
 hippoLabelList = [0 53 17];
 
 % read registered floating image
-regFloImage = MRIread(pathRegFloImage);
+regFloImage = myMRIread(pathRegFloImage, 0, pathTempImFolder);
 regFloImage = single(regFloImage.vol);
 regFloImage(regFloImage<0) = 0;
 regFloImage(isnan(regFloImage)) = 0;
 
 % read ref masked image
-refImage = MRIread(pathRefImage);
+refImage = myMRIread(pathRefImage, 0, pathTempImFolder);
 refImage = single(refImage.vol);
 refImage(refImage<0) = 0;
 refImage(isnan(refImage)) = 0;
@@ -45,7 +45,7 @@ switch labelPriorType
         
         % upadte labelMap with registered labels
         pathRegFloLabels = fullfile(regPriorSubfolder, 'labels.nii.gz');
-        regFloLabels = MRIread(pathRegFloLabels);
+        regFloLabels = myMRIread(pathRegFloLabels, 0, pathTempImFolder);
         regFloLabels = single(regFloLabels.vol);
         for k=1:length(labelsList)
             labelMap = processDeltaFunction(labelMap, regFloLabels, likelihood, labelsList, brainVoxels{1}, k);
@@ -53,7 +53,7 @@ switch labelPriorType
         
         % upadte labelMapHippo with registered hippo labels
         pathRegFloHippoLabels = fullfile(regPriorSubfolder, 'hippo_labels.nii.gz');
-        regFloHippoLabels = MRIread(pathRegFloHippoLabels);
+        regFloHippoLabels = myMRIread(pathRegFloHippoLabels, 0, pathTempImFolder);
         regFloHippoLabels = single(regFloHippoLabels.vol);
         labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels{1}, 1);
         labelMapHippo = processDeltaFunction(labelMapHippo, regFloHippoLabels, likelihood, hippoLabelList, brainVoxels{1}, 2);
@@ -69,7 +69,7 @@ switch labelPriorType
         for k=1:length(labelsList)
             temp_pathLogOdds = fullfile(regPriorSubfolder, ['logOdds_' num2str(labelsList(k)) '.nii.gz']);
             [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-                brainVoxels{1}, k);
+                brainVoxels{1}, k, pathTempImFolder);
         end
         %update labelMap with marginalised posterior
         labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
@@ -79,13 +79,13 @@ switch labelPriorType
         partitionFunction = zeros([1, length(brainVoxels{1})], 'single');
         temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_non_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-            brainVoxels{1}, 1);
+            brainVoxels{1}, 1, pathTempImFolder);
         temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_right_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-            brainVoxels{1}, 2);
+            brainVoxels{1}, 2, pathTempImFolder);
         temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_left_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
-            brainVoxels{1}, 3);
+            brainVoxels{1}, 3, pathTempImFolder);
         labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
         
 end
@@ -101,10 +101,10 @@ labelMap(index,:) = labelMap(index,:) + posterior(brainVoxels);  % update corres
 end
 
 function [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds, ...
-    brainVoxels, index)
+    brainVoxels, index, pathTempImFolder)
 
 % load logOdds
-MRILogOdds = MRIread(temp_pathLogOdds);
+MRILogOdds = myMRIread(temp_pathLogOdds, 0, pathTempImFolder);
 labelPrior = single(MRILogOdds.vol);
 
 % update partition function and calculate unmargenalisedPosterior

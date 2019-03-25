@@ -1,4 +1,4 @@
-function pathNewImage = rescaleImage(pathImage, resultFolder, channel, brainNum, recompute)
+function pathNewImage = rescaleImage(pathImage, resultFolder, channel, brainNum, pathTempImFolder, recompute)
 
 % Rescale image. Result is saved in specified folder with '_rescaled' added
 % to the original filename.
@@ -15,7 +15,7 @@ if ~exist(pathNewImage, 'file') || recompute
     if channel, disp(['rescaling channel ' num2str(channel)]); else, disp(['rescaling ' brainNum]); end
     
     % read image
-    imageMRI = MRIread(pathImage);
+    imageMRI = myMRIread(pathImage, 0, pathTempImFolder);
     image = imageMRI.vol;
     
     % sort non-zero intensities
@@ -37,7 +37,7 @@ if ~exist(pathNewImage, 'file') || recompute
     
     % save image
     imageMRI.vol = image;
-    MRIwrite(imageMRI, pathNewImage);
+    myMRIwrite(imageMRI, pathNewImage, 'float', pathTempImFolder);
     
 else
     

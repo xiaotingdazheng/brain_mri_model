@@ -1,16 +1,16 @@
-function accuracy = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, labelsList)
+function accuracy = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, labelsList, pathTempImFolder)
 
 % This function computes the dice coefficient between the segmented image
 % and the provided GT.
 
 % open whole brain segmentation
-segmentationMRI = MRIread(pathSegmentation);
+segmentationMRI = myMRIread(pathSegmentation, 0, pathTempImFolder);
 segmentation = segmentationMRI.vol;
 % open hippo segmentation
-hippoSegmentationMRI = MRIread(pathHippoSegmentation);
+hippoSegmentationMRI = myMRIread(pathHippoSegmentation, 0, pathTempImFolder);
 hippoSegmentation = hippoSegmentationMRI.vol;
 % open test labels and crop them if necessary
-refLabelsMRI = MRIread(pathRefLabels);
+refLabelsMRI = myMRIread(pathRefLabels, 0, pathTempImFolder);
 refLabels = refLabelsMRI.vol;
 
 % initialise result matrix

@@ -1,4 +1,4 @@
-function calculatePrior(pathFloLabels, labelPriorType, priorSubfolder, labelsList, rho, threshold, recompute, freeSurferHome)
+function calculatePrior(pathFloLabels, labelPriorType, priorSubfolder, labelsList, rho, threshold, pathTempImFolder, recompute, freeSurferHome)
 
 floBrainNum = findBrainNum(pathFloLabels);
 nLabels = length(labelsList);
@@ -14,7 +14,7 @@ switch labelPriorType
         end
         
         % produce a mask of the brain with margin of 5 voxels
-        LabelsMRI = MRIread(pathFloLabels);
+        LabelsMRI = myMRIread(pathFloLabels, 0, pathTempImFolder);
         Labels = LabelsMRI.vol;
         brainMask = Labels > 1;
         brainMask = imfill(bwdist(brainMask)< 5, 'holes');
@@ -24,26 +24,26 @@ switch labelPriorType
             temp_path = fullfile(priorSubfolder, ['logOdds_' num2str(labelsList(l)) '.nii.gz']);
             if ~exist(temp_path, 'file') || recompute
                 mask = (Labels == labelsList(l)); % find mask of current label
-                computeLogOdds(mask, brainMask, temp_path, LabelsMRI, rho, threshold)
+                computeLogOdds(mask, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
             end
         end
         % calculate logOdds for left hippocampus
         temp_path = fullfile(priorSubfolder, 'logOdds_left_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
             maskHippo = Labels > 20100;
-            computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
+            computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
         end
         % calculate logOdds for right hippocampus
         temp_path = fullfile(priorSubfolder, 'logOdds_right_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
             maskHippo = Labels > 20000 & Labels < 20100;
-            computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
+            computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
         end
         % calculate logOdds for non-hippocampus structures
         temp_path = fullfile(priorSubfolder, 'logOdds_non_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
             maskNonHippo = Labels < 20000;
-            computeLogOdds(maskNonHippo, brainMask, temp_path, LabelsMRI, rho, threshold)
+            computeLogOdds(maskNonHippo, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
         end
         
     case 'delta function'
@@ -58,11 +58,11 @@ switch labelPriorType
             disp(['computing delta function of training ' floBrainNum])
             
             setFreeSurfer(freeSurferHome);
-            floLabels = MRIread(pathFloLabels); % read labels
+            floLabels = myMRIread(pathFloLabels, 0, pathTempImFolder); % read labels
             hippoMap((floLabels.vol > 20000 & floLabels.vol < 20100) | floLabels.vol == 53) = 53; % right hippo
             hippoMap(floLabels.vol > 20100 | floLabels.vol == 17) = 17; % left hippo
             floLabels.vol = hippoMap;
-            MRIwrite(floLabels, pathFloHippoLabels); % write new file
+            myMRIwrite(floLabels, pathFloHippoLabels, 'float', pathTempImFolder); % write new file
             
         end
         
@@ -70,7 +70,7 @@ end
 
 end
 
-function computeLogOdds(mask, brainMask, path, LabelsMRI, rho, threshold)
+function computeLogOdds(mask, brainMask, path, LabelsMRI, rho, threshold, pathTempImFolder)
 
 distInt = bwdist(~mask);
 distOut = -bwdist(mask);
@@ -91,6 +91,6 @@ probMap(probMap > 200) = 200; % set upper value to 200
 LabelsMRI.vol = probMap;
 
 % save label probability in separate file
-MRIwrite(LabelsMRI, path);
+myMRIwrite(LabelsMRI, path, 'float', pathTempImFolder);
 
 end

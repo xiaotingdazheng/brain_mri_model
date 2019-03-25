@@ -10,16 +10,13 @@
 function MRI = myMRIread(filename,justheader,tempdir)
 
 if ~isdeployed
-    addpath('/usr/local/freesurfer/stable5_3_0/matlab');
-    addpath('/autofs/homes/002/iglesias/matlab/myFunctions/');
+    % addpath('/autofs/homes/002/iglesias/matlab/myFunctions/');
 end
 
 if(exist('justheader','var')~=1) || isempty(justheader), justheader = 0; end
 if(exist('tempdir','var')~=1) || isempty(tempdir), tempdir = '/tmp/'; end
 if tempdir(end)~='/', tempdir=[tempdir '/']; end
-if exist(tempdir,'dir')==0
-    error('Error in myMRIread: temporary directory does not exist')
-end
+if ~exist(tempdir,'dir'), mkdir(tempdir); end
 
 if length(filename)>6 && strcmp(filename(end-6:end),'.nii.gz')>0
     cl=clock();

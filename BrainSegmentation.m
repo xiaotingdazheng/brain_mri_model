@@ -8,17 +8,17 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 
 % cell paths test images
-pathDirTestImages= '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOut/test_images';
+pathDirTestImages= '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutNew/test_images';
 % cell paths test first labels (FS labels)
-pathDirRefFirstLabels= '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOut/test_first_labels';
+pathDirRefFirstLabels= '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutNew/test_first_labels';
 % cell paths test labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOut/test_labels';
+pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutNew/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOut/training_labels';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutNew/training_labels';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOut/classesTable.txt';
+pathClassesTable= '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutNew/classesTable.txt';
 % optional paths
-pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/real_leaveOneOut/training_images';
+pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/synth_leaveOneOutNew/training_images';
 
 % experiment title
 title = 'label fusion on synthetic t1s generated from CobraLab data';

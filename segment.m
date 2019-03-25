@@ -73,7 +73,7 @@ for i=1:nImages
     
     % evaluation
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
-    accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList);
+    accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder);
     
 end
 

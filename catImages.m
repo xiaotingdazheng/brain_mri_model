@@ -1,4 +1,4 @@
-function catImages(cellPathImages, pathCatImage, recompute)
+function catImages(cellPathImages, pathCatImage, pathTempImFolder, recompute)
 
 if ~exist(fileparts(pathCatImage),'dir'), mkdir(fileparts(pathCatImage)); end
 
@@ -9,16 +9,16 @@ if ~exist(pathCatImage, 'file') || recompute
     nChannel = length(cellPathImages);
 
     % read first image
-    refImageMRI = MRIread(cellPathImages{1});
+    refImageMRI = myMRIread(cellPathImages{1}, 0, pathTempImFolder);
     new_refImage = refImageMRI.vol;
     % concatenate other channels
     for channel=2:nChannel
-        temp_refImageMRI = MRIread(cellPathImages{channel});
+        temp_refImageMRI = myMRIread(cellPathImages{channel}, 0, pathTempImFolder);
         new_refImage = cat(4, new_refImage, temp_refImageMRI.vol);
     end
     % write concatenated image
     refImageMRI.vol = new_refImage;
-    MRIwrite(refImageMRI, pathCatImage);
+    myMRIwrite(refImageMRI, pathCatImage, 'float', pathTempImFolder);
     
 else
     disp('channels already concatenated');

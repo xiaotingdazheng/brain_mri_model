@@ -18,19 +18,19 @@ for channel=1:nChannel
     pathStatsMatrix = fullfile(pathStatsMatrixFolder, 'ClassesStats.mat');
     if multiChannel, pathStatsMatrix = strrep(pathStatsMatrix, '.mat', ['_channel' num2str(channel) '.mat']); end
     classesStats = computeIntensityStats(pathRefImage{channel}, pathRefFirstLabels{channel}, labelsList, labelClasses, pathStatsMatrix,...
-        channel*multiChannel, recompute);
+        channel*multiChannel, pathTempImFolder, recompute);
     
     for i=1:length(structPathsTrainingLabels)
         % we now use pathRefFirstLabels{1}, because all channels are now aligned
         pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, ...
-            pathRefImage{channel}, targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
+        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage{channel},...
+            targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
         if multiChannel && channel > 1
             % realign the images coming from the same labels (1=align by registration)
             cellPathsNewImages{i,channel} = alignImages...
                 (cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 1, channel, freeSurferHome, niftyRegHome, recompute, debug);
         end
-        mask(cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, 0, NaN, 0, refBrainNum, freeSurferHome, 1, 0);
+        mask(cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, 0, NaN, 0, refBrainNum, pathTempImFolder, freeSurferHome, 1, 0);
     end
     
 end
@@ -45,7 +45,7 @@ if multiChannel
         [~,name,ext] = fileparts(cellPathsNewImages{i,1});
         pathCatRefImage = fullfile(pathDirSyntheticImages, [name ext]);
         pathCatRefImage = strrep(pathCatRefImage, '.nii.gz', '_cat.nii.gz');
-        catImages(cellPathsNewImages(i,:), pathCatRefImage, recompute);
+        catImages(cellPathsNewImages(i,:), pathCatRefImage, pathTempImFolder, recompute);
     end
 end
 

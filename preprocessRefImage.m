@@ -21,18 +21,18 @@ for channel=1:nChannel
     
     % rescale image
     if rescale
-        pathRefImage{channel} = rescaleImage(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, channel*multiChannel, refBrainNum, recompute);
+        pathRefImage{channel} = rescaleImage(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, channel*multiChannel, refBrainNum, pathTempImFolder, recompute);
     end
     
     % mask image with zeros using its labels
     pathRefImage{channel} = mask(pathRefImage{channel}, pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, ...
-        channel*multiChannel, 0, 1, refBrainNum, freeSurferHome, recompute, 1);
+        channel*multiChannel, 0, 1, refBrainNum, pathTempImFolder, freeSurferHome, recompute, 1);
     
 end
 
 if multiChannel
     pathNewRefImage = multiChannelPreprocessing(pathRefImage, temp_pathPreprocessedRefImFolder, nChannel, rescale, ...
-        realignImages, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug);
+        realignImages, refBrainNum, pathTempImFolder, freeSurferHome, niftyRegHome, recompute, debug);
 else
     pathNewRefImage = pathRefImage;
 end
@@ -40,7 +40,7 @@ end
 end
 
 function pathNewRefImage = multiChannelPreprocessing(pathRefImage, temp_pathPreprocessedRefImFolder, nChannel, rescale, ...
-    realignImages, refBrainNum, freeSurferHome, niftyRegHome, recompute, debug)
+    realignImages, refBrainNum, pathTempImFolder, freeSurferHome, niftyRegHome, recompute, debug)
 
 % create concatenated image subfolder
 pathCatSubfolder = fullfile(fileparts(temp_pathPreprocessedRefImFolder), 'concatenated_image');
@@ -60,11 +60,11 @@ end
 
 % pad all images with NaNs
 for channel=1:nChannel
-    mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, refBrainNum, freeSurferHome, 1, 0);
+    mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, refBrainNum, pathTempImFolder, freeSurferHome, 1, 0);
 end
 
 % concatenate all the channels into a single image
-catImages(pathAlignedRefImages, pathCatRefImage, recompute);
+catImages(pathAlignedRefImages, pathCatRefImage, pathTempImFolder, recompute);
 pathNewRefImage = [pathRefImage pathCatRefImage];
 
 end

@@ -66,6 +66,7 @@ if(~isfield(mri,'vol'))
 end
 
 if tempdir(end)~='/', tempdir=[tempdir '/']; end
+if ~exist(tempdir,'dir'), mkdir(tempdir); end
 
 
 vsz = size(mri.vol);

@@ -24,7 +24,7 @@ if targetRes
         [~,~] = system(cmd);
     end
     % mask ref image with nans and put it back in the cell
-    mask(pathUpsampledRefImage, pathUpsampledRefImage, pathUpsampledRefImage, 0, NaN, 0, refBrainNum, '', 1, 0);
+    mask(pathUpsampledRefImage, pathUpsampledRefImage, pathUpsampledRefImage, 0, NaN, 0, refBrainNum, pathTempImFolder, '', 1, 0);
     pathRefImage{end} = pathUpsampledRefImage;
     
     if evaluate
@@ -51,9 +51,9 @@ end
 
 % find brain voxels
 if multiChannel
-    brainVoxels = selectBrainVoxels(pathRefImage{end}, margin);
+    brainVoxels = selectBrainVoxels(pathRefImage{end}, margin, pathTempImFolder);
 else
-    brainVoxels{1} = selectBrainVoxels(pathRefImage{end}, margin);
+    brainVoxels{1} = selectBrainVoxels(pathRefImage{end}, margin, pathTempImFolder);
 end
 
 end

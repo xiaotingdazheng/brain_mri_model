@@ -1,4 +1,4 @@
-function pathMaskedImage = mask(pathImage, pathMask, result, channel, padChar, padFS, brainNum, freeSurferHome, recompute, verbose)
+function pathMaskedImage = mask(pathImage, pathMask, result, channel, padChar, padFS, brainNum, pathTempImFolder, freeSurferHome, recompute, verbose)
 
 % Mask image with provided mask. Result is saved in specified folder with
 % '_masked' added to the original filename.
@@ -22,7 +22,7 @@ if ~exist(pathMaskedImage, 'file') || recompute
         cmd = ['mri_mask ' pathImage ' ' pathMask ' ' pathMaskedImage];
         [~,~] = system(cmd);
     else
-        maskWithChar(pathImage, pathMask, pathMaskedImage, padChar);
+        maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder);
     end
     
 else
@@ -33,10 +33,10 @@ end
 
 end
 
-function maskWithChar(pathImage, pathMask, pathMaskedImage, padChar)
+function maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder)
 
 % read image
-imageMRI = MRIread(pathImage);
+imageMRI = myMRIread(pathImage, 0, pathTempImFolder);
 image= imageMRI.vol;
 image(image<0.01) = 0;
 
@@ -45,7 +45,7 @@ if isequal(pathMask, pathImage)
     mask = imdilate(image > 0, strel);
 else
     % read mask
-    maskMRI = MRIread(pathMask);
+    maskMRI = myMRIread(pathMask, 0, pathTempImFolder);
     mask = maskMRI.vol;
     mask = mask > 0;
 end
@@ -55,6 +55,6 @@ image(~mask) = padChar;
 
 % write new Image
 imageMRI.vol = image;
-MRIwrite(imageMRI, pathMaskedImage);
+myMRIwrite(imageMRI, pathMaskedImage, 'float', pathTempImFolder);
 
 end
