@@ -68,7 +68,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
         % blur and save isotropic image
         blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, minTargetRes, pathNewImage, trainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder)
         % save image and labels at target resolution
-        downsample(pathNewImage, pathNewLabels, trainingLabelsMRI.fspec, minTargetRes, isFinalImageAnisotropic, RefToFloAxisMap, freeSurferHome);
+        downsample(pathNewImage, pathNewLabels, pathTrainingLabels, minTargetRes, isFinalImageAnisotropic, RefToFloAxisMap, freeSurferHome);
     end
     
     if isFinalImageAnisotropic
@@ -86,7 +86,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
         % blurring images
         blurAndSave(newImage, regTrainingLabelsMRI, regTrainingLabelsRes, targetRes, pathNewImage, regTrainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder);
         % downsample to target resolution
-        downsample(pathNewImage, pathNewLabels, regTrainingLabelsMRI.fspec, targetRes, 0, RefToFloAxisMap, freeSurferHome);
+        downsample(pathNewImage, pathNewLabels, pathRegTrainingLabels, targetRes, 0, RefToFloAxisMap, freeSurferHome);
         
     end
     
