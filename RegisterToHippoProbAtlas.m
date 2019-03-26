@@ -18,8 +18,8 @@ if ~contains(pathLabels,'*nii.gz')
     pathLabels = fullfile(pathLabels, '*nii.gz');
 end
 structLabels = dir(pathLabels);
-rightLabels = [41,42,43,44,46,47,49,50,51,52,54,58,60,62,63];
-leftLabels =  [2 ,3 ,4 ,5 ,7 ,8 ,10,11,12,13,18,26,28,30,31];
+rightLabels = [41,42,43,44,46,47,49,50,51,52,54,58,60,62,63,508,20001,20002,20003,20004,20005,20006,20007,20008];
+leftLabels =  [2 ,3 ,4 ,5 ,7 ,8 ,10,11,12,13,18,26,28,30,31,558,20101,20102,20103,20104,20105,20106,20107,20108];
 
 for brain=1:length(structLabels)
     

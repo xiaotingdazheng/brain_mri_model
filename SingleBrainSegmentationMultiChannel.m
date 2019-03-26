@@ -5,7 +5,7 @@ function SingleBrainSegmentationMultiChannel(pathRefImageChannel1, pathRefImageC
     pathDirTrainingLabels, ...
     pathDirTrainingImagesChannel1, pathDirTrainingImagesChannel2, ...
     pathClassesTable, ...
-    leaveOneOut, useSynthethicImages, recompute, id, debug, deleteSubfolder,...
+    leaveOneOut, useSynthethicImages, debug, deleteSubfolder,...
     targetResolution, alignTestImages, rescale,...
     margin, rho, threshold, sigma1, sigma2, labelPriorType, ...
     registrationOptions, ...
@@ -22,7 +22,6 @@ tic
 if isdeployed
     leaveOneOut = str2double(leaveOneOut);
     useSynthethicImages = str2double(useSynthethicImages);
-    recompute = str2double(recompute);
     debug = str2double(debug);
     deleteSubfolder = str2double(deleteSubfolder);
     targetResolution = str2double(targetResolution);
@@ -49,6 +48,7 @@ if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
 
 % regroup parameters
 sigma = [sigma1 sigma2];
+recompute = 1;
 params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
     margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome, pathClassesTable};
 
@@ -61,7 +61,7 @@ if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
     sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
 
 % display processed test brain
-[refBrainNum, ~, pathTempImFolder] = createTempFolder(pathRefImage, id, recompute);
+[refBrainNum, pathTempImFolder] = createTempFolder(pathResultPrefix);
 disp(['%%% Processing test ' refBrainNum]);
 
 % build path resulting accuracies
