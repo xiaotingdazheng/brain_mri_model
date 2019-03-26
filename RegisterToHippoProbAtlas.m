@@ -3,8 +3,8 @@ close all;
 
 % paths
 pathHippoProbAtlas = '~/data/hippo_prob_atlas.nii.gz';
-pathLabels = '~/data/CobraLab/labels/high_res_merged_left_right_flipped';
-pathResultFolder = '~/data/CobraLab/labels/hippo_labels_reg_to_prob_atlas';
+pathLabels = '~/data/CobraLab/labels/smoothed_trans';
+pathResultFolder = '~/data/CobraLab/labels/nellie_labels_reg_to_prob_atlas';
 % path freesurfer and niftyreg
 freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
@@ -33,17 +33,15 @@ for brain=1:length(structLabels)
     labels = labelsMRI.vol;
     hippoMask = zeros(size(labels),'single');
     
-    if ~contains(pathCurrentLabels, 'trans')
+    if contains(pathCurrentLabels, 'left')
         side = 'left';
         hippoMask = (labels>20100)*255;
-        pathRegLabels = fullfile(pathResultFolder, strrep([name ext],'.nii.gz','.left.nii.gz'));
-        pathRegLabels = strrep(pathRegLabels, '.smoothed_twice','');
+        pathRegLabels = fullfile(pathResultFolder, [name ext]);
     else
         side = 'right';
         idx = find(labels>20000 & labels<20100);
         hippoMask(idx) = 255;
-        pathRegLabels = fullfile(pathResultFolder, strrep([name ext],'.nii.gz','.right.nii.gz'));
-        pathRegLabels = strrep(pathRegLabels, '.smoothed_twice.trans','');
+        pathRegLabels = fullfile(pathResultFolder, [name ext]);
     end
     
     % write mask
@@ -51,6 +49,7 @@ for brain=1:length(structLabels)
     labelsMRI.vol = hippoMask;
     pathHippoMask = '/tmp/hippo_mask.nii.gz';
     MRIwrite(labelsMRI,pathHippoMask);
+    clear labelsMRI hippoMask
     
     % register mask onto prob atlas
     disp('registering mask to probability atlas')
@@ -71,7 +70,7 @@ for brain=1:length(structLabels)
     regLabelsMRI = MRIread(pathRegLabels);
     regLabels = regLabelsMRI.vol;
     
-    % change labels fromleft to right
+    % change labels from left to right
     if strcmp(side, 'right')
         disp('turning right labels to left ones')
         for l=1:length(rightLabels)
