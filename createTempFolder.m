@@ -24,4 +24,11 @@ elseif exist(pathTempImFolder,'dir') && ~recompute
     disp(['using files already computed in ' pathTempImFolder]); disp(' ');
 end
 
+aux=getenv('USE_SCRATCH');
+if ~(isempty(aux) && str2double(aux)>0 && exist('/scratch/','dir')>0)
+    pathTempImFolder(pathTempImFolder=='/')='_';
+    pathTempImFolder(pathTempImFolder==' ')='_';
+    pathTempImFolder=['/scratch/' pathTempImFolder];
+end
+
 end
