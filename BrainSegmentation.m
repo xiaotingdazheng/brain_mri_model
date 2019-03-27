@@ -28,21 +28,21 @@ title = 'label fusion on synthetic multi contrast images generated from CobraLab
 evaluate = 1;                % evaluate test scans segmentations aginst provided ref labels (0-1)
 leaveOneOut = 1;             % segment one image with the rest of the datatset (0-1)
 useSynthethicImages = 1;     % use real or synthetic images (0-1)
-recompute = 1;               % recompute files, even if they exist (0-1)
-debug = 0;                   % display debug information from registrations (0-1)
+recompute = 0;               % recompute files, even if they exist (0-1)
+debug = 1;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)
 % preprocessing parameters
 targetResolution = 0.4;      % resolution of synthetic images (0 = test image resolution, only if one channel)
 alignTestImages = 1;         % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
 rescale = 1;                 % rescale intensities between 0 and 255 (0-1)
 % label fusion parameters
-margin = 10;                 % margin for brain voxels selection
+margin = 7;                  % margin for brain voxels selection
 rho = 0.5;                   % exponential decay for logOdds maps
 threshold = 0.1;             % lower bound for logOdds maps
 sigma = [15 20];             % var for Gaussian likelihood
 labelPriorType = 'logOdds';  % type of prior ('logOdds' or 'delta function')
 % registration parameters
-registrationOptions = '-ln 4 -lp 4 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005 -vel';
+registrationOptions = '-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

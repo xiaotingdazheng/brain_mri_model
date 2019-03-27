@@ -50,9 +50,13 @@ for i=1:length(structPathsFloImages)
     regPriorSubfolder = registerLabels(pathFloLabels, priorSubfolder, pathRefImage, registrationSubfolder, labelPriorType, labelsList,...
         refBrainNum, niftyRegHome, recompute, debug);
     
+    % compute likelihood
+    calculateLikelihood
+    
     % perform summation of posterior on the fly
-    [labelMap, labelMapHippo, sizeSegmMap] = updateLabelMaps(labelMap, labelMapHippo, pathRefImage, pathRegFloImage, regPriorSubfolder, ...
-        labelPriorType, brainVoxels, sigma, labelsList, pathTempImFolder);
+    [likelihood, sizeSegmMap] = calculateLikelihood(pathRefImage, pathRegFloImage, pathTempImFolder, sigma);
+    [labelMap, labelMapHippo] = updateLabelMaps(labelMap, labelMapHippo, likelihood, regPriorSubfolder, labelPriorType, ...
+        brainVoxels, labelsList, pathTempImFolder);
 
 end
 
