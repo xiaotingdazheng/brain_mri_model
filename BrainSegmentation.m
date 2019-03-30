@@ -8,19 +8,19 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 
 % cell paths test images
-pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_images_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_images_t2'};
+pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_images_t1' ...
+    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_images_t2'};
 % cell paths test first labels (FS labels)
-pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_first_labels_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_first_labels_t2'};
+pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_first_labels_t1' ...
+    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_first_labels_t2'};
 % cell paths test labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_labels';
+pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/training_labels';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/training_labels';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/classesTable.txt';
+pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/classesTable.txt';
 % optional paths
-%pathDirTrainingImages = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/training_images';
+% pathDirTrainingImages = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/training_images';
 
 % experiment title
 title = 'label fusion on synthetic multi contrast images generated from CobraLab data';
@@ -63,6 +63,6 @@ params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder target
 accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params);
 
 % plot results
-comparisonGraph({accuracy,'regions'}, title)
+% comparisonGraph({accuracy,'regions'}, title)
 
 disp(' '); tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));
