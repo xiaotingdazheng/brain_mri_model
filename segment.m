@@ -15,6 +15,7 @@ pathMainFolder = fileparts(structPathsRefLabels(1).folder);
 pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
 % parameters initialisation
 evaluate = 1;
+cropHippo = 0;
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 nImages = length(structPathsTestImages{1});
 accuracies = cell(nImages,1);
@@ -25,7 +26,7 @@ for i=1:nImages
     % paths of reference image and corresponding FS labels
     [pathRefImage, pathRefFirstLabels, pathRefLabels, refBrainNum] = buildRefPaths(structPathsTestImages,...
         structPathsFirstRefLabels, structPathsRefLabels, i);
-    pathResultPrefix = fullfile(pathMainFolder, refBrainNum, refBrainNum);
+    pathResultPrefix = fullfile(pathMainFolder, 'results', refBrainNum, refBrainNum);
     
     % display processed test brain
     disp(' '); disp(['%%% Processing test ' refBrainNum]);
@@ -59,8 +60,9 @@ for i=1:nImages
     end
     
     % upsample ref data to targetRes
-    [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, ...
-        targetResolution, multiChannel, margin, refBrainNum, recompute, evaluate);
+    [pathRefImage, pathRefLabels, brainVoxels, cropping] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathRefFirstLabels, pathTempImFolder, ...
+        targetResolution, multiChannel, margin, refBrainNum, recompute, evaluate, cropHippo);
+
     
     % remove old hippocampus labels and add background
     [updatedLabelsList, updatedLabelsNames] = updateLabelsList(labelsList, labelsNames);
@@ -69,11 +71,11 @@ for i=1:nImages
     disp(' '); disp(['%% segmenting ' refBrainNum]);
     [pathSegmentation, pathHippoSegmentation] = labelFusion...
         (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, updatedLabelsNames, ...
-        pathTempImFolder, pathResultPrefix, refBrainNum, freeSurferHome, niftyRegHome, debug);
+        pathTempImFolder, pathResultPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
-    accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder);
+    accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
     
 end
 

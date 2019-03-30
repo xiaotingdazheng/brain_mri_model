@@ -1,5 +1,5 @@
-function [pathSegmentation, pathHippoSegmentation] = getSegmentations(labelMap, labelMapHippo, pathResultPrefix, pathRefImage, brainVoxels, ...
-    labelsList, labelsNames, sizeSegmMap, pathTempImFolder)
+function [pathSegmentation, pathHippoSegmentation] = getSegmentations(pathResultPrefix, pathRefImage, brainVoxels, labelsList, labelsNames,...
+    sizeSegmMap, pathTempImFolder,labelMapFolder)
 
 % This function performs the argmax operation on the labels posterior
 % probability, to obtain the most probable segmentation. It takes as inputs
@@ -8,6 +8,8 @@ function [pathSegmentation, pathHippoSegmentation] = getSegmentations(labelMap, 
 % files.
 
 % path files to be saved
+pathLabelMap = fullfile(labelMapFolder, 'labelMap.mat');
+pathLabelMapHippo = fullfile(labelMapFolder, 'labelMapHippo.mat');
 pathSegmentation = [pathResultPrefix '.all_segmentation.nii.gz'];
 pathHippoSegmentation = [pathResultPrefix '.hippo_vs_rest_segmentation.nii.gz'];
 pathVolumesTxt = [pathResultPrefix '.volumes.txt'];
@@ -15,6 +17,8 @@ resultsFolder = fileparts(pathSegmentation);
 if ~exist(resultsFolder, 'dir'), mkdir(resultsFolder); end
 
 % initialisation
+load(pathLabelMap, 'labelMap');
+load(pathLabelMapHippo, 'labelMapHippo');
 mri = myMRIread(pathRefImage, 0, pathTempImFolder);
 refImageRes = [mri.xsize mri.ysize mri.zsize];
 hippoLabelList= [0 53 17];
@@ -49,7 +53,9 @@ mri.vol = labelMapHippo;
 myMRIwrite(mri, pathHippoSegmentation, 'float', pathTempImFolder);
 % save text file with volume of each structure
 fid=fopen(pathVolumesTxt, 'w');
-for i=2:length(volumes), fprintf(fid, '%s: %.3f \n', strip(labelsNames{i}), volumes(i)); end
+for i=2:length(volumes)
+    if volumes(i)>0, fprintf(fid, '%s: %.3f \n', strip(labelsNames{i}), volumes(i)); end
+end
 fclose(fid);
 
 end

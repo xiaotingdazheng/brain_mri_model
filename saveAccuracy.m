@@ -2,7 +2,7 @@ function accuracy = saveAccuracy(accuracies, pathAccuracies, labelsList, labelsN
 
 accuracies = cell2mat(accuracies);
 
-labelsList = [labelsList NaN];
+labelsList = [labelsList 53 17];
 
 accuracy = cell(size(accuracies,1)+3,size(accuracies,2)+2); % initialisation
 

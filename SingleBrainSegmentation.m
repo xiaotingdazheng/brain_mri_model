@@ -41,6 +41,7 @@ if ~exist('pathRefLabels','var'), pathRefLabels=''; end
 
 % regroup parameters
 recompute = 1;
+cropHippo = 1;
 params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
     margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome, pathClassesTable};
 
@@ -90,8 +91,8 @@ else
 end
 
 % upsample ref data to targetRes
-[pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, ...
-    targetResolution, multiChannel, margin, refBrainNum, recompute, evaluate);
+[pathRefImage, pathRefLabels, brainVoxels, cropping] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathRefFirstLabels, pathTempImFolder, ...
+    targetResolution, multiChannel, margin, refBrainNum, recompute, evaluate, cropHippo);
 
 % remove old hippocampus labels and add background
 [updatedLabelsList, updatedLabelsNames] = updateLabelsList(labelsList, labelsNames);
@@ -100,13 +101,13 @@ end
 disp(' '); disp(['%% segmenting ' refBrainNum]);
 [pathSegmentation, pathHippoSegmentation] = labelFusion...
     (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, updatedLabelsNames, ...
-    pathTempImFolder, pathResultPrefix, refBrainNum, freeSurferHome, niftyRegHome, debug);
+    pathTempImFolder, pathResultPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug);
 
 % evaluation
 if evaluate
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
     pathAccuracies = [pathResultPrefix '.regions_accuracies.mat'];
-    accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder);
+    accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
     if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
     save(pathAccuracies, 'accuracies');
 end

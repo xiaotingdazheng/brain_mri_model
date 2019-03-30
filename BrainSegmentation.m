@@ -8,17 +8,17 @@ freeSurferHome = '/usr/local/freesurfer/';
 niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 
 % cell paths test images
-pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_images_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_images_t2'};
+pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_images_t1' ...
+    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_images_t2'};
 % cell paths test first labels (FS labels)
-pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_first_labels_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_first_labels_t2'};
+pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_first_labels_t1' ...
+    '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_first_labels_t2'};
 % cell paths test labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/test_labels';
+pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/training_labels';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/training_labels';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/classesTable.txt';
+pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_New/classesTable.txt';
 % optional paths
 %pathDirTrainingImages = '~/data/CobraLab/label_fusions/multi_channel/synth_leaveOneOut_new/training_images';
 
@@ -36,10 +36,10 @@ targetResolution = 0.4;      % resolution of synthetic images (0 = test image re
 alignTestImages = 1;         % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
 rescale = 1;                 % rescale intensities between 0 and 255 (0-1)
 % label fusion parameters
-margin = 7;                  % margin for brain voxels selection
+margin = 5;                  % margin for brain voxels selection
 rho = 0.5;                   % exponential decay for logOdds maps
 threshold = 0.1;             % lower bound for logOdds maps
-sigma = [15 20];             % var for Gaussian likelihood
+sigma = [50 50];             % var for Gaussian likelihood
 labelPriorType = 'logOdds';  % type of prior ('logOdds' or 'delta function')
 % registration parameters
 registrationOptions = '-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005';

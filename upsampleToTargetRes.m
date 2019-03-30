@@ -1,5 +1,5 @@
-function [pathRefImage, pathRefLabels, brainVoxels] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathTempImFolder, targetRes,...
-    multiChannel, margin, refBrainNum, recompute, evaluate)
+function [pathRefImage, pathRefLabels, brainVoxels, cropping] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathRefFirstLabels, pathTempImFolder, targetRes,...
+    multiChannel, margin, refBrainNum, recompute, evaluate, cropHippo)
 
 % path upsampled ref folder
 if ~multiChannel, brainVoxels = cell(1); end
@@ -17,15 +17,22 @@ if targetRes
     pathUpsampledRefImage = fullfile(pathUpsampledRefDataSubfolder, [name '_' resolution '.nii.gz']);
     temp_pathRefLabels = strrep(pathRefLabels,'.nii.gz','.mgz'); [~,name,~] = fileparts(temp_pathRefLabels);
     pathUpsampledRefLabels = fullfile(pathUpsampledRefDataSubfolder, [name '_' resolution '.nii.gz']);
+    pathUpsampledRefFirstLabels = fullfile(pathUpsampledRefDataSubfolder, [name '_first_' resolution '.nii.gz']);
     
     % upsample ref image
     if (~exist(pathUpsampledRefImage, 'file') || recompute)
         cmd = ['mri_convert ' pathRefImage{end} ' ' pathUpsampledRefImage ' --voxsize ' voxsize ' -odt float'];
         [~,~] = system(cmd);
     end
+    % upsample ref first labels image
+    if (~exist(pathUpsampledRefFirstLabels, 'file') || recompute)
+        cmd = ['mri_convert ' pathRefFirstLabels{1} ' ' pathUpsampledRefFirstLabels ' --voxsize ' voxsize ' -rt nearest -odt float'];
+        [~,~] = system(cmd);
+    end
     % mask ref image with nans and put it back in the cell
     mask(pathUpsampledRefImage, pathUpsampledRefImage, pathUpsampledRefImage, 0, NaN, 0, refBrainNum, pathTempImFolder, '', 1, 0);
     pathRefImage{end} = pathUpsampledRefImage;
+    pathRefFirstLabels{1} = pathUpsampledRefFirstLabels;
     
     if evaluate
         % upsample ref labels
@@ -47,6 +54,13 @@ elseif ~any(targetRes) && evaluate
         pathRefLabels = pathUpsampledRefLabels;
     end
     
+end
+
+if cropHippo
+    mri = myMRIread(pathRefFirstLabels{1});
+    [~,cropping] = cropLabelVol(mri, 20, 'hippo');
+else
+    cropping = 0;
 end
 
 % find brain voxels

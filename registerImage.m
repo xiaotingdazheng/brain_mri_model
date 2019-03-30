@@ -1,11 +1,12 @@
-function pathRegFloImage = registerImage(pathRefImage, pathFloImage, registrationSubFolder, registrationOptions, multiChannel, brainVoxels, recompute, ...
-    refBrainNum, niftyRegHome, debug)
+function [pathRegFloImage, pathCroppedLogOddsFolder, pathRefImage, brainVoxels] = registerImage(pathRefImage, pathFloImage, registrationSubFolder, registrationOptions,...
+    multiChannel, brainVoxels, recompute, refBrainNum, cropping, priorSubfolder, niftyRegHome, debug)
 
 % naming variables
 floBrainNum = findBrainNum(pathFloImage);
 filename = [floBrainNum '_to_' refBrainNum];
 % names of files that will be used/saved during registration
-pathRegFloImage = fullfile(registrationSubFolder,[filename '.nii.gz']); %path of registered floating image
+if cropping, pathRegFloImage = fullfile(registrationSubFolder,[filename '_cropped.nii.gz']); %path of registered floating image
+else, pathRegFloImage = fullfile(registrationSubFolder,[filename '.nii.gz']); end
 aff = fullfile(registrationSubFolder, [filename '.aff']); %deformation of first registration
 pathRigidRegFloImage = fullfile(registrationSubFolder, [filename '.rigid.nii.gz']);
 pathTransformation = fullfile(registrationSubFolder, [filename '.cpp.nii.gz']); %modify name of the saved aff file
@@ -18,11 +19,23 @@ if ~exist(aff, 'file') || recompute
     cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathFloImage ' -aff ' aff ' -res ' pathRigidRegFloImage ' -pad 0 -voff'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
 end
+
+if cropping
+    [pathFloImage, pathRefImage, pathCroppedLogOddsFolder, brainVoxels] = ...
+        cropHippo(cropping, aff, pathRigidRegFloImage, pathRefImage, filename, refBrainNum, registrationSubFolder, priorSubfolder, niftyRegHome, recompute);
+else
+    pathCroppedLogOddsFolder = priorSubfolder;
+end
+
 % compute registration synthetic image to real images
 if ~exist(pathRegFloImage, 'file') || recompute
     disp(['registering ' floBrainNum ' to ' refBrainNum ' with reg_f3d']);
     pathRegF3d = fullfile(niftyRegHome, 'reg_f3d');
-    cmd = [pathRegF3d ' -ref ' pathRefImage ' -flo ' pathFloImage ' -res ' pathRegFloImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];
+    if cropping
+        cmd = [pathRegF3d ' -ref ' pathRefImage ' -flo ' pathFloImage ' -res ' pathRegFloImage ' -cpp ' pathTransformation ' ' registrationOptions];
+    else
+        cmd = [pathRegF3d ' -ref ' pathRefImage ' -flo ' pathFloImage ' -res ' pathRegFloImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];
+    end
     if multiChannel
         weights = zeros(1,length(brainVoxels));
         for i=1:length(brainVoxels), weights(i)=length(brainVoxels{i}); end

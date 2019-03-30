@@ -1,5 +1,4 @@
-function [labelMap, labelMapHippo] = updateLabelMaps(labelMap, labelMapHippo, likelihood, regPriorSubfolder, labelPriorType, ...
-    brainVoxels, labelsList, pathTempImFolder)
+function updateLabelMaps(likelihood, regPriorSubfolder, labelPriorType, brainVoxels, labelsList, pathTempImFolder, labelMapFolder, i)
 
 % This function updates the labelMap matrix on which we will perform the
 % argmax operation to obatin the best segmentation possible. The update
@@ -14,7 +13,22 @@ function [labelMap, labelMapHippo] = updateLabelMaps(labelMap, labelMapHippo, li
 % segmentation around the edges of the structures.
 
 hippoLabelList = [0 53 17];
+pathLabelMap = fullfile(labelMapFolder, 'labelMap.mat');
+pathLabelMapHippo = fullfile(labelMapFolder, 'labelMapHippo.mat');
+if ~exist(labelMapFolder,'dir'), mkdir(labelMapFolder); end
 disp('updating sum of posteriors');
+
+% initialising/loading label maps
+if ~exist(pathLabelMap,'file') || i==1
+    labelMap = zeros(length(labelsList), length(brainVoxels{1}), 'single');
+else
+    load(pathLabelMap, 'labelMap');
+end
+if ~exist(pathLabelMapHippo,'file') || i== 1
+    labelMapHippo = zeros(3, length(brainVoxels{1}), 'single'); 
+else
+    load(pathLabelMapHippo, 'labelMapHippo');
+end
 
 switch labelPriorType
     
@@ -49,7 +63,10 @@ switch labelPriorType
                 brainVoxels{1}, k, pathTempImFolder);
         end
         %update labelMap with marginalised posterior
-        labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+        % labelMap = labelMap + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+        for k=1:length(labelsList)
+            labelMap(k,:) = labelMap(k,:) + unmargenalisedPosterior(k,:)./partitionFunction;
+        end
         
         % same mechanism for hipocampus logOdds
         unmargenalisedPosterior = zeros(size(labelMapHippo), 'single');
@@ -63,9 +80,15 @@ switch labelPriorType
         temp_pathLogOdds = fullfile(regPriorSubfolder, 'logOdds_left_hippo.nii.gz');
         [unmargenalisedPosterior, partitionFunction] = processLogOdds(unmargenalisedPosterior, partitionFunction, likelihood, temp_pathLogOdds,...
             brainVoxels{1}, 3, pathTempImFolder);
-        labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+        % labelMapHippo = labelMapHippo + bsxfun(@rdivide, unmargenalisedPosterior, partitionFunction);
+        for k=1:3
+            labelMapHippo(k,:) = labelMapHippo(k,:) + unmargenalisedPosterior(k,:)./partitionFunction;
+        end
         
 end
+
+save(pathLabelMap, 'labelMap', '-v7.3');
+save(pathLabelMapHippo, 'labelMapHippo', '-v7.3');
 
 end
 

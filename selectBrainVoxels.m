@@ -1,7 +1,9 @@
-function brainVoxels = selectBrainVoxels(pathRefFirstLabels, margin, pathTempImFolder)
+function brainVoxels = selectBrainVoxels(pathImage, margin, pathTempImFolder)
+
+% pathImage can be the path of an image or of corresponding labels
 
 % get indices of voxels belonging to brain
-refFirstLabelsMRI = myMRIread(pathRefFirstLabels, 0, pathTempImFolder);
+refFirstLabelsMRI = myMRIread(pathImage, 0, pathTempImFolder);
 brainMask = refFirstLabelsMRI.vol >0.001;
 brainMask = imdilate(brainMask, ones(margin, margin, margin));
 

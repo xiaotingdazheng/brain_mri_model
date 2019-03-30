@@ -1,4 +1,4 @@
-function accuracy = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, labelsList, pathTempImFolder)
+function accuracy = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, labelsList, pathTempImFolder, cropping)
 
 % This function computes the dice coefficient between the segmented image
 % and the provided GT.
@@ -11,10 +11,11 @@ hippoSegmentationMRI = myMRIread(pathHippoSegmentation, 0, pathTempImFolder);
 hippoSegmentation = hippoSegmentationMRI.vol;
 % open test labels and crop them if necessary
 refLabelsMRI = myMRIread(pathRefLabels, 0, pathTempImFolder);
+if cropping, refLabelsMRI = applyCropping(refLabelsMRI,cropping); end
 refLabels = refLabelsMRI.vol;
-
+    
 % initialise result matrix
-accuracy = NaN(1,length(labelsList)+1);
+accuracy = NaN(1,length(labelsList)+2);
 
 % compute dice coef for each brain region
 for i=1:length(labelsList)
@@ -30,12 +31,19 @@ for i=1:length(labelsList)
     
 end
 
-% compute dice coef for whole hippocampus
-temp_RefMask = refLabels > 20000 | refLabels == 17 | refLabels == 53;
-if ~isequal(unique(hippoSegmentation), 0) && ~isequal(unique(temp_RefMask), 0)
-    accuracy(end) = dice(hippoSegmentation, temp_RefMask);
+% compute dice coef for right hippocampus
+temp_RefMask = (refLabels > 20000 & refLabels < 20100) | refLabels == 53;
+temp_segmentationMask = (hippoSegmentation > 20000 & hippoSegmentation < 20100) | hippoSegmentation == 53;
+if ~isequal(unique(temp_segmentationMask), 0) && ~isequal(unique(temp_RefMask), 0)
+    accuracy(end-1) = dice(temp_segmentationMask, temp_RefMask);
 end
 
+% compute dice coef for left hippocampus
+temp_RefMask = refLabels > 20100 | refLabels == 17;
+temp_segmentationMask = hippoSegmentation == 17 | hippoSegmentation > 20100;
+if ~isequal(unique(temp_segmentationMask), 0) && ~isequal(unique(temp_RefMask), 0)
+    accuracy(end) = dice(temp_segmentationMask, temp_RefMask);
+end
 
 end
 

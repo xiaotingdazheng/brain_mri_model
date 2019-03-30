@@ -1,5 +1,5 @@
-function [pathSegm, pathHippoSegm] = labelFusion(pathRefImage, pathDirFloImages, pathDirFloLabels, brainVoxels, ...
-    labelFusionParameters, labelsList, labelsNames, pathTempImFolder, pathResultPrefix, refBrainNum, freeSurferHome, niftyRegHome, debug)
+function [pathSegm, pathHippoSegm] = labelFusion(cellPathsRefImage, pathDirFloImages, pathDirFloLabels, brainVoxels, ...
+    labelFusionParameters, labelsList, labelsNames, pathTempImFolder, pathResultPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug)
 
 % read parameters
 rho = labelFusionParameters{1};
@@ -11,9 +11,6 @@ multiChannel = labelFusionParameters{6};
 recompute = labelFusionParameters{7};
 registrationOptions = labelFusionParameters{8};
 
-% define paths of real image and corresponding labels
-pathRefImage = pathRefImage{end};
-
 % handling paths floating data
 if ~contains(pathDirFloImages, '*'), pathDirFloImages = fullfile(pathDirFloImages, '*nii.gz'); end
 if ~contains(pathDirFloLabels, '*'), pathDirFloLabels = fullfile(pathDirFloLabels, '*nii.gz'); end
@@ -21,16 +18,15 @@ structPathsFloImages = dir(pathDirFloImages);
 structPathsFloLabels = dir(pathDirFloLabels);
 % define subfolders
 registrationFolder = fullfile(pathTempImFolder, 'registrations');
+labelMapFolder = fullfile(pathTempImFolder, 'labelMaps');
 if isequal(labelPriorType, 'delta function'), priorFolder = fullfile(pathTempImFolder, 'hippo_labels_delta');
 else, priorFolder = fullfile(pathTempImFolder,'logOdds'); end
 
-% initialise label maps fusion with zeros (background label)
-labelMap = zeros(length(labelsList), length(brainVoxels{1}), 'single');
-labelMapHippo = zeros(3, length(brainVoxels{1}), 'single');
 
 for i=1:length(structPathsFloImages)
     
     % paths of synthetic image and labels
+    pathRefImage = cellPathsRefImage{end};
     pathFloImage = fullfile(structPathsFloImages(i).folder, structPathsFloImages(i).name);
     pathFloLabels = fullfile(structPathsFloLabels(i).folder, structPathsFloLabels(i).name);
     
@@ -43,8 +39,8 @@ for i=1:length(structPathsFloImages)
     
     % registration of synthetic image to real image
     registrationSubfolder = fullfile(registrationFolder, ['training_' floBrainNum '_reg_to_test_' refBrainNum]);
-    pathRegFloImage = registerImage(pathRefImage, pathFloImage, registrationSubfolder, registrationOptions, multiChannel, brainVoxels,...
-        recompute, refBrainNum, niftyRegHome, debug);
+    [pathRegFloImage, priorSubfolder, pathRefImage, brainVoxels] = registerImage(pathRefImage, pathFloImage, registrationSubfolder, registrationOptions,...
+        multiChannel, brainVoxels, recompute, refBrainNum, cropping, priorSubfolder, niftyRegHome, debug);
 
     % registration of priors
     regPriorSubfolder = registerLabels(pathFloLabels, priorSubfolder, pathRefImage, registrationSubfolder, labelPriorType, labelsList,...
@@ -54,14 +50,14 @@ for i=1:length(structPathsFloImages)
     [likelihood, sizeSegmMap] = calculateLikelihood(pathRefImage, pathRegFloImage, pathTempImFolder, sigma);
     
     % perform summation of posterior on the fly
-    [labelMap, labelMapHippo] = updateLabelMaps(labelMap, labelMapHippo, likelihood, regPriorSubfolder, labelPriorType, ...
-        brainVoxels, labelsList, pathTempImFolder);
+    updateLabelMaps(likelihood, regPriorSubfolder, labelPriorType, brainVoxels, labelsList, pathTempImFolder, labelMapFolder, i);
 
 end
 
+% pathSegm ='';
+% pathHippoSegm='';
 % get most likely segmentation
-[pathSegm, pathHippoSegm] = getSegmentations(labelMap, labelMapHippo, pathResultPrefix, pathRefImage, brainVoxels, labelsList, ...
-    labelsNames, sizeSegmMap, pathTempImFolder);
+[pathSegm, pathHippoSegm] = getSegmentations(pathResultPrefix, pathRefImage, brainVoxels, labelsList, labelsNames, sizeSegmMap, pathTempImFolder, labelMapFolder);
 
 % delete temp subfolder if specified
 if deleteSubfolder, rmdir(pathTempImFolder,'s'); end
