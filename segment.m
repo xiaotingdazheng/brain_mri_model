@@ -73,14 +73,13 @@ for i=1:nImages
         (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, updatedLabelsNames, ...
         pathTempImFolder, pathResultPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug);
     
-%     % evaluation
-%     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
-%     accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
+    % evaluation
+    disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
+    accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
     
 end
 
-% % save results
-% accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);
-accuracy = 0;
+% save results
+accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);
 
 end
