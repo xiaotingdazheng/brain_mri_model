@@ -46,18 +46,18 @@ for i=1:length(structPathsFloImages)
     regPriorSubfolder = registerLabels(pathFloLabels, priorSubfolder, pathRefImage, registrationSubfolder, labelPriorType, labelsList,...
         refBrainNum, niftyRegHome, recompute, debug);
     
-    % compute likelihood
-    [likelihood, sizeSegmMap] = calculateLikelihood(pathRefImage, pathRegFloImage, pathTempImFolder, sigma);
-    
-    % perform summation of posterior on the fly
-    updateLabelMaps(likelihood, regPriorSubfolder, labelPriorType, brainVoxels, labelsList, pathTempImFolder, labelMapFolder, i);
+%     % compute likelihood
+%     [likelihood, sizeSegmMap] = calculateLikelihood(pathRefImage, pathRegFloImage, pathTempImFolder, sigma);
+%     
+%     % perform summation of posterior on the fly
+%     updateLabelMaps(likelihood, regPriorSubfolder, labelPriorType, brainVoxels, labelsList, pathTempImFolder, labelMapFolder, i);
 
 end
 
-% pathSegm ='';
-% pathHippoSegm='';
+pathSegm ='';
+pathHippoSegm='';
 % get most likely segmentation
-[pathSegm, pathHippoSegm] = getSegmentations(pathResultPrefix, pathRefImage, brainVoxels, labelsList, labelsNames, sizeSegmMap, pathTempImFolder, labelMapFolder);
+% [pathSegm, pathHippoSegm] = getSegmentations(pathResultPrefix, pathRefImage, brainVoxels, labelsList, labelsNames, sizeSegmMap, pathTempImFolder, labelMapFolder);
 
 % delete temp subfolder if specified
 if deleteSubfolder, rmdir(pathTempImFolder,'s'); end

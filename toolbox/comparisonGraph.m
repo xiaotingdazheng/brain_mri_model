@@ -22,6 +22,15 @@ regions_names = strrep(regions_names,'central','');
 regions_names = strrep(regions_names,'posterior','');
 regions_names = strip(regions_names);
 new_names = unique(regions_names,'stable');
+
+names_to_remove = {'background';'CC';'optic chiasm';'vessel';'choroid plexus';'optic chiasm';'CC';'HATA'};
+idx=[];
+for i=1:length(names_to_remove)
+   tidx = find(ismember(new_names, names_to_remove(i)));
+   idx = [idx tidx];
+end
+new_names(idx) = [];
+
 categories = categorical(new_names);
 
 means = zeros(1, nargin-1);
