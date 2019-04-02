@@ -26,7 +26,7 @@ for channel=1:nChannel
     
     % mask image with zeros using its labels
     pathRefImage{channel} = mask(pathRefImage{channel}, pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, ...
-        channel*multiChannel, 0, 1, refBrainNum, pathTempImFolder, freeSurferHome, recompute, 1);
+        channel*multiChannel, 0, 0, refBrainNum, pathTempImFolder, freeSurferHome, recompute, 1, 5);
     
 end
 
@@ -60,7 +60,8 @@ end
 
 % pad all images with NaNs
 for channel=1:nChannel
-    mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, refBrainNum, pathTempImFolder, freeSurferHome, 1, 0);
+    mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, ...
+        refBrainNum, pathTempImFolder, freeSurferHome, 1, 0, 5);
 end
 
 % concatenate all the channels into a single image

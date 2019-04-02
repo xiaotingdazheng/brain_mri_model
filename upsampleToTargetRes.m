@@ -30,7 +30,7 @@ if targetRes
         [~,~] = system(cmd);
     end
     % mask ref image with nans and put it back in the cell
-    mask(pathUpsampledRefImage, pathUpsampledRefImage, pathUpsampledRefImage, 0, NaN, 0, refBrainNum, pathTempImFolder, '', 1, 0);
+    mask(pathUpsampledRefImage, pathUpsampledRefImage, pathUpsampledRefImage, 0, NaN, 0, refBrainNum, pathTempImFolder, '', 1, 0, 5);
     pathRefImage{end} = pathUpsampledRefImage;
     pathRefFirstLabels{1} = pathUpsampledRefFirstLabels;
     

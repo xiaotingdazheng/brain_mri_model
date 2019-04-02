@@ -15,7 +15,7 @@ pathMainFolder = fileparts(structPathsRefLabels(1).folder);
 pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
 % parameters initialisation
 evaluate = 1;
-cropHippo = 0;
+cropHippo = 1;
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 nImages = length(structPathsTestImages{1});
 accuracies = cell(nImages,1);

@@ -1,7 +1,9 @@
-function pathMaskedImage = mask(pathImage, pathMask, result, channel, padChar, padFS, brainNum, pathTempImFolder, freeSurferHome, recompute, verbose)
+function pathMaskedImage = mask(pathImage, pathMask, result, channel, padChar, padFS, brainNum, pathTempImFolder, freeSurferHome, recompute, verbose, dilate)
 
 % Mask image with provided mask. Result is saved in specified folder with
 % '_masked' added to the original filename.
+
+if nargin<12, dilate = 1; end
 
 % create name of masked file
 if ~contains(result,'.nii.gz')
@@ -22,7 +24,7 @@ if ~exist(pathMaskedImage, 'file') || recompute
         cmd = ['mri_mask ' pathImage ' ' pathMask ' ' pathMaskedImage];
         [~,~] = system(cmd);
     else
-        maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder);
+        maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder, dilate);
     end
     
 else
@@ -33,22 +35,26 @@ end
 
 end
 
-function maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder)
+function maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder, dilate)
 
 % read image
 imageMRI = myMRIread(pathImage, 0, pathTempImFolder);
 image= imageMRI.vol;
-image(image<0.01) = 0;
+image(image<0) = 0;
 
 if isequal(pathMask, pathImage)
-    strel=zeros(3,3,3); strel(2,2,:)=ones(1,1,3); strel(2,:,2)=ones(1,3,1); strel(:,2,2)=ones(3,1,1);
-    mask = imdilate(image > 0, strel);
+    mask = image >0.01;
 else
     % read mask
     maskMRI = myMRIread(pathMask, 0, pathTempImFolder);
     mask = maskMRI.vol;
     mask = mask > 0;
 end
+
+% dilate mask
+% strel=zeros(3,3,3); strel(2,2,:)=ones(1,1,3); strel(2,:,2)=ones(1,3,1); strel(:,2,2)=ones(3,1,1);
+strel=ones(dilate,dilate,dilate);
+mask = imdilate(mask, strel);
 
 % mask image with NaNs
 image(~mask) = padChar;
