@@ -2,7 +2,7 @@ function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTes
 
 % read and check parameters
 nChannel = length(pathDirTestImages);
-[leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
+[evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
     sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
 % build paths structures
 structPathsTestImages = cell(size(pathDirTestImages));
@@ -14,8 +14,6 @@ structPathsRefLabels = dir(pathDirTestLabels{1});
 pathMainFolder = fileparts(structPathsRefLabels(1).folder);
 pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
 % parameters initialisation
-evaluate = 1;
-cropHippo = 1;
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 nImages = length(structPathsTestImages{1});
 accuracies = cell(nImages,1);

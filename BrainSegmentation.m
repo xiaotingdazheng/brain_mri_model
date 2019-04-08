@@ -30,6 +30,7 @@ pathDirTrainingImages = {'~/data/CobraLab/label_fusions/multi_channel/real_leave
 title = 'label fusion on real multi contrast images from CobraLab data';
 % general parameters
 evaluate = 1;                % evaluate test scans segmentations aginst provided ref labels (0-1)
+cropHippo = 1;               % crop results around hippocampus (0-1)
 leaveOneOut = 1;             % segment one image with the rest of the datatset (0-1)
 useSynthethicImages = 0;     % use real or synthetic images (0-1)
 recompute = 0;               % recompute files, even if they exist (0-1)
@@ -60,8 +61,8 @@ if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
     (pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, useSynthethicImages, 0, evaluate);
 
 % regroup parameters
-params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
-    margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome, pathClassesTable};
+params = {evaluate cropHippo leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages ...
+    margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome pathClassesTable};
 
 % segment brains  
 accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params);

@@ -5,12 +5,12 @@ function SingleBrainSegmentationMultiChannel(pathRefImageChannel1, pathRefImageC
     pathDirTrainingLabels, ...
     pathDirTrainingImagesChannel1, pathDirTrainingImagesChannel2, ...
     pathClassesTable, ...
+    evaluate, cropHippo, ...
     leaveOneOut, useSynthethicImages, debug, deleteSubfolder,...
     targetResolution, alignTestImages, rescale,...
     margin, rho, threshold, sigma1, sigma2, labelPriorType, ...
     registrationOptions, ...
-    freeSurferHome, niftyRegHome,...
-    evaluate)
+    freeSurferHome, niftyRegHome)
 
 now = clock;
 fprintf('Started on %d/%d at %dh%02d\n', now(3), now(2), now(4), now(5)); disp(' ');
@@ -20,6 +20,8 @@ tic
 
 % adds function paths
 if isdeployed
+    evaluate = str2double(evaluate);
+    cropHippo = str2double(cropHippo);
     leaveOneOut = str2double(leaveOneOut);
     useSynthethicImages = str2double(useSynthethicImages);
     debug = str2double(debug);
@@ -32,7 +34,6 @@ if isdeployed
     threshold = str2double(threshold);
     sigma1 = str2double(sigma1);
     sigma2 = str2double(sigma2);
-    evaluate = str2double(evaluate);
 else
     addpath(fullfile(freeSurferHome, 'matlab/'));
     addpath(genpath(pwd));
@@ -49,17 +50,17 @@ if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
 % regroup parameters
 sigma = [sigma1 sigma2];
 recompute = 1;
-cropHippo = 1;
-params = {leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
-    margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome, pathClassesTable};
+params = {evaluate cropHippo leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
+    margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome pathClassesTable};
 
 %------------------------- equivalent of segment -------------------------%
 
 % initialisation
 nChannel = length(pathRefImage);
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
-[leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
-    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
+[evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, ...
+    alignTestImages, margin, rho, threshold, sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, ...
+    labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
 
 % display processed test brain
 [refBrainNum, pathTempImFolder] = createTempFolder(pathResultPrefix);

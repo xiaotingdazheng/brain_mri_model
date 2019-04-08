@@ -1,26 +1,30 @@
-function [leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold, sigma, ...
-    labelPriorType, regOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel)
+function [evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho,...
+    threshold, sigma, labelPriorType, regOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel)
 
 %read params
-leaveOneOut = params{1};
-useSynthethicImages = params{2};
-recompute = params{3};
-debug = params{4};
-deleteSubfolder = params{5};
-targetResolution = params{6};
-rescale = params{7};
-alignTestImages = params{8};
-margin = params{9};
-rho = params{10};
-threshold = params{11};
-sigma = params{12};
-labelPriorType = params{13};
-regOptions = params{14};
-freeSurferHome = params{15};
-niftyRegHome = params{16};
-pathClassesTable = params{17};
+evaluate = params{1};
+cropHippo = params{2};
+leaveOneOut = params{3};
+useSynthethicImages = params{4};
+recompute = params{5};
+debug = params{6};
+deleteSubfolder = params{7};
+targetResolution = params{8};
+rescale = params{9};
+alignTestImages = params{10};
+margin = params{11};
+rho = params{12};
+threshold = params{13};
+sigma = params{14};
+labelPriorType = params{15};
+regOptions = params{16};
+freeSurferHome = params{17};
+niftyRegHome = params{18};
+pathClassesTable = params{19};
 
 %check them
+if ~(evaluate==0 || evaluate==1), error('evaluate should be 0 or 1'); end
+if ~(cropHippo==0 || cropHippo==1), error('cropHippo should be 0 or 1'); end
 if ~(leaveOneOut==0 || leaveOneOut==1), error('leaveOneOut should be 0 or 1'); end
 if ~(useSynthethicImages==0 || useSynthethicImages==1), error('useSynthethicImages should be 0 or 1'); end
 if ~(recompute==0 || recompute==1), error('recompute should be 0 or 1'); end
