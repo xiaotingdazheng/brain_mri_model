@@ -1,48 +1,63 @@
-function pathMaskedImage = mask(pathImage, pathMask, result, channel, padChar, padFS, brainNum, pathTempImFolder, freeSurferHome, recompute, verbose, dilate)
+function pathMaskedImage = mask(pathImage, pathMask, result, rescale, channel, padChar, brainNum, pathTempImFolder, recompute, verbose)
 
 % Mask image with provided mask. Result is saved in specified folder with
 % '_masked' added to the original filename.
 
-if nargin<12, dilate = 1; end
-
 % create name of masked file
 if ~contains(result,'.nii.gz')
     temp_path = strrep(pathImage,'.nii.gz','.mgz'); [~,name,~] = fileparts(temp_path);
-    pathMaskedImage = fullfile(result, [name '_masked.nii.gz']);
+    if rescale, pathMaskedImage = fullfile(result, [name '_rescaled_masked.nii.gz']);
+    else, pathMaskedImage = fullfile(result, [name '_masked.nii.gz']); end
     if ~exist(result, 'dir'), mkdir(result); end
 else
     pathMaskedImage = pathImage;
 end
+if isequal(pathMask, pathImage), pathMask=''; end
 
+% rescale and mask image
 if ~exist(pathMaskedImage, 'file') || recompute
-    
     if channel && verbose, disp(['masking channel ' num2str(channel)]); elseif verbose, disp(['masking ' brainNum]); end
-    
-    % mask image
-    if padFS
-        setFreeSurfer(freeSurferHome);
-        cmd = ['mri_mask ' pathImage ' ' pathMask ' ' pathMaskedImage];
-        [~,~] = system(cmd);
-    else
-        maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder, dilate);
-    end
-    
+    imageMRI = myMRIread(pathImage, 0, pathTempImFolder); %read image
+    image= imageMRI.vol;
+    if rescale, image = robustRescale(image); end % rescale image
+    image = maskWithChar(image, pathMask, padChar, pathTempImFolder); % mask image
+    imageMRI.vol = image;
+    myMRIwrite(imageMRI, pathMaskedImage, 'float', pathTempImFolder); % write new image
 else
-    
     if channel && verbose, disp(['channel ' num2str(channel) ' already masked']); elseif verbose, disp([brainNum ' already masked']); end
-    
 end
 
 end
 
-function maskWithChar(pathImage, pathMask, pathMaskedImage, padChar, pathTempImFolder, dilate)
+function image = robustRescale(image)
 
-% read image
-imageMRI = myMRIread(pathImage, 0, pathTempImFolder);
-image= imageMRI.vol;
+% sort non-zero intensities
+intensities = image(:);
+intensities = intensities(intensities>0);
+intensities = sort(intensities);
+
+% define robust min and max
+robustMin = intensities(round(0.025*length(intensities)));
+robustMax = intensities(round(0.975*length(intensities)));
+
+% trim values outside new range
+image(image < robustMin) = 0;
+image(image > robustMax) = robustMax;
+
+% rescale image
+image = (image-robustMin)/(robustMax-robustMin)*255;
 image(image<0) = 0;
 
-if isequal(pathMask, pathImage)
+end
+
+function image = maskWithChar(image, pathMask, padChar, pathTempImFolder)
+
+dilate = 7;
+
+% remove negative values
+image(image<0) = 0;
+
+if isempty(pathMask)
     mask = image >0.01;
 else
     % read mask
@@ -58,9 +73,5 @@ mask = imdilate(mask, strel);
 
 % mask image with NaNs
 image(~mask) = padChar;
-
-% write new Image
-imageMRI.vol = image;
-myMRIwrite(imageMRI, pathMaskedImage, 'float', pathTempImFolder);
 
 end

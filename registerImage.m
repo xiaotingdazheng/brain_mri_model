@@ -16,7 +16,7 @@ if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % log
 if ~exist(aff, 'file') || recompute
     disp(['registering ' floBrainNum ' to ' refBrainNum ' with reg_aladin']);
     pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
-    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathFloImage ' -aff ' aff ' -res ' pathRigidRegFloImage ' -pad 0 -voff'];
+    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathFloImage ' -aff ' aff ' -res ' pathRigidRegFloImage ' -pad 0'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
 end
 

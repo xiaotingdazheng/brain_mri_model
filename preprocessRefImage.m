@@ -19,14 +19,9 @@ for channel=1:nChannel
     pathRefFirstLabels{channel} = mgz2nii(pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, 0, 'labels', channel*multiChannel, refBrainNum, ...
         freeSurferHome, recompute);
     
-    % rescale image
-    if rescale
-        pathRefImage{channel} = rescaleImage(pathRefImage{channel}, temp_pathPreprocessedRefImFolder, channel*multiChannel, refBrainNum, pathTempImFolder, recompute);
-    end
-    
-    % mask image with zeros using its labels
+    % rescale and mask image with zeros using its labels
     pathRefImage{channel} = mask(pathRefImage{channel}, pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, ...
-        channel*multiChannel, 0, 0, refBrainNum, pathTempImFolder, freeSurferHome, recompute, 1, 5);
+        rescale, channel*multiChannel, NaN, refBrainNum, pathTempImFolder, recompute, 1);
     
 end
 
@@ -56,12 +51,6 @@ if realignImages
         pathAlignedRefImages{channel} = alignImages...
             (pathRefImage{1}, pathRefImage{channel}, realignImages, channel, freeSurferHome, niftyRegHome, recompute, debug);
     end
-end
-
-% pad all images with NaNs
-for channel=1:nChannel
-    mask(pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, pathAlignedRefImages{channel}, channel, NaN, 0, ...
-        refBrainNum, pathTempImFolder, freeSurferHome, 1, 0, 5);
 end
 
 % concatenate all the channels into a single image

@@ -10,17 +10,20 @@ niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 % niftyRegHome = '/home/bbillot/software/exe_brain_mri_model/compiled-nifty-reg/bin';
 
 % cell paths test images
-pathDirTestImages= '~/data/CobraLab/label_fusions/brains_t2/synth_new/test_images';
+pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/test/test_images_t1' ...
+    '~/data/CobraLab/label_fusions/multi_channel/test/test_images_t2'};
 % cell paths test first labels (FS labels)
-pathDirRefFirstLabels= '~/data/CobraLab/label_fusions/brains_t2/synth_new/test_first_labels';
+pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/test/test_first_labels_t1' ...
+    '~/data/CobraLab/label_fusions/multi_channel/test/test_first_labels_t2'};
 % cell paths test labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_new/test_labels';
+pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/test/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t2/synth_new/training_labels';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/multi_channel/test/training_labels_real';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/brains_t2/synth_new/classesTable.txt';
+pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/test/classesTable.txt';
 % optional paths
-% pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/synth_new/training_images';
+pathDirTrainingImages = {'~/data/CobraLab/label_fusions/multi_channel/test/training_images_t1' ...
+    '~/data/CobraLab/label_fusions/multi_channel/test/training_images_t2'};
 
 % experiment title
 title = 'label fusion on T1 synthetic images generated from CobraLab data';
@@ -33,7 +36,7 @@ recompute = 0;               % recompute files, even if they exist (0-1)
 debug = 1;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)
 % preprocessing parameters
-targetResolution = 0.4;      % resolution of synthetic images (0 = test image resolution, only if one channel)
+targetResolution = 0.6;      % resolution of synthetic images (0 = test image resolution, only if one channel)
 alignTestImages = 1;         % align multi-channel test images, (0=no, 1=rigid reg, 2=rl)
 rescale = 1;                 % rescale intensities between 0 and 255 (0-1)
 % label fusion parameters

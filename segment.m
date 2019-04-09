@@ -58,8 +58,9 @@ for i=1:nImages
     end
     
     % upsample ref data to targetRes
+    disp(' '); disp('%% resampling test image to target resolution');
     [pathRefImage, pathRefLabels, brainVoxels, cropping] = upsampleToTargetRes(pathRefImage, pathRefLabels, pathRefFirstLabels, pathTempImFolder, ...
-        targetResolution, multiChannel, margin, refBrainNum, recompute, evaluate, cropHippo);
+        targetResolution, multiChannel, margin, recompute, evaluate, cropHippo);
     
     % remove old hippocampus labels and add background
     [updatedLabelsList, updatedLabelsNames] = updateLabelsList(labelsList, labelsNames);

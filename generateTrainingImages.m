@@ -21,32 +21,32 @@ for channel=1:nChannel
         channel*multiChannel, pathTempImFolder, recompute);
     
     for i=1:length(structPathsTrainingLabels)
+        
         % we now use pathRefFirstLabels{1}, because all channels are now aligned
         pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
         [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage{channel},...
             targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
-        if multiChannel && channel > 1
+        
+        pathDirSyntheticImages = fileparts(cellPathsNewImages{1,1});
+        pathDirSyntheticLabels = fileparts(cellPathsNewLabels{1,1});
+        
+        if channel > 1
+            
             % realign the images coming from the same labels (1=align by registration)
             cellPathsNewImages{i,channel} = alignImages...
                 (cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 1, channel, freeSurferHome, niftyRegHome, recompute, debug);
+            
+            % concatenate all the channels into a single image
+            pathDirSyntheticImages = fullfile(fileparts(fileparts(cellPathsNewImages{1,1})), 'concatenated_images');
+            [~,name,ext] = fileparts(cellPathsNewImages{i,1});
+            pathCatRefImage = fullfile(pathDirSyntheticImages, [name ext]);
+            pathCatRefImage = strrep(pathCatRefImage, '.nii.gz', '_cat.nii.gz');
+            catImages(cellPathsNewImages(i,:), pathCatRefImage, pathTempImFolder, recompute);
+            
         end
-        mask(cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, cellPathsNewImages{i,channel}, 0, NaN, 0, refBrainNum, pathTempImFolder, freeSurferHome, 1, 0);
+        
     end
     
-end
-
-pathDirSyntheticImages = fileparts(cellPathsNewImages{1,1});
-pathDirSyntheticLabels = fileparts(cellPathsNewLabels{1,1});
-
-if multiChannel
-    pathDirSyntheticImages = fullfile(fileparts(pathDirSyntheticImages), 'concatenated_images');
-    for i=1:length(structPathsTrainingLabels)
-        % concatenate all the channels into a single image
-        [~,name,ext] = fileparts(cellPathsNewImages{i,1});
-        pathCatRefImage = fullfile(pathDirSyntheticImages, [name ext]);
-        pathCatRefImage = strrep(pathCatRefImage, '.nii.gz', '_cat.nii.gz');
-        catImages(cellPathsNewImages(i,:), pathCatRefImage, pathTempImFolder, recompute);
-    end
 end
 
 end
