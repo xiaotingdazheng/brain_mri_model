@@ -1,5 +1,5 @@
 function [evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho,...
-    threshold, sigma, labelPriorType, regOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel)
+    threshold, sigma, labelPriorType, regOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, singleBrain)
 
 %read params
 evaluate = params{1};
@@ -70,5 +70,30 @@ fclose(fid);
 labelsList = txt{1};
 labelClasses = txt{2};
 labelsNames = txt{3};
+
+% write parameters in a file
+if ~singleBrain
+    pathParamsTxt=fullfile(fileparts(pathClassesTable), 'parameters.txt');
+    fid=fopen(pathParamsTxt, 'w');
+    fprintf(fid, 'evaluate: %d \n', evaluate);
+    fprintf(fid, 'cropHippo: %d \n', cropHippo);
+    fprintf(fid, 'leaveOneOut: %d \n', leaveOneOut);
+    fprintf(fid, 'useSynthethicImages: %d \n', useSynthethicImages);
+    fprintf(fid, 'recompute: %d \n', recompute);
+    fprintf(fid, 'debug: %d \n', debug);
+    fprintf(fid, 'deleteSubfolder: %d \n', deleteSubfolder);
+    fprintf(fid, 'targetResolution: %s \n', mat2str(targetResolution));
+    fprintf(fid, 'rescale: %d \n', rescale);
+    fprintf(fid, 'alignTestImages: %d \n', alignTestImages);
+    fprintf(fid, 'margin: %.3f \n', margin);
+    fprintf(fid, 'rho: %.3f \n', rho);
+    fprintf(fid, 'threshold: %.3f \n', threshold);
+    fprintf(fid, 'sigma: %.3f \n', mat2str(sigma));
+    fprintf(fid, 'labelPriorType: %s \n', labelPriorType);
+    fprintf(fid, 'regOptions: %s \n', regOptions);
+    fprintf(fid, 'freeSurferHome: %s \n', freeSurferHome);
+    fprintf(fid, 'niftyRegHome: %s \n', niftyRegHome);
+    fclose(fid);
+end
 
 end

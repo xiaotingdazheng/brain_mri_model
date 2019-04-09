@@ -3,7 +3,7 @@ function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTes
 % read and check parameters
 nChannel = length(pathDirTestImages);
 [evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
-    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel);
+    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, 0);
 % build paths structures
 structPathsTestImages = cell(size(pathDirTestImages));
 structPathsFirstRefLabels = cell(size(pathDirRefFirstLabels));
@@ -24,6 +24,8 @@ for i=1:nImages
     % paths of reference image and corresponding FS labels
     [pathRefImage, pathRefFirstLabels, pathRefLabels, refBrainNum] = buildRefPaths(structPathsTestImages,...
         structPathsFirstRefLabels, structPathsRefLabels, i);
+    pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
+    if ~exist(pathTempImFolder,'dir'), mkdir(pathTempImFolder); end
     pathResultPrefix = fullfile(pathMainFolder, 'results', refBrainNum, refBrainNum);
     
     % display processed test brain
@@ -31,8 +33,6 @@ for i=1:nImages
     
     % copies training labels to temp folder and erase labels corresponding to test image
     disp(' '); disp('%% copying training data');
-    pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
-    if ~exist(pathTempImFolder,'dir'), mkdir(pathTempImFolder); end
     if ~useSynthethicImages
         temp_pathDirTrainingLabels = copyTrainingData(pathDirTrainingLabels, pathTempImFolder, refBrainNum, 1, 'labels', freeSurferHome, recompute, leaveOneOut);
         temp_pathDirTrainingImages = copyTrainingData(pathDirTrainingImages, pathTempImFolder, refBrainNum, nChannel, 'images', freeSurferHome, recompute, leaveOneOut);
