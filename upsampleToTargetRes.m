@@ -20,13 +20,13 @@ if targetRes
     pathUpsampledRefFirstLabels = fullfile(pathUpsampledRefDataSubfolder, [name '_first_' resolution '.nii.gz']);
     
     % upsample ref image
-    if (~exist(pathUpsampledRefImage, 'file') || recompute)
+    if ~exist(pathUpsampledRefImage, 'file') || recompute
         cmd = ['mri_convert ' pathRefImage{end} ' ' pathUpsampledRefImage ' --voxsize ' voxsize ' -odt float'];
         [~,~] = system(cmd);
     end
     % upsample ref first labels image
-    if (~exist(pathUpsampledRefFirstLabels, 'file') || recompute)
-        cmd = ['mri_convert ' pathRefFirstLabels{1} ' ' pathUpsampledRefFirstLabels ' --voxsize ' voxsize ' -rt nearest -odt float'];
+    if ~exist(pathUpsampledRefFirstLabels, 'file') || recompute
+        cmd = ['mri_convert ' pathRefFirstLabels{1} ' ' pathUpsampledRefFirstLabels ' -rl ' pathUpsampledRefImage ' -rt nearest -odt float'];
         [~,~] = system(cmd);
     end
     % mask ref image with nans and put it back in the cell
@@ -37,7 +37,7 @@ if targetRes
     if evaluate
         % upsample ref labels
         if ~exist(pathUpsampledRefLabels, 'file') || recompute
-            cmd = ['mri_convert ' pathRefLabels ' ' pathUpsampledRefLabels ' --voxsize ' voxsize ' -odt float -rt nearest'];
+            cmd = ['mri_convert ' pathRefLabels ' ' pathUpsampledRefLabels ' -rl ' pathUpsampledRefImage ' -odt float -rt nearest'];
             [~,~] = system(cmd);
         end
         pathRefLabels = pathUpsampledRefLabels;
