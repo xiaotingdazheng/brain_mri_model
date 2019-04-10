@@ -2,6 +2,7 @@ function [pathRefImage, pathRefLabels, brainVoxels, cropping] = upsampleToTarget
     multiChannel, margin, recompute, evaluate, cropHippo)
 
 % path upsampled ref folder
+if isequal(class(pathRefLabels), 'cell'), pathRefLabels=pathRefLabels{1}; end
 if ~multiChannel, brainVoxels = cell(1); end
 pathUpsampledRefDataSubfolder = fullfile(pathTempImFolder, 'resampled_test_image_and_labels');
 if ~exist(pathUpsampledRefDataSubfolder, 'dir'), mkdir(pathUpsampledRefDataSubfolder); end
