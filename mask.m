@@ -58,7 +58,7 @@ dilate = 7;
 image(image<0) = 0;
 
 if isempty(pathMask)
-    mask = image >0.01;
+    mask = image >0.2;
 else
     % read mask
     maskMRI = myMRIread(pathMask, 0, pathTempImFolder);
