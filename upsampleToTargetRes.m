@@ -9,8 +9,6 @@ if ~exist(pathUpsampledRefDataSubfolder, 'dir'), mkdir(pathUpsampledRefDataSubfo
 
 if targetRes
     
-    disp('resampling ref image at target resolution')
-    
     % naming variables
     voxsize = [num2str(targetRes(1),'%.2f') ' ' num2str(targetRes(2),'%.2f') ' ' num2str(targetRes(3),'%.2f')];
     if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3), resolution = num2str(targetRes(1),'%.1f');
@@ -23,13 +21,15 @@ if targetRes
     
     % upsample ref image
     if ~exist(pathResampledRefImage, 'file') || recompute
+        disp('resampling test image at target resolution')
         cmd = ['mri_convert ' pathRefImage{end} ' ' pathResampledRefImage ' --voxsize ' voxsize ' -odt float'];
         [~,~] = system(cmd);
     end
     % upsample ref labels
     if evaluate && (~exist(pathResampledRefLabels, 'file') || recompute)
+        disp('resampling test labels at target resolution')
         mri = myMRIread(pathResampledRefImage, 1, pathTempImFolder);
-        cropsize = [num2str(mri.volsize(1),'%d'), 'x',num2str(mri.volsize(2),'%d'), 'x',num2str(mri.volsize(3),'%d')];
+        cropsize = [num2str(mri.volsize(1),'%d') ' ' num2str(mri.volsize(2),'%d') ' ' num2str(mri.volsize(3),'%d')];
         cmd = ['mri_convert ' pathRefLabels ' ' pathResampledRefLabels ' --voxsize ' voxsize ' --cropsize ' cropsize ' -odt float -rt nearest'];
         [~,~] = system(cmd);
     end
