@@ -11,11 +11,11 @@ freeSurferHome = '/share/apps/freesurfer/';
 niftyRegHome = '/home/bbillot/software/exe_brain_mri_model/compiled-nifty-reg/bin';
 
 % cell paths training labels
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t1/real_new/training_labels';
+pathDirTrainingLabels = '/home/bbillot/data/CobraLab/label_fusions/brains_t1/real_new/training_labels';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/brains_t1/real_new/classesTable.txt';
+pathClassesTable= '/home/bbillot/data/CobraLab/label_fusions/brains_t1/real_new/classesTable.txt';
 % optional paths
-pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/real_new/training_images';
+pathDirTrainingImages = '/home/bbillot/data/CobraLab/label_fusions/brains_t1/real_new/training_images';
 
 % general parameters
 evaluate = 1;                % evaluate test scans segmentations aginst provided ref labels (0-1)
