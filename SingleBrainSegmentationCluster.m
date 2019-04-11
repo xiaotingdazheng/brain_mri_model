@@ -62,7 +62,6 @@ nChannel = length(pathRefImage);
 
 % build path resulting accuracies
 pathMainFolder = fileparts(fileparts(pathRefImage{1}));
-pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
 % parameters initialisation
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder  multiChannel recompute registrationOptions};
@@ -116,10 +115,13 @@ disp(' '); disp(['%% segmenting ' refBrainNum]);
     pathTempImFolder, pathResultPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug);
 
 % evaluation
-disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
-accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
-if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
-save(pathAccuracies, 'accuracies');
+if evaluate
+    disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
+    pathAccuracies = [pathResultPrefix '.regions_accuracies.mat'];
+    accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
+    if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
+    save(pathAccuracies, 'accuracies');
+end
 
 
 %-------------------------------------------------------------------------%

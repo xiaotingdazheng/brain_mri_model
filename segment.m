@@ -1,4 +1,4 @@
-function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params)
+function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params, pathResultPrefix)
 
 % read and check parameters
 nChannel = length(pathDirTestImages);
@@ -12,21 +12,21 @@ for i=1:length(pathDirRefFirstLabels), structPathsFirstRefLabels{i} = dir(pathDi
 structPathsRefLabels = dir(pathDirTestLabels{1});
 % build path resulting accuracies
 pathMainFolder = fileparts(structPathsRefLabels(1).folder);
-pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
 % parameters initialisation
 if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
 nImages = length(structPathsTestImages{1});
 accuracies = cell(nImages,1);
 labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder  multiChannel recompute registrationOptions};
 
-for i=1:nImages
+for i=1:2
     
     % paths of reference image and corresponding FS labels
     [pathRefImage, pathRefFirstLabels, pathRefLabels, refBrainNum] = buildRefPaths(structPathsTestImages,...
         structPathsFirstRefLabels, structPathsRefLabels, i);
     pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
     if ~exist(pathTempImFolder,'dir'), mkdir(pathTempImFolder); end
-    pathResultPrefix = fullfile(pathMainFolder, 'results', refBrainNum, refBrainNum);
+    % pathResultPrefix = fullfile(pathMainFolder, 'results', refBrainNum, refBrainNum);
+    pathResultPrefix = fullfile(pathResultPrefix,['brain' num2str(i)],num2str(i));
     
     % display processed test brain
     disp(' '); disp(['%%% Processing test ' refBrainNum]);
@@ -72,12 +72,21 @@ for i=1:nImages
         pathTempImFolder, pathResultPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug);
     
     % evaluation
-    disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
-    accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
+    if evaluate
+        disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
+        brainAccuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
+        pathBrainAccuracies = [pathResultPrefix '.regions_accuracies.mat'];
+        if ~exist(fileparts(pathBrainAccuracies), 'dir'), mkdir(fileparts(pathBrainAccuracies)); end
+        save(pathBrainAccuracies, 'brainAccuracies');
+        accuracies{i} = brainAccuracies;
+    end
     
 end
 
-% save results
-accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);
+if evaluate
+    % save results
+    pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
+    accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);
+end
 
 end
