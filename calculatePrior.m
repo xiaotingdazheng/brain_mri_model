@@ -13,16 +13,11 @@ switch labelPriorType
             disp(['computing logOdds of training ' floBrainNum])
         end
         
-        % produce a mask of the brain with margin of 5 voxels
-        LabelsMRI = myMRIread(pathFloLabels, 0, pathTempImFolder);
-        Labels = LabelsMRI.vol;
-        brainMask = Labels > 1;
-        brainMask = imfill(bwdist(brainMask)< 5, 'holes');
-        
         % loop over all the labels
         for l=1:nLabels
             temp_path = fullfile(priorSubfolder, ['logOdds_' num2str(labelsList(l)) '.nii.gz']);
             if ~exist(temp_path, 'file') || recompute
+                if ~exist('Labels', 'var'), [LabelsMRI, brainMask] = loadLabels(pathFloLabels, pathTempImFolder); Labels = LabelsMRI.vol; end
                 mask = (Labels == labelsList(l)); % find mask of current label
                 computeLogOdds(mask, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
             end
@@ -30,18 +25,21 @@ switch labelPriorType
         % calculate logOdds for left hippocampus
         temp_path = fullfile(priorSubfolder, 'logOdds_left_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
+            if ~exist('Labels', 'var'), [LabelsMRI, brainMask] = loadLabels(pathFloLabels, pathTempImFolder); Labels = LabelsMRI.vol; end
             maskHippo = Labels > 20100;
             computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
         end
         % calculate logOdds for right hippocampus
         temp_path = fullfile(priorSubfolder, 'logOdds_right_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
+            if ~exist('Labels', 'var'), [LabelsMRI, brainMask] = loadLabels(pathFloLabels, pathTempImFolder); Labels = LabelsMRI.vol; end
             maskHippo = Labels > 20000 & Labels < 20100;
             computeLogOdds(maskHippo, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
         end
         % calculate logOdds for non-hippocampus structures
         temp_path = fullfile(priorSubfolder, 'logOdds_non_hippo.nii.gz');
         if ~exist(temp_path, 'file') || recompute
+            if ~exist('Labels', 'var'), [LabelsMRI, brainMask] = loadLabels(pathFloLabels, pathTempImFolder); Labels = LabelsMRI.vol; end
             maskNonHippo = Labels < 20000;
             computeLogOdds(maskNonHippo, brainMask, temp_path, LabelsMRI, rho, threshold, pathTempImFolder)
         end
@@ -68,6 +66,13 @@ switch labelPriorType
         
 end
 
+end
+
+function [LabelsMRI, brainMask] = loadLabels(pathFloLabels, pathTempImFolder)
+LabelsMRI = myMRIread(pathFloLabels, 0, pathTempImFolder);
+Labels = LabelsMRI.vol;
+brainMask = Labels > 1;
+brainMask = imfill(bwdist(brainMask)< 5, 'holes');
 end
 
 function computeLogOdds(mask, brainMask, path, LabelsMRI, rho, threshold, pathTempImFolder)
