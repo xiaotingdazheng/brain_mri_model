@@ -43,10 +43,10 @@ rescale = 1;                 % rescale intensities between 0 and 255 (0-1)
 margin = 5;                  % margin for brain voxels selection
 rho = 0.5;                   % exponential decay for logOdds maps
 threshold = 0.1;             % lower bound for logOdds maps
-sigma = 25;                  % var for Gaussian likelihood
-labelPriorType = 'delta function';  % type of prior ('logOdds' or 'delta function')
+sigma = 50;                  % var for Gaussian likelihood
+labelPriorType = 'logOdds';  % type of prior ('logOdds' or 'delta function')
 % registration parameters
-registrationOptions = '-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005';
+%registrationOptions = '-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -59,14 +59,28 @@ if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
 [pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages] = readPaths...
     (pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, useSynthethicImages, 0, evaluate);
 
+registrationOptions = {'-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005';
+    '-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.001 -le 0.01';
+    '-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.005 -le 0.05';
+    '-ln 4 -lp 3 -sx 2.5 -omp 3 -be 0.005 -le 0.05';
+    '-ln 4 -lp 3 -sx 2.5 -omp 3 -be 0.001 -le 0.01'};
+accuracy=cell(1,5);    
+
+for i=1:5
+
+    tic
+    
+    pathResultPrefix = fullfile('~/data/CobraLab/label_fusions/multi_channel/test_reg1', 'results', num2str(i));
 % regroup parameters
 params = {evaluate cropHippo leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages ...
-    margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome pathClassesTable};
+    margin rho threshold sigma labelPriorType registrationOptions{i} freeSurferHome niftyRegHome pathClassesTable};
 
 % segment brains  
-accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params);
-
+accuracy{i} = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params, pathResultPrefix);
+save accuracy
 % plot results
 % comparisonGraph({accuracy,'regions'}, title)
 
 disp(' '); tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));
+
+end
