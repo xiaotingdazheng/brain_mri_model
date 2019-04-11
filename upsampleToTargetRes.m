@@ -29,7 +29,7 @@ if targetRes
     if evaluate && (~exist(pathResampledRefLabels, 'file') || recompute)
         disp('resampling test labels at target resolution')
         mri = myMRIread(pathResampledRefImage, 1, pathTempImFolder);
-        cropsize = [num2str(mri.volsize(1),'%d') ' ' num2str(mri.volsize(2),'%d') ' ' num2str(mri.volsize(3),'%d')];
+        cropsize = [num2str(mri.volsize(2),'%d') ' ' num2str(mri.volsize(1),'%d') ' ' num2str(mri.volsize(3),'%d')];
         cmd = ['mri_convert ' pathRefLabels ' ' pathResampledRefLabels ' --voxsize ' voxsize ' --cropsize ' cropsize ' -odt float -rt nearest'];
         [~,~] = system(cmd);
     end
