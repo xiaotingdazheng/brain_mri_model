@@ -11,17 +11,17 @@ freeSurferHome = '/share/apps/freesurfer/';
 niftyRegHome = '/home/bbillot/software/exe_brain_mri_model/compiled-nifty-reg/bin';
 
 % cell paths training labels
-pathDirTrainingLabels = '/home/bbillot/data/CobraLab/label_fusions/brains_t1/real_new/training_labels';
+pathDirTrainingLabels = '/home/bbillot/data/CobraLab/label_fusions/brains_t1/synth_new/training_labels';
 % path labels table
-pathClassesTable= '/home/bbillot/data/CobraLab/label_fusions/brains_t1/real_new/classesTable.txt';
+pathClassesTable= '/home/bbillot/data/CobraLab/label_fusions/brains_t1/synth_new/classesTable.txt';
 % optional paths
-pathDirTrainingImages = '/home/bbillot/data/CobraLab/label_fusions/brains_t1/real_new/training_images';
+pathDirTrainingImages = '/home/bbillot/data/CobraLab/label_fusions/brains_t1/synth_new/training_images';
 
 % general parameters
 evaluate = 1;                % evaluate test scans segmentations aginst provided ref labels (0-1)
 cropHippo = 0;               % crop results around hippocampus (0-1)
 leaveOneOut = 1;             % segment one image with the rest of the datatset (0-1)
-useSynthethicImages = 0;     % use real or synthetic images (0-1)
+useSynthethicImages = 1;     % use real or synthetic images (0-1)
 recompute = 0;               % recompute files, even if they exist (0-1)
 debug = 0;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)

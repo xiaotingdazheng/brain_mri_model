@@ -1,4 +1,6 @@
-function accuracy = saveAccuracy(accuracies, pathAccuracies, labelsList, labelsNames)
+function accuracy = saveAccuracy(accuracies, pathAccuracies, labelsList, labelsNames, saving)
+
+if nargin<5, saving =1; end
 
 accuracies = cell2mat(accuracies);
 
@@ -22,6 +24,8 @@ accuracy(end,2:end) = num2cell(mean(cell2mat(accuracy(3:end-1,2:end)),'omitnan')
 
 % save created file, bottom right cell being the mean dice coefficient for
 % the whole label fusion
-save(pathAccuracies, 'accuracy')
+if saving
+    save(pathAccuracies, 'accuracy')
+end
 
 end

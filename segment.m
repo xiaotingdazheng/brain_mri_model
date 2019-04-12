@@ -1,4 +1,4 @@
-function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params, pathResultPrefix)
+function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params)
 
 % read and check parameters
 nChannel = length(pathDirTestImages);
@@ -18,15 +18,14 @@ nImages = length(structPathsTestImages{1});
 accuracies = cell(nImages,1);
 labelFusionParams = {rho threshold sigma labelPriorType deleteSubfolder  multiChannel recompute registrationOptions};
 
-for i=1:2
+for i=1:nImages
     
     % paths of reference image and corresponding FS labels
     [pathRefImage, pathRefFirstLabels, pathRefLabels, refBrainNum] = buildRefPaths(structPathsTestImages,...
         structPathsFirstRefLabels, structPathsRefLabels, i);
     pathTempImFolder = fullfile(pathMainFolder, ['temp_' refBrainNum]);
     if ~exist(pathTempImFolder,'dir'), mkdir(pathTempImFolder); end
-    % pathResultPrefix = fullfile(pathMainFolder, 'results', refBrainNum, refBrainNum);
-    pathResultPrefix = fullfile(pathResultPrefix,['brain' num2str(i)],num2str(i));
+    pathResultPrefix = fullfile(pathMainFolder, 'results', refBrainNum, refBrainNum);
     
     % display processed test brain
     disp(' '); disp(['%%% Processing test ' refBrainNum]);
@@ -74,11 +73,12 @@ for i=1:2
     % evaluation
     if evaluate
         disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
-        brainAccuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
+        accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
+        % save regions accuracies of current brain in text file
+        brainAccuracies = mat2str(accuracies{i});
         pathBrainAccuracies = [pathResultPrefix '.regions_accuracies.mat'];
         if ~exist(fileparts(pathBrainAccuracies), 'dir'), mkdir(fileparts(pathBrainAccuracies)); end
         save(pathBrainAccuracies, 'brainAccuracies');
-        accuracies{i} = brainAccuracies;
     end
     
 end
@@ -86,7 +86,7 @@ end
 if evaluate
     % save results
     pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
-    accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);
+    accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames, 0);
 end
 
 end
