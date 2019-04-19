@@ -76,17 +76,16 @@ for i=1:nImages
         accuracies{i} = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
         % save regions accuracies of current brain in text file
         brainAccuracies = mat2str(accuracies{i});
-        pathBrainAccuracies = [pathResultPrefix '.regions_accuracies.mat'];
+        pathBrainAccuracies = [pathResultPrefix '.regions_accuracies.txt'];
         if ~exist(fileparts(pathBrainAccuracies), 'dir'), mkdir(fileparts(pathBrainAccuracies)); end
         save(pathBrainAccuracies, 'brainAccuracies');
     end
-    
 end
 
 if evaluate
     % save results
     pathAccuracies = fullfile(pathMainFolder, 'accuracy.mat');
-    accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames, 0);
+    accuracy = saveAccuracy(accuracies, pathAccuracies, updatedLabelsList, updatedLabelsNames);
 end
 
 end

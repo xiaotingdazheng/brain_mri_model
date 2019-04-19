@@ -10,30 +10,27 @@ niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 % niftyRegHome = '/home/bbillot/software/exe_brain_mri_model/compiled-nifty-reg/bin';
 
 % cell paths test images
-pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/test_reg1/test_images_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/test_reg1/test_images_t2'};
+pathDirTestImages= '~/data/CobraLab/label_fusions/brains_t1/real_new/test_images';
 % cell paths test first labels (FS labels)
-pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/real_new/test_first_labels_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/real_new/test_first_labels_t2'};
+pathDirRefFirstLabels= '~/data/CobraLab/label_fusions/brains_t1/real_new/test_first_labels';
 % cell paths test labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/real_new/test_labels';
+pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t1/real_new/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/multi_channel/real_new/training_labels_real';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t1/real_new/training_labels';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/real_new/classesTable.txt';
+pathClassesTable= '~/data/CobraLab/label_fusions/brains_t1/real_new/classesTable.txt';
 % optional paths
-pathDirTrainingImages = {'~/data/CobraLab/label_fusions/multi_channel/real_new/training_images_t1' ...
-    '~/data/CobraLab/label_fusions/multi_channel/real_new/training_images_t2'};
+pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/real_new/training_images';
 
 % experiment title
-title = 'label fusion on multispectral real images from CobraLab data';
+title = 'label fusion on T1 real images from CobraLab data';
 % general parameters
 evaluate = 1;                % evaluate test scans segmentations aginst provided ref labels (0-1)
 cropHippo = 0;               % crop results around hippocampus (0-1)
 leaveOneOut = 1;             % segment one image with the rest of the datatset (0-1)
 useSynthethicImages = 0;     % use real or synthetic images (0-1)
-recompute = 1;               % recompute files, even if they exist (0-1)
-debug = 1;                   % display debug information from registrations (0-1)
+recompute = 0;               % recompute files, even if they exist (0-1)
+debug = 0;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)
 % preprocessing parameters
 targetResolution = 0.4;      % resolution of synthetic images (0 = test image resolution, only if one channel)
@@ -43,10 +40,10 @@ rescale = 1;                 % rescale intensities between 0 and 255 (0-1)
 margin = 5;                  % margin for brain voxels selection
 rho = 0.5;                   % exponential decay for logOdds maps
 threshold = 0.1;             % lower bound for logOdds maps
-sigma = 50;                  % var for Gaussian likelihood
+sigma = 25;                  % var for Gaussian likelihood
 labelPriorType = 'logOdds';  % type of prior ('logOdds' or 'delta function')
 % registration parameters
-registrationOptions = '-ln 4 -lp 3 -sx 2.5 --lncc 5.0 -omp 3 -be 0.0005 -le 0.005';
+registrationOptions = '-ln 4 -lp 3 -sx 2.5 -omp 3 -be 0.0005 -le 0.005 --lncc 1.0';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -67,8 +64,6 @@ params = {evaluate cropHippo leaveOneOut useSynthethicImages recompute debug del
 accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTestLabels, pathDirTrainingLabels, pathDirTrainingImages, params);
 
 % plot results
-comparisonGraph({accuracy,'regions'}, title)
+comparisonGraph({accuracy,'regions'}, title, 'all')
 
 disp(' '); tEnd = toc; fprintf('Elapsed time is %dh %dmin\n', floor(tEnd/3600), floor(rem(tEnd,3600)/60));
-
-save accuracy

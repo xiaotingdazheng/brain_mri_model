@@ -23,7 +23,10 @@ regions_names = strrep(regions_names,'posterior','');
 regions_names = strip(regions_names);
 new_names = unique(regions_names,'stable');
 
-names_to_remove = {'background';'CC';'optic chiasm';'vessel';'choroid plexus';'optic chiasm';'CC';'HATA'};
+names_to_remove = {'background';'CC';'optic chiasm';'vessel';'choroid plexus';...
+    'optic chiasm';'CC';'HATA';'fornix';'CSF';'accumbens area';...
+    'inferior lateral ventricule';'ventral DC';'3rd ventricule';'4th ventricule'};
+
 idx=[];
 for i=1:length(names_to_remove)
    tidx = find(ismember(new_names, names_to_remove(i)));
@@ -33,12 +36,12 @@ new_names(idx) = [];
 
 categories = categorical(new_names);
 
-means = zeros(1, nargin-1);
-new_accuracies = zeros(nargin-1, size(new_names,2));
+means = zeros(1, nargin-2);
+new_accuracies = zeros(nargin-2, size(new_names,2));
 legendTags = cell(1,2*length(means)); 
 
 % average right/left means DC together and compute total means
-for arg=1:nargin-1
+for arg=1:nargin-2
     regions_DCs = cell2mat(varargin{arg}{1}(end,2:end-1));
     for i=1:length(new_names)
         temp_mean_DC = 0;
@@ -51,27 +54,32 @@ for arg=1:nargin-1
         end
         new_accuracies(arg, i) = temp_mean_DC;
     end
-    means(arg) = varargin{arg}{1}{end,end};
+    if strcmp(varargin{end},'selection')
+        means(arg) = mean(new_accuracies(arg, :),'omitnan');
+    else
+        means(arg) = varargin{arg}{1}{end,end};
+    end
+    
 end
 
 % create legend
-for arg=1:nargin-1
+for arg=1:nargin-2
     legendTags{arg} = varargin{arg}{2};
-    legendTags{nargin-1+arg} = [varargin{arg}{2}, ' mean DC'];
+    legendTags{nargin-2+arg} = [varargin{arg}{2}, ' mean DC = ' num2str(means(arg),'%.3f')];
 end
 
 % bar plot and mean DC
 figure;
 bar(categories,new_accuracies');
 hold on;
-for arg=1:nargin-1
+for arg=1:nargin-2
     plot(means(arg)*ones(size(categories)));
     hold on;
 end
 hold off;
 ylabel('Dice coefficient')
 legend(legendTags)
-title(varargin{end})
+title(varargin{end-1})
 grid on
 grid minor
 
