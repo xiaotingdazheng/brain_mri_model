@@ -67,8 +67,10 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
         newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
         % blur and save isotropic image
         blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, minTargetRes, pathNewImage, trainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder)
-        % save image and labels at target resolution
-        downsample(pathNewImage, pathNewLabels, pathTrainingLabels, minTargetRes, isFinalImageAnisotropic, RefToFloAxisMap, freeSurferHome);
+        % downsample image at target res, only in isotropic case
+        if ~isFinalImageAnisotropic
+            downsample(pathNewImage, pathNewLabels, pathTrainingLabels, minTargetRes, isFinalImageAnisotropic, RefToFloAxisMap, freeSurferHome);
+        end
     end
     
     if isFinalImageAnisotropic
@@ -177,7 +179,7 @@ end
 
 end
 
-function pathRegTrainingLabels = rigidlyRegisterTrainingLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImageSubfolder, ...
+function pathRegTrainingLabels = rigidlyRegisterTrainingLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImFolder, ...
     channel, refBrainNum, niftyRegHome, debug, recompute)
 
 % define naming variables
@@ -186,30 +188,43 @@ floBrainNum = findBrainNum(pathNewImage);
 pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
 % path rigid transformation
-pathRigidTransFolder = fullfile(pathTempImageSubfolder, 'rigid_transformations');
+pathRigidTransFolder = fullfile(pathTempImFolder, 'rigid_transformations');
 aff = fullfile(pathRigidTransFolder, [floBrainNum '_to_' refBrainNum '.aff']);
 if ~exist(pathRigidTransFolder, 'dir'), mkdir(pathRigidTransFolder); end
 % path registered training labels
-pathRegTrainingLabelsSubfolder = fullfile(pathTempImageSubfolder, 'registered_training_labels');
+pathRegTrainingLabelsSubfolder = fullfile(pathTempImFolder, 'registered_training_labels');
 if channel, pathRegTrainingLabelsSubfolder = fullfile(pathRegTrainingLabelsSubfolder, ['channel_' num2str(channel)]); end
 pathRegTrainingLabels = fullfile(pathRegTrainingLabelsSubfolder, ['training_' floBrainNum '_labels_reg_to_' refBrainNum '.nii.gz']);
 if ~exist(pathRegTrainingLabelsSubfolder, 'dir'), mkdir(pathRegTrainingLabelsSubfolder); end
+
+% enlarge ref image to size of training labels
+mriTrainingLabels = myMRIread(pathTrainingLabels, 1, pathTempImFolder);
+mriRefImage = myMRIread(pathRefImage, 1, pathTempImFolder);
+resTrainingLabels = [num2str(mriTrainingLabels.xsize,'%.1f') ' ' num2str(mriTrainingLabels.ysize,'%.1f') ' ' num2str(mriTrainingLabels.zsize,'%.1f')];
+cropsizeTrainingLabels = [mriTrainingLabels.volsize(2) mriTrainingLabels.volsize(1) mriTrainingLabels.volsize(3)];
+cropsizeRefImage = [mriRefImage.volsize(2) mriRefImage.volsize(1) mriRefImage.volsize(3)];
+padding = ceil(max(cropsizeTrainingLabels-cropsizeRefImage, 0)/2);
+pathTempRefImage = '/tmp/ref.nii.gz';
+padImage(pathRefImage, pathTempRefImage, padding, pathTempImFolder);
 
 if ~exist(aff, 'file') || recompute
     disp('registering temporary isotropic image to anistropic test image');
     % linear registration
     res = '/tmp/res.nii.gz';
-    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0'];
+    cmd = [pathRegAladin ' -ref ' pathTempRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0'];
+%     cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0 -nac'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
-    [~,~]=system(['rm ' res]);
+%     [~,~]=system(['rm ' res]);
+%     [~,~]=system(['rm ' pathTempRefImage]);
 else
     disp('temporary isotropic image already registered to test image')
 end
-
 if ~exist(pathRegTrainingLabels, 'file') || recompute
     disp('applying rigid transformation to training labels');
     % apply linear transformation to labels
-    cmd = [pathRegResample ' -ref ' pathTrainingLabels ' -flo ' pathTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
+    cmd = [pathRegResample ' -ref ' res ' -flo ' pathTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
+    if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
+    cmd = ['mri_convert ' pathRegTrainingLabels ' ' pathRegTrainingLabels ' --voxsize ' resTrainingLabels ' -odt float'];
     if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
 else
     disp('rigid transformation already applied to training labels')

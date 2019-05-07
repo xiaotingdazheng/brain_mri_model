@@ -49,7 +49,9 @@ if ~exist('pathDirTrainingImages','var'), pathDirTrainingImages=''; end
 
 % regroup parameters
 sigma = [sigma1 sigma2];
-recompute = 1;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+recompute = 0;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 params = {evaluate cropHippo leaveOneOut useSynthethicImages recompute debug deleteSubfolder targetResolution rescale alignTestImages...
     margin rho threshold sigma labelPriorType registrationOptions freeSurferHome niftyRegHome pathClassesTable};
 
