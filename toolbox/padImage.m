@@ -1,17 +1,24 @@
-function padImage(pathImage, pathPaddedImage, padding, pathTempImFolder)
+function padImage(pathImage, pathPaddedImage, padsize, pathTempImFolder, padchar)
+
+if nargin < 5
+    padchar = 0;
+end
+
+% pad image with padchar (0 by default)
+% padsize: 1x3 vector containing padding size in each dimension.
 
 % read image
 mri = myMRIread(pathImage, 0, pathTempImFolder);
 vol = mri.vol;
 
 % pad image
-matlabPadding = padding; 
-matlabPadding([1 2]) = matlabPadding([2 1]);
-paddedVol = padarray(vol, matlabPadding, 0, 'both');
+matlabPadsize = padsize; 
+matlabPadsize([1 2]) = matlabPadsize([2 1]);
+paddedVol = padarray(vol, matlabPadsize, padchar, 'both');
 
 % update header
 v2r=mri.vox2ras0;
-v2r(1:3,4)=v2r(1:3,4)-v2r(1:3,1:3)*[padding(1); padding(2); padding(3)];
+v2r(1:3,4)=v2r(1:3,4)-v2r(1:3,1:3)*[padsize(1); padsize(2); padsize(3)];
 
 % write image
 mri.vol = paddedVol;

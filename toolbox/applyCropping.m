@@ -23,5 +23,7 @@ mriCropped=[];
 mriCropped.vol=volCropped;
 v2r(1:3,4)=v2r(1:3,4)+v2r(1:3,1:3)*[minJ-1; minI-1; minK-1];
 mriCropped.vox2ras0=v2r;
+mriCropped.vox2ras1=v2r;
+mriCropped.vox2ras=v2r;
 
 end
