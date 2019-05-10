@@ -197,35 +197,44 @@ if channel, pathRegTrainingLabelsSubfolder = fullfile(pathRegTrainingLabelsSubfo
 pathRegTrainingLabels = fullfile(pathRegTrainingLabelsSubfolder, ['training_' floBrainNum '_labels_reg_to_' refBrainNum '.nii.gz']);
 if ~exist(pathRegTrainingLabelsSubfolder, 'dir'), mkdir(pathRegTrainingLabelsSubfolder); end
 
-% enlarge ref image to size of training labels
-mriTrainingLabels = myMRIread(pathTrainingLabels, 1, pathTempImFolder);
-mriRefImage = myMRIread(pathRefImage, 1, pathTempImFolder);
-resTrainingLabels = [num2str(mriTrainingLabels.xsize,'%.1f') ' ' num2str(mriTrainingLabels.ysize,'%.1f') ' ' num2str(mriTrainingLabels.zsize,'%.1f')];
-cropsizeTrainingLabels = [mriTrainingLabels.volsize(2) mriTrainingLabels.volsize(1) mriTrainingLabels.volsize(3)];
-cropsizeRefImage = [mriRefImage.volsize(2) mriRefImage.volsize(1) mriRefImage.volsize(3)];
-padding = ceil(max(cropsizeTrainingLabels-cropsizeRefImage, 0)/2);
-pathTempRefImage = '/tmp/ref.nii.gz';
-padImage(pathRefImage, pathTempRefImage, padding, pathTempImFolder);
+% % enlarge ref image to size of training labels
+% mriTrainingLabels = myMRIread(pathTrainingLabels, 1, pathTempImFolder);
+% mriRefImage = myMRIread(pathRefImage, 1, pathTempImFolder);
+% resTrainingLabels = [num2str(mriTrainingLabels.xsize,'%.1f') ' ' num2str(mriTrainingLabels.ysize,'%.1f') ' ' num2str(mriTrainingLabels.zsize,'%.1f')];
+% resRefImage = [num2str(mriRefImage.xsize,'%.1f') ' ' num2str(mriRefImage.ysize,'%.1f') ' ' num2str(mriRefImage.zsize,'%.1f')];
+% sizeTrainingLabels = [mriTrainingLabels.volsize(2) mriTrainingLabels.volsize(1) mriTrainingLabels.volsize(3)];
+% sizeRefImage = [mriRefImage.volsize(2) mriRefImage.volsize(1) mriRefImage.volsize(3)];
+% rassizeTrainingLabels = sizeTrainingLabels.*str2num(resTrainingLabels);
+% rassizeRefImage = sizeRefImage.*str2num(resRefImage);
+% pad = ceil(max(rassizeTrainingLabels-rassizeRefImage,0)./(2*str2num(resRefImage)));
+% pathTempRefImage = '/tmp/ref.nii.gz';
+% padImage(pathRefImage, pathTempRefImage, pad, pathTempImFolder);
 
 if ~exist(aff, 'file') || recompute
     disp('registering temporary isotropic image to anistropic test image');
     % linear registration
     res = '/tmp/res.nii.gz';
-    cmd = [pathRegAladin ' -ref ' pathTempRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0'];
-%     cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0 -nac'];
+%     cmd = [pathRegAladin ' -ref ' pathTempRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0 -nac'];
+    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
 %     [~,~]=system(['rm ' res]);
 %     [~,~]=system(['rm ' pathTempRefImage]);
 else
     disp('temporary isotropic image already registered to test image')
 end
+
 if ~exist(pathRegTrainingLabels, 'file') || recompute
     disp('applying rigid transformation to training labels');
+    pathPaddedTrainingLabels = '/tmp/paddedTrainingLabels.nii.gz';
+    padImage(pathTrainingLabels, pathPaddedTrainingLabels, 140, pathTempImFolder);
     % apply linear transformation to labels
-    cmd = [pathRegResample ' -ref ' res ' -flo ' pathTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
+%     cmd = [pathRegResample ' -ref ' pathTrainingLabels ' -flo ' pathTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
+    cmd = [pathRegResample ' -ref ' pathPaddedTrainingLabels ' -flo ' pathPaddedTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
+%     cmd = [pathRegResample ' -ref ' res ' -flo ' pathTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
     if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
-    cmd = ['mri_convert ' pathRegTrainingLabels ' ' pathRegTrainingLabels ' --voxsize ' resTrainingLabels ' -odt float'];
-    if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
+    mri = myMRIread(pathRegTrainingLabels); [mri,~] = cropLabelVol(mri); myMRIwrite(mri,pathRegTrainingLabels);
+%     cmd = ['mri_convert ' pathRegTrainingLabels ' ' pathRegTrainingLabels ' --voxsize ' resTrainingLabels ' -odt float'];
+%     if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
 else
     disp('rigid transformation already applied to training labels')
 end
