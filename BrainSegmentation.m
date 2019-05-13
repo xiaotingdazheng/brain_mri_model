@@ -10,25 +10,27 @@ niftyRegHome = '/home/benjamin/Software/nifty-reg-mod/niftyreg/build/reg-apps/';
 % niftyRegHome = '/home/bbillot/software/exe_brain_mri_model/compiled-nifty-reg/bin';
 
 % cell paths test images
-pathDirTestImages= '~/data/CobraLab/label_fusions/brains_t1/synth_new/test_images';
+pathDirTestImages= {'~/data/CobraLab/label_fusions/multi_channel/synth_new_fixed_t2/test_images_t1';...
+                    '~/data/CobraLab/label_fusions/multi_channel/synth_new_fixed_t2/test_images_t2'};
 % cell paths test first labels (FS labels)
-pathDirRefFirstLabels= '~/data/CobraLab/label_fusions/brains_t1/synth_new/test_first_labels';
+pathDirRefFirstLabels= {'~/data/CobraLab/label_fusions/multi_channel/synth_new_fixed_t2/test_first_labels_t1';...
+                        '~/data/CobraLab/label_fusions/multi_channel/synth_new_fixed_t2/test_first_labels_t2'};
 % cell paths test labels
-pathDirTestLabels = '~/data/CobraLab/label_fusions/brains_t1/synth_new/test_labels';
+pathDirTestLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_new_fixed_t2/test_labels';
 % cell paths training labels
-pathDirTrainingLabels = '~/data/CobraLab/label_fusions/brains_t1/synth_new/training_labels';
+pathDirTrainingLabels = '~/data/CobraLab/label_fusions/multi_channel/synth_new_fixed_t2/training_labels';
 % path labels table
-pathClassesTable= '~/data/CobraLab/label_fusions/brains_t1/synth_new/classesTable.txt';
+pathClassesTable= '~/data/CobraLab/label_fusions/multi_channel/synth_new_fixed_t2/classesTable.txt';
 % optional paths
 % pathDirTrainingImages = '~/data/CobraLab/label_fusions/brains_t1/synth_new/training_images';
 
 % experiment title
-title = 'label fusion on T1 real images from CobraLab data';
+title = 'label fusion on multispectral synthetic images from CobraLab data';
 % general parameters
 evaluate = 1;                % evaluate test scans segmentations aginst provided ref labels (0-1)
 cropHippo = 0;               % crop results around hippocampus (0-1)
 leaveOneOut = 1;             % segment one image with the rest of the datatset (0-1)
-useSynthethicImages = 0;     % use real or synthetic images (0-1)
+useSynthethicImages = 1;     % use real or synthetic images (0-1)
 recompute = 0;               % recompute files, even if they exist (0-1)
 debug = 0;                   % display debug information from registrations (0-1)
 deleteSubfolder = 0;         % delete subfolder where all intermediate information is stored (0-1)

@@ -52,8 +52,19 @@ end
 
 % crop Hippocampus
 if cropHippo
+    if targetRes
+        % upsample ref first labels
+        temp_pathRefFirstLabels = strrep(pathRefFirstLabels{1},'.nii.gz','.mgz'); [~,name,~] = fileparts(temp_pathRefFirstLabels);
+        pathResampledRefFirstLabels = fullfile(pathUpsampledRefDataSubfolder, [name '_' resolution '.nii.gz']);
+        if ~exist(pathResampledRefFirstLabels, 'file') || recompute
+            disp('upsampling first ref labels to target res');
+            cmd = ['mri_convert ' pathRefFirstLabels{1} ' ' pathResampledRefFirstLabels ' --voxsize ' voxsize ' -rt nearest -odt float'];
+            [~,~] = system(cmd);
+        end
+    end
+    % crop hippo with upsampled first labels
     disp('cropping ref image around hippocampus')
-    mri = myMRIread(pathRefFirstLabels{1}, 1, pathTempImFolder);
+    mri = myMRIread(pathResampledRefFirstLabels, 0, pathTempImFolder);
     [~,cropping] = cropLabelVol(mri, 20, 'hippo');
 else
     cropping = 0;

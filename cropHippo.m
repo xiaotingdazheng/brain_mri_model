@@ -11,6 +11,7 @@ if ~exist(pathCroppedLodOddsFolder, 'dir'), mkdir(pathCroppedLodOddsFolder); end
 
 % apply cropping to ref image
 if ~exist(pathCroppedRefImage, 'file') || recompute
+    disp('apply cropping to ref image');
     mri = myMRIread(pathRefImage);
     mri = applyCropping(mri,cropping);
     myMRIwrite(mri, pathCroppedRefImage);
@@ -19,6 +20,7 @@ brainVoxels = selectBrainVoxels(pathCroppedRefImage, 5, pathTempImFolder);
 
 % apply cropping to flo image
 if ~exist(pathCroppedFloImage, 'file') || recompute
+    disp('apply cropping to floating image');
     mri = myMRIread(pathRigidRegFloImage);
     mri = applyCropping(mri,cropping);
     myMRIwrite(mri, pathCroppedFloImage);
@@ -26,10 +28,12 @@ end
 
 % apply cropping to logOdds
 struct = dir(fullfile(priorSubfolder,'*nii.gz'));
+count = 0;
 for i=1:length(struct)
     temp_pathLogOdds = fullfile(struct(i).folder, struct(i).name);
     temp_pathLogOddsCropped = fullfile(pathCroppedLodOddsFolder, struct(i).name);
     if ~exist(temp_pathLogOddsCropped, 'file') || recompute
+        if count == 0, count = 1; disp('apply cropping to logOdds'); end
         cmd = [pathRegResample ' -ref ' pathRigidRegFloImage ' -flo ' temp_pathLogOdds ' -trans ' aff ' -res ' temp_pathLogOddsCropped ' -pad 0 -inter 0'];
         [~,~] = system(cmd);
         mri = myMRIread(temp_pathLogOddsCropped);
