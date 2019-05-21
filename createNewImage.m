@@ -199,19 +199,9 @@ if ~exist(pathRegTrainingLabelsSubfolder, 'dir'), mkdir(pathRegTrainingLabelsSub
 
 if ~exist(aff, 'file') || recompute
     disp('registering temporary isotropic image to anistropic test image');
-    % mask input images
-    pathMaskRefImage = '/tmp/maskRefImage.nii.gz';
-    pathMaskNewImage = '/tmp/maskNewImage.nii.gz';
-    createMask(pathRefImage, pathMaskRefImage, pathTempImFolder);
-    createMask(pathNewImage, pathMaskNewImage, pathTempImFolder);
     % linear registration
-    res = '/tmp/res.nii.gz';
-    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ...
-        ' -rmask ' pathMaskRefImage ' -fmask ' pathMaskNewImage ' -ln 4 -lp 3 -rigOnly -pad 0 -comm'];
+    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -ln 4 -lp 3 -rigOnly -pad 0'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
-%     [~,~]=system(['rm ' res]);
-%     [~,~]=system(['rm ' pathMaskRefImage]);
-%     [~,~]=system(['rm ' pathMaskNewImage]);
 else
     disp('temporary isotropic image already registered to test image')
 end
@@ -219,7 +209,7 @@ end
 if ~exist(pathRegTrainingLabels, 'file') || recompute
     disp('applying rigid transformation to training labels');
     pathPaddedTrainingLabels = '/tmp/paddedTrainingLabels.nii.gz';
-    padImage(pathTrainingLabels, pathPaddedTrainingLabels, 220, pathTempImFolder);
+    padImage(pathTrainingLabels, pathPaddedTrainingLabels, 170, pathTempImFolder);
     % apply linear transformation to labels
     cmd = [pathRegResample ' -ref ' pathPaddedTrainingLabels ' -flo ' pathPaddedTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
     if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
