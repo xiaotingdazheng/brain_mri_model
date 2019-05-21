@@ -22,11 +22,18 @@ for channel=1:nChannel
     
     for i=1:length(structPathsTrainingLabels)
         
-        % we now use pathRefFirstLabels{1}, because all channels are now aligned
+        % select training labels
         pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage{channel},...
-            targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
+        floBrainNum = findBrainNum(pathTrainingLabels);
+        if channel > 1
+            pathTrainingLabels = fullfile(pathTempImFolder, 'registered_training_labels', ['training_labels_' floBrainNum '_to_' refBrainNum '.nii.gz']);
+        end
         
+        % generate new image
+        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage{channel},...
+            targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, floBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
+        
+        % create dir names
         pathDirSyntheticImages = fileparts(cellPathsNewImages{1,1});
         pathDirSyntheticLabels = fileparts(cellPathsNewLabels{1,1});
         

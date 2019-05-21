@@ -1,5 +1,5 @@
 function [pathNewImage, pathNewLabels] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage, ...
-    targetRes, labelsList, labelClasses, channel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug)
+    targetRes, labelsList, labelClasses, channel, refBrainNum, floBrainNum, recompute, freeSurferHome, niftyRegHome, debug)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -10,27 +10,26 @@ function [pathNewImage, pathNewLabels] = createNewImage(pathTrainingLabels, clas
 % desired target resolution, before saving the final result.
 
 
-% resolutions of ref image
+% resolution of ref image
 refImageMRI = myMRIread(pathRefImage, 1, pathTempImFolder);
 refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
-if ~any(targetRes), targetRes = refImageRes; end % set targetRes to refImageRes if specified
+if ~any(targetRes), targetRes = refImageRes; end % set targetRes to refImageRes if targetRes isn't specified
 
 % define names of naming variables
-trainingBrainNum = findBrainNum(pathTrainingLabels);
-if refImageRes(1) == refImageRes(2) && refImageRes(1) == refImageRes(3)
-    isFinalImageAnisotropic = 0;
-    if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3), resolution = num2str(targetRes(1),'%.1f'); 
+if all(refImageRes == refImageRes(1))
+    if all(targetRes == targetRes(1)), resolution = num2str(targetRes(1),'%.1f'); 
     else, resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')]; end
 else
-    isFinalImageAnisotropic = 1; 
-    if targetRes(1) == targetRes(2) && targetRes(1) == targetRes(3) && channel
-        targetRes = refImageRes;
+    if all(targetRes == targetRes(1)) && channel
+        %image is synthetised anisotropically (refImageRes) and will then be aligned (rigid registration) with isotropic t1
+        targetRes = refImageRes; 
         resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
-    else
+    elseif all(targetRes == targetRes(1))
         resolution = num2str(targetRes(1),'%.1f');
+    else
+        resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
     end
 end
-minTargetRes = min(targetRes)*ones(1,3); % = targetRes if isotropic
 
 % paths synthetic directories
 pathDirSyntheticImages = fullfile(pathTempImFolder, 'floating_images');
@@ -43,69 +42,44 @@ if ~exist(pathDirSyntheticImages, 'dir'), mkdir(pathDirSyntheticImages); end
 if ~exist(pathDirSyntheticLabels, 'dir'), mkdir(pathDirSyntheticLabels); end
 
 % paths synthetic image and labels
-pathNewImage = fullfile(pathDirSyntheticImages, ['training_' trainingBrainNum '_synthetic_' resolution '.nii.gz']);
-pathNewLabels = fullfile(pathDirSyntheticLabels, ['training_' trainingBrainNum '_labels_' resolution '.nii.gz']);
-
-% path registered training labels
-pathRegTrainingLabelsSubfolder = fullfile(pathTempImFolder, 'registered_training_labels');
-if channel, pathRegTrainingLabelsSubfolder = fullfile(pathRegTrainingLabelsSubfolder, ['channel_' num2str(channel)]); end
-pathRegTrainingLabels = fullfile(pathRegTrainingLabelsSubfolder, ['training_' trainingBrainNum '_labels_reg_to_' refBrainNum '.nii.gz']);
+pathNewImage = fullfile(pathDirSyntheticImages, ['training_' floBrainNum '_synthetic_' resolution '.nii.gz']);
+pathNewLabels = fullfile(pathDirSyntheticLabels, ['training_' floBrainNum '_labels_' resolution '.nii.gz']);
 
 
 if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
     
-    if channel, disp(['% creating channel' num2str(channel) ' image from training ' trainingBrainNum ' labels']);
-    else, disp(['% creating image from training ' trainingBrainNum ' labels']); end
+    if channel, disp(['% creating channel' num2str(channel) ' image from training ' floBrainNum ' labels']);
+    else, disp(['% creating image from training ' floBrainNum ' labels']); end
     
     % read training labels and corresponding resolution
     trainingLabelsMRI = myMRIread(pathTrainingLabels, 0, pathTempImFolder);
     trainingLabelsRes = [trainingLabelsMRI.xsize trainingLabelsMRI.ysize trainingLabelsMRI.zsize];
     RefToFloAxisMap = findAxis(refImageMRI, trainingLabelsMRI);
     
-    if isFinalImageAnisotropic == 0 || (isFinalImageAnisotropic && ~exist(pathRegTrainingLabels, 'file')) || recompute
-        % create new image by sampling from intensity prob distribution
-        newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
-        % blur and save isotropic image
-        blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, minTargetRes, pathNewImage, trainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder)
-        % downsample image at target res, only in isotropic case
-        if ~isFinalImageAnisotropic
-            downsample(pathNewImage, pathNewLabels, pathTrainingLabels, minTargetRes, isFinalImageAnisotropic, RefToFloAxisMap, freeSurferHome);
-        end
+    % create new image by sampling from intensity prob distribution
+    newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
+    % blur and save isotropic image
+    blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, targetRes, pathNewImage, trainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder)
+    % rigidly register training labels for other channels
+    if channel == 1
+        registerLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImFolder, refBrainNum, niftyRegHome, debug, recompute); 
     end
-    
-    if isFinalImageAnisotropic
-        
-        % reformate labels if they are anisotropic
-        pathRegTrainingLabels = rigidlyRegisterTrainingLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImFolder, ...
-            channel, refBrainNum, niftyRegHome, debug, recompute);
-        % read training labels
-        regTrainingLabelsMRI = myMRIread(pathRegTrainingLabels, 0, pathTempImFolder);
-        regTrainingLabelsRes = [regTrainingLabelsMRI.xsize regTrainingLabelsMRI.ysize regTrainingLabelsMRI.zsize];
-        RefToFloAxisMap = findAxis(refImageMRI, regTrainingLabelsMRI);
-        
-        % create new image by sampling from intensity prob distribution
-        newImage = sampleIntensities(regTrainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, regTrainingLabelsRes);
-        % blurring images
-        blurAndSave(newImage, regTrainingLabelsMRI, regTrainingLabelsRes, targetRes, pathNewImage, regTrainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder);
-        % downsample to target resolution
-        downsample(pathNewImage, pathNewLabels, pathRegTrainingLabels, targetRes, 0, RefToFloAxisMap, freeSurferHome);
-        
-    end
+    % downsample image at target res, only in isotropic case
+    downsample(pathNewImage, pathNewLabels, pathTrainingLabels, targetRes, RefToFloAxisMap, freeSurferHome);
     
 else
-    
-    if channel, disp(['% channel' num2str(channel) ' image from training ' trainingBrainNum ' labels already generated']);
-    else, disp(['% image from training ' trainingBrainNum ' labels already generated']); end
-    
+    % display massage
+    if channel, disp(['% channel' num2str(channel) ' image from training ' floBrainNum ' labels already generated']);
+    else, disp(['% image from training ' floBrainNum ' labels already generated']); end
 end
 
 end
 
-function new_image = sampleIntensities(labels, labelsList, labelClasses, classesStats, sampledImageRes, newImageRes)
+function newImage = sampleIntensities(labels, labelsList, labelClasses, classesStats, sampledImageRes, newImageRes)
 
 disp('generating voxel intensities');
 
-new_image = zeros(size(labels), 'single');
+newImage = zeros(size(labels), 'single');
 uniqueClasses = unique(labelClasses);
 scalingFactor = sqrt(prod(sampledImageRes)/prod(newImageRes));
 
@@ -124,15 +98,15 @@ for lC=1:length(uniqueClasses)
     % sample from prob distribution lC
     for l=1:length(labelsBelongingToClass)
         voxelIndices = find(labels == labelsBelongingToClass(l)); %find voxels with label l
-        new_image(voxelIndices) = classesStats(2,classLabel) + classesStats(4,classLabel)*scalingFactor*randn(size(voxelIndices)); %generate new values
+        newImage(voxelIndices) = classesStats(2,classLabel) + classesStats(4,classLabel)*scalingFactor*randn(size(voxelIndices)); %generate new values
     end
     
 end
-new_image(new_image <0) = 0;
+newImage(newImage <0) = 0;
 
 end
 
-function blurAndSave(new_image, labelsMRI, inputImageRes, targetRes, pathNewImage, labels, RefToFloAxisMap, pathTempImFolder)
+function blurAndSave(newImage, labelsMRI, inputImageRes, targetRes, pathNewImage, labels, RefToFloAxisMap, pathTempImFolder)
 
 % initialisation 
 disp('blurring image to prevent alliasing');
@@ -150,19 +124,19 @@ sigmaFilt([1 2]) = sigmaFilt([2 1]);
 pixdim = [1 1 1];
 
 % blurring images
-new_image = GaussFilt3dMask(new_image, imageMask, sigmaFilt, pixdim); %new blurring
-new_image(new_image<0)=0;
+newImage = GaussFilt3dMask(newImage, imageMask, sigmaFilt, pixdim); %new blurring
+newImage(newImage<0)=0;
 
 % save temporary image (at sampling resolution)
 disp('writting created high resolution image');
-labelsMRI.vol = new_image;
+labelsMRI.vol = newImage;
 myMRIwrite(labelsMRI, pathNewImage, 'float', pathTempImFolder); %write a new nifti file.
 
 end
 
-function downsample(pathNewImage, pathNewSegmMap, pathOldLabels, targetRes, anisotropicFinalImage, RefToFloAxisMap, freeSurferHome)
+function downsample(pathNewImage, pathNewSegmMap, pathOldLabels, targetRes, RefToFloAxisMap, freeSurferHome)
 
-disp('dowmsampling to target resolution');
+disp('downsampling to target resolution');
 
 setFreeSurfer(freeSurferHome);
 
@@ -172,30 +146,25 @@ strTargetRes = [num2str(targetRes(1),'%.2f') ' ' num2str(targetRes(2),'%.2f') ' 
 % save image and labels at target resolution
 cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' strTargetRes ' -rt cubic -odt float']; % downsample at target resolution
 [~,~] = system(cmd1);
-if ~anisotropicFinalImage
-    cmd2 = ['mri_convert ' pathOldLabels ' ' pathNewSegmMap ' -voxsize ' strTargetRes ' -rt nearest -odt float']; % same for labels
-    [~,~] = system(cmd2);
-end
+cmd2 = ['mri_convert ' pathOldLabels ' ' pathNewSegmMap ' -voxsize ' strTargetRes ' -rt nearest -odt float']; % same for labels
+[~,~] = system(cmd2);
 
 end
 
-function pathRegTrainingLabels = rigidlyRegisterTrainingLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImFolder, ...
-    channel, refBrainNum, niftyRegHome, debug, recompute)
+function pathRegTrainingLabels = registerLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImFolder, ...
+    refBrainNum, niftyRegHome, debug, recompute)
 
 % define naming variables
 floBrainNum = findBrainNum(pathNewImage);
 % paths registration functions
 pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
-% path rigid transformation
-pathRigidTransFolder = fullfile(pathTempImFolder, 'rigid_transformations');
-aff = fullfile(pathRigidTransFolder, [floBrainNum '_to_' refBrainNum '.aff']);
-if ~exist(pathRigidTransFolder, 'dir'), mkdir(pathRigidTransFolder); end
 % path registered training labels
-pathRegTrainingLabelsSubfolder = fullfile(pathTempImFolder, 'registered_training_labels');
-if channel, pathRegTrainingLabelsSubfolder = fullfile(pathRegTrainingLabelsSubfolder, ['channel_' num2str(channel)]); end
-pathRegTrainingLabels = fullfile(pathRegTrainingLabelsSubfolder, ['training_' floBrainNum '_labels_reg_to_' refBrainNum '.nii.gz']);
-if ~exist(pathRegTrainingLabelsSubfolder, 'dir'), mkdir(pathRegTrainingLabelsSubfolder); end
+pathRegTrainingLabelsFolder = fullfile(pathTempImFolder, 'registered_training_labels');
+pathRegTrainingLabels = fullfile(pathRegTrainingLabelsFolder, ['training_labels_' floBrainNum '_to_' refBrainNum '.nii.gz']);
+if ~exist(pathRegTrainingLabelsFolder, 'dir'), mkdir(pathRegTrainingLabelsFolder); end
+% path rigid transformation
+aff = fullfile(pathRegTrainingLabelsFolder, ['training_labels_' floBrainNum '_to_' refBrainNum '.aff']);
 
 if ~exist(aff, 'file') || recompute
     disp('registering temporary isotropic image to anistropic test image');
@@ -213,6 +182,7 @@ if ~exist(pathRegTrainingLabels, 'file') || recompute
     % apply linear transformation to labels
     cmd = [pathRegResample ' -ref ' pathPaddedTrainingLabels ' -flo ' pathPaddedTrainingLabels ' -trans ' aff ' -res ' pathRegTrainingLabels ' -pad 0 -inter 0'];
     if debug, system(cmd); else, cmd = [cmd ' -voff']; [~,~] = system(cmd); end
+    [~,~] = system(['rm ' pathPaddedTrainingLabels]);
     mri = myMRIread(pathRegTrainingLabels); [mri,~] = cropLabelVol(mri); myMRIwrite(mri,pathRegTrainingLabels);
 else
     disp('rigid transformation already applied to training labels')
