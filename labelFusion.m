@@ -17,7 +17,7 @@ if ~contains(pathDirFloLabels, '*'), pathDirFloLabels = fullfile(pathDirFloLabel
 structPathsFloImages = dir(pathDirFloImages);
 structPathsFloLabels = dir(pathDirFloLabels);
 % define subfolders
-registrationFolder = fullfile(pathTempImFolder, 'registrations');
+registrationFolder = fullfile(pathTempImFolder, 'label_fusion_registrations');
 labelMapFolder = fullfile(pathTempImFolder, 'labelMaps');
 if isequal(labelPriorType, 'delta function'), priorFolder = fullfile(pathTempImFolder, 'hippo_labels_delta');
 else, priorFolder = fullfile(pathTempImFolder,'logOdds'); end

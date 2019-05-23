@@ -11,45 +11,43 @@ if ~exist(pathStatsMatrixFolder, 'dir'), mkdir(pathStatsMatrixFolder); end
 structPathsTrainingLabels = dir(pathDirTrainingLabels{1});
 cellPathsNewImages = cell(length(structPathsTrainingLabels), nChannel);
 cellPathsNewLabels = cell(length(structPathsTrainingLabels), nChannel);
+classesStats = cell(1,nChannel);
 
-for channel=1:nChannel
+
+for i=1:length(structPathsTrainingLabels)
     
-    % compute stats from reference image
-    pathStatsMatrix = fullfile(pathStatsMatrixFolder, 'ClassesStats.mat');
-    if multiChannel, pathStatsMatrix = strrep(pathStatsMatrix, '.mat', ['_channel' num2str(channel) '.mat']); end
-    classesStats = computeIntensityStats(pathRefImage{channel}, pathRefFirstLabels{channel}, labelsList, labelClasses, pathStatsMatrix,...
-        channel*multiChannel, pathTempImFolder, recompute);
+    % select training labels
+    pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
+    floBrainNum = findBrainNum(pathTrainingLabels);
     
-    for i=1:length(structPathsTrainingLabels)
+    for channel=1:nChannel
         
-        % select training labels
-        pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-        floBrainNum = findBrainNum(pathTrainingLabels);
-        if channel > 1
-            pathTrainingLabels = fullfile(pathTempImFolder, 'registered_training_labels', ['training_labels_' floBrainNum '_to_' refBrainNum '.nii.gz']);
+        % compute/load stats from reference image
+        if isempty(classesStats{channel})
+            pathStatsMatrix = fullfile(pathStatsMatrixFolder, 'ClassesStats.mat');
+            if multiChannel, pathStatsMatrix = strrep(pathStatsMatrix, '.mat', ['_channel' num2str(channel) '.mat']); end
+            classesStats{channel} = computeIntensityStats(pathRefImage{channel}, pathRefFirstLabels{channel}, labelsList, labelClasses, pathStatsMatrix,...
+                channel*multiChannel, pathTempImFolder, recompute);
         end
         
         % generate new image
-        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage{channel},...
+        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}, pathTrainingLabels] = createNewImage(pathTrainingLabels, classesStats{channel}, pathTempImFolder, pathRefImage{channel},...
             targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, floBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
         
         % create dir names
         pathDirSyntheticImages = fileparts(cellPathsNewImages{1,1});
         pathDirSyntheticLabels = fileparts(cellPathsNewLabels{1,1});
         
+        % concatenate all the channels into a single image
         if channel > 1
-            
-            % realign the images coming from the same labels (1=align by registration)
-            cellPathsNewImages{i,channel} = alignImages...
-                (cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 1, channel, freeSurferHome, niftyRegHome, recompute, debug);
-            
-            % concatenate all the channels into a single image
+            % realign all channels (2=mri_convert)
+            cellPathsNewImages{i,channel} = alignImages(cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 2, channel, freeSurferHome, niftyRegHome, recompute, debug);
+            % concatenate channels
             pathDirSyntheticImages = fullfile(fileparts(fileparts(cellPathsNewImages{1,1})), 'concatenated_images');
             [~,name,ext] = fileparts(cellPathsNewImages{i,1});
             pathCatRefImage = fullfile(pathDirSyntheticImages, [name ext]);
             pathCatRefImage = strrep(pathCatRefImage, '.nii.gz', '_cat.nii.gz');
             catImages(cellPathsNewImages(i,:), pathCatRefImage, pathTempImFolder, recompute);
-            
         end
         
     end

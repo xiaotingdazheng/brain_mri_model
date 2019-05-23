@@ -1,4 +1,4 @@
-function [pathNewImage, pathNewLabels] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage, ...
+function [pathNewImage, pathNewLabels, pathTrainingLabels] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage, ...
     targetRes, labelsList, labelClasses, channel, refBrainNum, floBrainNum, recompute, freeSurferHome, niftyRegHome, debug)
 
 % This script generates a synthetic image from a segmentation map and basic
@@ -47,30 +47,33 @@ pathNewLabels = fullfile(pathDirSyntheticLabels, ['training_' floBrainNum '_labe
 
 
 if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
+    if channel, disp(['% creating channel ' num2str(channel) ' from training labels ' floBrainNum]);
+    else, disp(['% creating image from training labels ' floBrainNum]); end
     
-    if channel, disp(['% creating channel' num2str(channel) ' image from training ' floBrainNum ' labels']);
-    else, disp(['% creating image from training ' floBrainNum ' labels']); end
+    if channel == 1
+        % read training labels and corresponding resolution
+        trainingLabelsMRI = myMRIread(pathTrainingLabels, 0, pathTempImFolder);
+        trainingLabelsRes = [trainingLabelsMRI.xsize trainingLabelsMRI.ysize trainingLabelsMRI.zsize];
+        RefToFloAxisMap = findAxis(refImageMRI, trainingLabelsMRI);
+        % create image and register training labels to it
+        newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
+        blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, targetRes, pathNewImage, trainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder)
+        pathTrainingLabels = registerLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImFolder, refBrainNum, niftyRegHome, debug, recompute);
+    end
     
-    % read training labels and corresponding resolution
+    % synthetise new image based on training labels
     trainingLabelsMRI = myMRIread(pathTrainingLabels, 0, pathTempImFolder);
     trainingLabelsRes = [trainingLabelsMRI.xsize trainingLabelsMRI.ysize trainingLabelsMRI.zsize];
     RefToFloAxisMap = findAxis(refImageMRI, trainingLabelsMRI);
-    
-    % create new image by sampling from intensity prob distribution
     newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
-    % blur and save isotropic image
     blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, targetRes, pathNewImage, trainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder)
-    % rigidly register training labels for other channels
-    if channel == 1
-        registerLabels(pathNewImage, pathTrainingLabels, pathRefImage, pathTempImFolder, refBrainNum, niftyRegHome, debug, recompute); 
-    end
-    % downsample image at target res, only in isotropic case
+    % downsample image at target res
     downsample(pathNewImage, pathNewLabels, pathTrainingLabels, targetRes, RefToFloAxisMap, freeSurferHome);
     
 else
-    % display massage
-    if channel, disp(['% channel' num2str(channel) ' image from training ' floBrainNum ' labels already generated']);
-    else, disp(['% image from training ' floBrainNum ' labels already generated']); end
+    % display message
+    if channel, disp(['% channel ' num2str(channel) ' from training ' floBrainNum ' already generated']);
+    else, disp(['% image from training ' floBrainNum ' already generated']); end
 end
 
 end
