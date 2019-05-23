@@ -16,18 +16,29 @@ refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
 if ~any(targetRes), targetRes = refImageRes; end % set targetRes to refImageRes if targetRes isn't specified
 
 % define names of naming variables
+computeRigidReg = 0;
 if all(refImageRes == refImageRes(1))
-    if all(targetRes == targetRes(1)), resolution = num2str(targetRes(1),'%.1f'); 
+    if all(targetRes == targetRes(1)), resolution = num2str(targetRes(1),'%.1f');
     else, resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')]; end
 else
-    if all(targetRes == targetRes(1)) && channel
-        %image is synthetised anisotropically (refImageRes) and will then be aligned (rigid registration) with isotropic t1
-        targetRes = refImageRes; 
-        resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
-    elseif all(targetRes == targetRes(1))
-        resolution = num2str(targetRes(1),'%.1f');
+    if all(targetRes == targetRes(1))
+        if channel
+            %image is synthetised anisotropically (refImageRes) and will then be aligned (mri_convert) with isotropic channel 1
+            targetRes = refImageRes;
+            resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
+        else
+            resolution = num2str(targetRes(1),'%.1f');
+            computeRigidReg = 1;
+        end
     else
-        resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
+        if channel
+            %image is synthetised anisotropically (refImageRes) and will then be aligned (mri_convert) with anisotropic channel 1
+            targetRes = refImageRes;
+            resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
+        else
+            resolution = [num2str(targetRes(1),'%.1f'), 'x',num2str(targetRes(2),'%.1f'), 'x',num2str(targetRes(3),'%.1f')];
+            computeRigidReg = 1;
+        end
     end
 end
 
@@ -50,7 +61,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
     if channel, disp(['% creating channel ' num2str(channel) ' from training labels ' floBrainNum]);
     else, disp(['% creating image from training labels ' floBrainNum]); end
     
-    if channel == 1
+    if channel == 1 || computeRigidReg
         % read training labels and corresponding resolution
         trainingLabelsMRI = myMRIread(pathTrainingLabels, 0, pathTempImFolder);
         trainingLabelsRes = [trainingLabelsMRI.xsize trainingLabelsMRI.ysize trainingLabelsMRI.zsize];
