@@ -118,7 +118,7 @@ dilateShape(dist<=1)=1;
 imageMask = imdilate(imfill(labels > 0, 'holes'), dilateShape);
 
 f = targetRes./inputImageRes;
-sigmaFilt = 0.9*f;
+sigmaFilt = 0.85*f;
 sigmaFilt([1 2 3]) = sigmaFilt(RefToFloAxisMap);
 sigmaFilt([1 2]) = sigmaFilt([2 1]);
 pixdim = [1 1 1];
@@ -169,8 +169,10 @@ aff = fullfile(pathRegTrainingLabelsFolder, ['training_labels_' floBrainNum '_to
 if ~exist(aff, 'file') || recompute
     disp('registering temporary isotropic image to anistropic test image');
     % linear registration
-    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -ln 4 -lp 3 -rigOnly -pad 0'];
+    res = '/tmp/res.nii.gz';
+    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
+    [~,~]=system(['rm ' res]);
 else
     disp('temporary isotropic image already registered to test image')
 end

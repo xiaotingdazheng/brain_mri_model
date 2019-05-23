@@ -1,5 +1,7 @@
 function pathImageNii = mgz2nii(pathImage, resultFolder, eraseOld, Imagetype, channel, brainNum, freeSurferHome, recompute)
 
+% Imagetype (str): 'images' or 'labels' (for interpolation)
+
 [folder,name,ext] = fileparts(pathImage);
 
 if strcmp(ext, '.mgz')
