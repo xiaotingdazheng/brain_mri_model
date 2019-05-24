@@ -1,5 +1,5 @@
 function [pathNewImage, pathNewLabels, pathTrainingLabels] = createNewImage(pathTrainingLabels, classesStats, pathTempImFolder, pathRefImage, ...
-    targetRes, labelsList, labelClasses, channel, refBrainNum, floBrainNum, recompute, freeSurferHome, niftyRegHome, debug)
+    pathNewImageT1, targetRes, labelsList, labelClasses, channel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug)
 
 % This script generates a synthetic image from a segmentation map and basic
 % statistics of intensity distribution for all the regions in the brain.
@@ -16,6 +16,7 @@ refImageRes = [refImageMRI.xsize refImageMRI.ysize refImageMRI.zsize];
 if ~any(targetRes), targetRes = refImageRes; end % set targetRes to refImageRes if targetRes isn't specified
 
 % define names of naming variables
+floBrainNum = findBrainNum(pathTrainingLabels);
 computeRigidReg = 0;
 if all(refImageRes == refImageRes(1))
     if all(targetRes == targetRes(1)), resolution = num2str(targetRes(1),'%.1f');
@@ -79,7 +80,7 @@ if recompute || ~exist(pathNewImage, 'file') || ~exist(pathNewLabels, 'file')
     newImage = sampleIntensities(trainingLabelsMRI.vol, labelsList, labelClasses, classesStats, refImageRes, trainingLabelsRes);
     blurAndSave(newImage, trainingLabelsMRI, trainingLabelsRes, targetRes, pathNewImage, trainingLabelsMRI.vol, RefToFloAxisMap, pathTempImFolder)
     % downsample image at target res
-    downsample(pathNewImage, pathNewLabels, pathTrainingLabels, targetRes, RefToFloAxisMap, freeSurferHome);
+    downsample(pathNewImage, pathNewLabels, pathTrainingLabels, targetRes, channel, pathNewImageT1, RefToFloAxisMap, freeSurferHome);
     
 else
     % display message
@@ -148,7 +149,7 @@ myMRIwrite(labelsMRI, pathNewImage, 'float', pathTempImFolder); %write a new nif
 
 end
 
-function downsample(pathNewImage, pathNewSegmMap, pathOldLabels, targetRes, RefToFloAxisMap, freeSurferHome)
+function downsample(pathNewImage, pathNewSegmMap, pathOldLabels, targetRes, channel, pathNewImageT1, RefToFloAxisMap, freeSurferHome)
 
 disp('downsampling to target resolution');
 
@@ -158,9 +159,13 @@ targetRes([1 2 3]) = targetRes(RefToFloAxisMap);
 strTargetRes = [num2str(targetRes(1),'%.2f') ' ' num2str(targetRes(2),'%.2f') ' ' num2str(targetRes(3),'%.2f')];
 
 % save image and labels at target resolution
-cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -voxsize ' strTargetRes ' -rt cubic -odt float']; % downsample at target resolution
+cmd1 = ['mri_convert ' pathNewImage ' ' pathNewImage ' -odt float']; % downsample at target resolution
+cmd2 = ['mri_convert ' pathOldLabels ' ' pathNewSegmMap ' -rt nearest -odt float']; % same for labels
+% adapts command if realignment needed
+if channel > 1, cmd1 = [cmd1 ' -rl ' pathNewImageT1]; cmd2 = [cmd2 ' -rl ' pathNewImageT1]; 
+else, cmd1 = [cmd1 ' -voxsize ' strTargetRes]; cmd2 = [cmd2 ' -voxsize ' strTargetRes]; end
+% execute commands
 [~,~] = system(cmd1);
-cmd2 = ['mri_convert ' pathOldLabels ' ' pathNewSegmMap ' -voxsize ' strTargetRes ' -rt nearest -odt float']; % same for labels
 [~,~] = system(cmd2);
 
 end
@@ -175,10 +180,10 @@ pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
 pathRegResample = fullfile(niftyRegHome, 'reg_resample');
 % path registered training labels
 pathRegTrainingLabelsFolder = fullfile(pathTempImFolder, 'registered_training_labels');
-pathRegTrainingLabels = fullfile(pathRegTrainingLabelsFolder, ['training_labels_' floBrainNum '_to_' refBrainNum '.nii.gz']);
+pathRegTrainingLabels = fullfile(pathRegTrainingLabelsFolder, ['training_' floBrainNum '_labels_to_' refBrainNum '.nii.gz']);
 if ~exist(pathRegTrainingLabelsFolder, 'dir'), mkdir(pathRegTrainingLabelsFolder); end
 % path rigid transformation
-aff = fullfile(pathRegTrainingLabelsFolder, ['training_labels_' floBrainNum '_to_' refBrainNum '.aff']);
+aff = fullfile(pathRegTrainingLabelsFolder, ['training_' floBrainNum '_labels_to_' refBrainNum '.aff']);
 
 if ~exist(aff, 'file') || recompute
     disp('registering temporary isotropic image to anistropic test image');

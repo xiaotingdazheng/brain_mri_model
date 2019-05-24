@@ -18,7 +18,6 @@ for i=1:length(structPathsTrainingLabels)
     
     % select training labels
     pathTrainingLabels = fullfile(structPathsTrainingLabels(i).folder, structPathsTrainingLabels(i).name);
-    floBrainNum = findBrainNum(pathTrainingLabels);
     
     for channel=1:nChannel
         
@@ -31,8 +30,8 @@ for i=1:length(structPathsTrainingLabels)
         end
         
         % generate new image
-        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}, pathTrainingLabels] = createNewImage(pathTrainingLabels, classesStats{channel}, pathTempImFolder, pathRefImage{channel},...
-            targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, floBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
+        [cellPathsNewImages{i,channel}, cellPathsNewLabels{i,channel}, pathTrainingLabels] = createNewImage(pathTrainingLabels, classesStats{channel}, pathTempImFolder,...
+            pathRefImage{channel}, cellPathsNewImages{i,1}, targetRes, labelsList, labelClasses, channel*multiChannel, refBrainNum, recompute, freeSurferHome, niftyRegHome, debug);
         
         % create dir names
         pathDirSyntheticImages = fileparts(cellPathsNewImages{1,1});
@@ -40,9 +39,6 @@ for i=1:length(structPathsTrainingLabels)
         
         % concatenate all the channels into a single image
         if channel > 1
-            % realign all channels (2=mri_convert)
-            cellPathsNewImages{i,channel} = alignImages(cellPathsNewImages{i,1}, cellPathsNewImages{i,channel}, 2, channel, freeSurferHome, niftyRegHome, recompute, debug);
-            % concatenate channels
             pathDirSyntheticImages = fullfile(fileparts(fileparts(cellPathsNewImages{1,1})), 'concatenated_images');
             [~,name,ext] = fileparts(cellPathsNewImages{i,1});
             pathCatRefImage = fullfile(pathDirSyntheticImages, [name ext]);
