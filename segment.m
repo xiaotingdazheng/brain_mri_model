@@ -3,7 +3,7 @@ function accuracy = segment(pathDirTestImages, pathDirRefFirstLabels, pathDirTes
 % read and check parameters
 nChannel = length(pathDirTestImages);
 [evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
-    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, 0);
+    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, 1);
 % build paths structures
 structPathsTestImages = cell(size(pathDirTestImages));
 structPathsFirstRefLabels = cell(size(pathDirRefFirstLabels));

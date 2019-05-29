@@ -1,5 +1,5 @@
 function [evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho,...
-    threshold, sigma, labelPriorType, regOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, singleBrain)
+    threshold, sigma, labelPriorType, regOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, writeParams)
 
 %read params
 evaluate = params{1};
@@ -72,7 +72,7 @@ labelClasses = txt{2};
 labelsNames = txt{3};
 
 % write parameters in a file
-if ~singleBrain
+if writeParams
     pathParamsTxt=fullfile(fileparts(pathClassesTable), 'parameters.txt');
     fid=fopen(pathParamsTxt, 'w');
     fprintf(fid, 'evaluate: %d \n', evaluate);

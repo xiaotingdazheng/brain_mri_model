@@ -58,7 +58,7 @@ params = {evaluate cropHippo leaveOneOut useSynthethicImages recompute debug del
 % read and check parameters
 nChannel = length(pathRefImage);
 [evaluate, cropHippo, leaveOneOut, useSynthethicImages, recompute, debug, deleteSubfolder, targetResolution, rescale, alignTestImages, margin, rho, threshold,...
-    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, 1);
+    sigma, labelPriorType, registrationOptions, freeSurferHome, niftyRegHome, labelsList, labelClasses, labelsNames] = readParams(params, nChannel, 0);
 
 % build path resulting accuracies
 pathMainFolder = fileparts(fileparts(pathRefImage{1}));
