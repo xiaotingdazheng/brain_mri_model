@@ -189,7 +189,7 @@ if ~exist(aff, 'file') || recompute
     disp('registering temporary isotropic image to anistropic test image');
     % linear registration
     res = '/tmp/res.nii.gz';
-    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -rigOnly -pad 0'];
+    cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathNewImage ' -aff ' aff ' -res ' res ' -ln 4 -lp 3 -pad 0'];
     if debug, system(cmd); else, [~,~] = system(cmd); end
     [~,~]=system(['rm ' res]);
 else
