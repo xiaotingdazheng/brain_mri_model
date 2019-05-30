@@ -24,7 +24,7 @@ if isdeployed
     evaluate = str2double(evaluate);
     cropHippo = str2double(cropHippo);
     leaveOneOut = str2double(leaveOneOut);
-    useSynthethicImages = str2double(useSynthethicImages);   
+    useSynthethicImages = str2double(useSynthethicImages);
     debug = str2double(debug);
     deleteSubfolder = str2double(deleteSubfolder);
     targetResolution = str2double(targetResolution);
@@ -78,8 +78,7 @@ else
 end
 
 % preprocessing test image
-disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']);
-else, disp(['%% preprocessing test ' refBrainNum]); end
+disp(' '); if multiChannel, disp(['%% preprocessing test ' refBrainNum ' images ']); else, disp(['%% preprocessing test ' refBrainNum]); end
 [pathRefImage, pathRefFirstLabels] = preprocessRefImage(pathRefImage, pathRefFirstLabels, pathTempImFolder, rescale, alignTestImages, ...
     refBrainNum, freeSurferHome, niftyRegHome, recompute, debug);
 
@@ -91,8 +90,8 @@ if useSynthethicImages
 else
     disp(' '); disp(['%% preprocessing real training images for ' refBrainNum]);
     [pathDirFloatingImages, pathDirFloatingLabels] = preprocessRealTrainingImages(temp_pathDirTrainingImages,...
-        temp_pathDirTrainingLabels, pathRefImage, pathTempImFolder, targetResolution, nChannel, rescale, freeSurferHome, ...
-        niftyRegHome, recompute, debug);
+        temp_pathDirTrainingLabels, pathRefImage, pathTempImFolder, targetResolution, nChannel, rescale, ...
+        freeSurferHome, niftyRegHome, recompute, debug);
 end
 
 % upsample ref data to targetRes

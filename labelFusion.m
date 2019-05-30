@@ -41,7 +41,7 @@ for i=1:length(structPathsFloImages)
     registrationSubfolder = fullfile(registrationFolder, ['training_' floBrainNum '_reg_to_test_' refBrainNum]);
     [pathRegFloImage, priorSubfolder, pathRefImage, brainVoxels] = registerImage(pathRefImage, pathFloImage, registrationSubfolder, registrationOptions,...
         multiChannel, brainVoxels, recompute, refBrainNum, cropping, priorSubfolder, niftyRegHome, debug);
-
+    
     % registration of priors
     regPriorSubfolder = registerLabels(pathFloLabels, priorSubfolder, pathRefImage, registrationSubfolder, labelPriorType, labelsList,...
         refBrainNum, niftyRegHome, recompute, debug);
