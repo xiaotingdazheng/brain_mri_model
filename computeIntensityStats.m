@@ -34,7 +34,6 @@ if recompute || ~exist(pathStatsMatrix, 'file')
     % 4th row = 1.4826*median absolute deviation (ie sigmaMAD)
     classesStats = zeros(4, classesNumber);
 
-
     for lC=1:classesNumber
 
         %find labels belonging to class lC
@@ -50,7 +49,7 @@ if recompute || ~exist(pathStatsMatrix, 'file')
 
         % compute basic stats and save it in matrix
         classesStats(:,lC) = [mean(intensities,'omitnan'); median(intensities,'omitnan'); std(intensities,'omitnan'); 1.4826*mad(intensities,'omitnan')];
-
+        
     end
 
     save(pathStatsMatrix, 'classesStats')

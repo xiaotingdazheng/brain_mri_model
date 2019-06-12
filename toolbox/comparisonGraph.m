@@ -20,6 +20,7 @@ regions_names = strrep(regions_names,'mid','');
 regions_names = strrep(regions_names,'anterior','');
 regions_names = strrep(regions_names,'central','');
 regions_names = strrep(regions_names,'posterior','');
+regions_names = strrep(regions_names,'proper','');
 regions_names = strip(regions_names);
 new_names = unique(regions_names,'stable');
 
@@ -29,8 +30,8 @@ names_to_remove = {'background';'CC';'optic chiasm';'vessel';'choroid plexus';..
 
 idx=[];
 for i=1:length(names_to_remove)
-   tidx = find(ismember(new_names, names_to_remove(i)));
-   idx = [idx tidx];
+    tidx = find(ismember(new_names, names_to_remove(i)));
+    idx = [idx tidx];
 end
 new_names(idx) = [];
 
@@ -38,10 +39,15 @@ categories = categorical(new_names);
 
 means = zeros(1, nargin-2);
 new_accuracies = zeros(nargin-2, size(new_names,2));
-legendTags = cell(1,2*length(means)); 
+legendTags = cell(1,2*length(means));
 
 % average right/left means DC together and compute total means
-for arg=1:nargin-2
+if strcmp(varargin{end},'selection')
+    max_iter=nargin-2;
+else
+    max_iter=nargin-1;
+end
+for arg=1:max_iter
     regions_DCs = cell2mat(varargin{arg}{1}(end,2:end-1));
     for i=1:length(new_names)
         temp_mean_DC = 0;
@@ -63,23 +69,27 @@ for arg=1:nargin-2
 end
 
 % create legend
-for arg=1:nargin-2
+for arg=1:max_iter
     legendTags{arg} = varargin{arg}{2};
-    legendTags{nargin-2+arg} = [varargin{arg}{2}, ' mean DC = ' num2str(means(arg),'%.3f')];
+    legendTags{max_iter+arg} = [varargin{arg}{2}, ' mean DC = ' num2str(means(arg),'%.3f')];
 end
 
 % bar plot and mean DC
 figure;
 bar(categories,new_accuracies');
 hold on;
-for arg=1:nargin-2
+for arg=1:max_iter
     plot(means(arg)*ones(size(categories)));
     hold on;
 end
 hold off;
 ylabel('Dice coefficient')
 legend(legendTags)
-title(varargin{end-1})
+if strcmp(varargin{end},'selection')
+    title(varargin{end-1})
+else
+    title(varargin{end})
+end
 grid on
 grid minor
 

@@ -1,5 +1,6 @@
 function [likelihood, sizeSegmMap] = calculateLikelihood(pathRefImage, pathRegFloImage, pathTempImFolder, sigma)
 
+disp('% computing likelihood')
 
 % read registered floating image
 regFloImage = myMRIread(pathRegFloImage, 0, pathTempImFolder);

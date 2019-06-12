@@ -1,6 +1,6 @@
 function SingleBrainSegmentation(pathRefImage, ...
     pathRefFirstLabels, ...
-    pathResultPrefix, ...
+    pathPrefix, ...
     pathRefLabels, ...
     pathDirTrainingLabels, ...
     pathDirTrainingImages, ...
@@ -60,7 +60,7 @@ if nChannel > 1, multiChannel = 1; else, multiChannel = 0; end
     labelsList, labelClasses, labelsNames] = readParams(params, nChannel, 0);
 
 % display processed test brain
-[refBrainNum, pathTempImFolder] = createTempFolder(pathResultPrefix);
+[refBrainNum, pathTempImFolder, pathResultsPrefix] = createTempFolder(pathPrefix);
 disp(['%%% Processing test ' refBrainNum]);
 
 % build path resulting accuracies
@@ -106,12 +106,12 @@ disp(' '); disp('%% resampling test image to target resolution');
 disp(' '); disp(['%% segmenting ' refBrainNum]);
 [pathSegmentation, pathHippoSegmentation] = labelFusion...
     (pathRefImage, pathDirFloatingImages, pathDirFloatingLabels, brainVoxels, labelFusionParams, updatedLabelsList, updatedLabelsNames, ...
-    pathTempImFolder, pathResultPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug);
+    pathTempImFolder, pathResultsPrefix, refBrainNum, cropping, freeSurferHome, niftyRegHome, debug);
 
 % evaluation
 if evaluate
     disp(' '); disp(['%% evaluating segmentation for test ' refBrainNum]); disp(' ');
-    pathAccuracies = [pathResultPrefix '.regions_accuracies.mat'];
+    pathAccuracies = [pathResultsPrefix '.regions_accuracies.mat'];
     accuracies = computeAccuracy(pathSegmentation, pathHippoSegmentation, pathRefLabels, updatedLabelsList, pathTempImFolder, cropping);
     if ~exist(fileparts(pathAccuracies), 'dir'), mkdir(fileparts(pathAccuracies)); end
     save(pathAccuracies, 'accuracies');
