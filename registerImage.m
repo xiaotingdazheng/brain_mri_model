@@ -13,7 +13,7 @@ pathTransformation = fullfile(registrationSubFolder, [filename '.cpp.nii.gz']); 
 if ~exist(registrationSubFolder, 'dir'), mkdir(registrationSubFolder), end % logOdds folder
 
 % compute first rigid registration
-if ~multiChannel && (~exist(aff, 'file') || recompute)
+if ~exist(aff, 'file') || recompute
     disp(['registering ' floBrainNum ' to ' refBrainNum ' with reg_aladin']);
     pathRegAladin = fullfile(niftyRegHome, 'reg_aladin');
     cmd = [pathRegAladin ' -ref ' pathRefImage ' -flo ' pathFloImage ' -aff ' aff ' -res ' pathRigidRegFloImage ' -ln 3 -lp 2 -pad 0'];
@@ -31,7 +31,7 @@ end
 if ~exist(pathRegFloImage, 'file') || recompute
     disp(['registering ' floBrainNum ' to ' refBrainNum ' with reg_f3d']);
     pathRegF3d = fullfile(niftyRegHome, 'reg_f3d');
-    if cropping || multiChannel
+    if cropping
         cmd = [pathRegF3d ' -ref ' pathRefImage ' -flo ' pathFloImage ' -res ' pathRegFloImage ' -cpp ' pathTransformation ' ' registrationOptions];
     else
         cmd = [pathRegF3d ' -ref ' pathRefImage ' -flo ' pathFloImage ' -res ' pathRegFloImage ' -aff ' aff ' -cpp ' pathTransformation ' ' registrationOptions];

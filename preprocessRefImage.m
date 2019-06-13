@@ -21,7 +21,7 @@ for channel=1:nChannel
     
     % rescale and mask image with zeros using its labels
     pathRefImage{channel} = mask(pathRefImage{channel}, pathRefFirstLabels{channel}, temp_pathPreprocessedRefImFolder, ...
-        rescale, channel*multiChannel, NaN, refBrainNum, pathTempImFolder, recompute, 1);
+        rescale, channel*multiChannel, 0, refBrainNum, pathTempImFolder, recompute, 1);
     
 end
 

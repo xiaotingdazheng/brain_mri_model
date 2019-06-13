@@ -46,7 +46,7 @@ for channel=1:nChannel
         % resample image and labels at target resolution or align them with first channel
         if channel == 1 
             if recompute || ~exist(cellPathsNewImages{i,channel}, 'file') || ~exist(cellPathsNewLabels{i,channel}, 'file')
-                pathTrainingImage = mask(pathTrainingImage, pathTrainingLabels, pathFolderFloImages, rescale, 1, NaN, floBrainNum, pathTempImFolder, 1, 1);
+                pathTrainingImage = mask(pathTrainingImage, pathTrainingLabels, pathFolderFloImages, rescale, 1, 0, floBrainNum, pathTempImFolder, 1, 1);
                 disp(['downsampling training ' floBrainNum ' image to target resolution'])
                 setFreeSurfer(freeSurferHome);
                 cmd1 = ['mri_convert ' pathTrainingImage ' ' cellPathsNewImages{i, channel} ' -voxsize ' voxsize ' -rt cubic -odt float'];
@@ -60,7 +60,7 @@ for channel=1:nChannel
         else
             if recompute || ~exist(cellPathsNewImages{i,channel}, 'file')
                 % rescale and mask images
-                pathTrainingImage = mask(pathTrainingImage, pathTrainingImage, pathFolderFloImages, rescale, channel, NaN, floBrainNum, pathTempImFolder, 1, 1);
+                pathTrainingImage = mask(pathTrainingImage, pathTrainingImage, pathFolderFloImages, rescale, channel, 0, floBrainNum, pathTempImFolder, 1, 1);
                 % align image to channel 1
                 cellPathsNewImages{i,channel} = alignImages...
                     (cellPathsNewImages{i,1}, pathTrainingImage, 1, channel, freeSurferHome, niftyRegHome, recompute, debug);

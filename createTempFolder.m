@@ -1,5 +1,8 @@
 function [refBrainNum, pathTempImFolder, pathResultsPrefix] = createTempFolder(prefix)
 
+% build the name of current test brain, and create 2 folders: results and
+% temp directories.
+
 % build refBrainNum
 [~,refBrainNum,~] = fileparts(prefix);
 

@@ -23,7 +23,7 @@ if targetRes
     if ~exist(pathResampledRefImage, 'file') || recompute
         disp('resampling test image at target resolution')
         cmd = ['mri_convert ' pathRefImage{end} ' ' pathResampledRefImage ' --voxsize ' voxsize ' -odt float'];
-        [~,~] = system(cmd);
+        [~,~] = system(cmd); % changes NaNs to zeros!
     end
     % upsample ref labels
     if evaluate && (~exist(pathResampledRefLabels, 'file') || recompute)
